@@ -1,0 +1,6 @@
+# @install: lix --silent download "haxelib:/haxeui-heaps#1.7.0" into haxeui-heaps/1.7.0/haxelib
+-lib haxeui-core
+-lib heaps
+-cp ${HAXE_LIBCACHE}/haxeui-heaps/1.7.0/haxelib/
+-D haxeui-heaps=1.7.0
+-D haxeui_nofilters

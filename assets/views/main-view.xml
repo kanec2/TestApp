@@ -1,0 +1,84 @@
+<vbox style="padding: 0px;" width="100%" height="100%">
+    <!--
+        Additional Classes:
+            .nk-page-boxed
+    -->
+
+    <!--
+        Additional Classes:
+            .nk-header-opaque
+    -->
+    <vbox styleName="nk-header nk-header-opaque " style="padding: 10px;" width="100%" height="100%">
+        <menubar styleName="upBar" width="100%" style="background-opacity: 0.3; background-color: #303e47; color: #ffffff "> 
+            <image styleName="nk-nav-logo" text="Item 1" />
+            <spacer width="100%" />
+            <menuitem styleName="li" text="FEATURES" style="background-opacity: 0; padding-top:27px; color:white; text-align:center;font-size: 1.07rem;" />
+            <menuitem styleName="li" text="BLOG" style="background-opacity: 0;padding-top:27px; color:white; text-align:center;font-size: 1.07rem;"/>
+            <menuitem styleName="li" text="GALLERY" style="background-opacity: 0;padding-top:27px; color:white; text-align:center;font-size: 1.07rem;"/>
+            <menuitem styleName="li" text="TOURNAMENTS" style="background-opacity: 0;padding-top:27px; color:white;  text-align:center;font-size: 1.07rem;"/>
+            <menuitem styleName="li" text="STORE" style="background-opacity: 0;padding-top:27px; color:white;  text-align:center;font-size: 1.07rem;"/>
+        </menubar>
+
+        <box width="100%" height="50%" style="padding-top:10px;">
+            <box height="100%" width="100%" style="padding:0px; margin:0px; background-color:#000000; background-opacity:0"> 
+                <!--<image resource="assets/images/slide-1.jpg" horizontalAlign="center" height="100%" styleName="nk-image-slider-img"/>-->
+
+                <imageslider width="90%" height="100%" horizontalAlign="center" style="background-image:assets/images/slide-1.jpg; backgroundImageSliceTop: 15; backgroundImageSliceLeft: 15; backgroundImageSliceBottom: 71,; backgroundImageSliceRight: 180;">
+
+                </imageslider>
+            </box>
+        </box>
+        <section-header text="Latest news" style="font-size:1.57rem; color:white" />
+        <hbox style="border: 0px solid $normal-border-color;padding-left:15px;padding-right:15px;" width="100%" height="31%">
+            <listview width="50%" height="100%" styleName="left-menu" selectedIndex="0" onchange="stack1.selectedIndex = this.selectedIndex" style="border:none;">
+                <item-renderer width="100%" layout="horizontal" style="background-color:#000000; border:none;">
+                    <hbox width="100%" style="border:none;">
+                        <image id="lstImg"  width="64px" height="64px" resource="haxeui-core/styles/default/haxeui_small.png" />
+                        <vbox width="100%" height="100%" style="margin-left:18px;">
+                            <label id="lstHeaderText" styleName="h1" width="100%" textAlign="justify" style="color:white; font-size:16px; margin:0; padding:0" text="SMELL MAGIC IN THE AIR. OR MAYBE BARBECUE"/>
+                            <spacer height="2" />
+                            <label id="lstContentText" styleName="p" textAlign="justify" style="color:white; font-size:12px; margin:0; padding:0;" text="With what mingled joy and sorrow do I take up the pen to wr..." />
+                            <spacer height="8" />
+                            <label id="lstDateText" text="Sep 18, 2018" style="color:white; font-size:10px; margin:0; padding:0;" horizontalAlign="left"/>
+                        </vbox>
+                    </hbox>
+                </item-renderer>
+                <data>
+                    <item lstImg="assets/images/post-1.jpg" lstHeaderText="SMELL MAGIC IN THE AIR. OR MAYBE BARBECUE" lstContentText="With what mingled joy and sorrow do I take up the pen to wr.."/>
+                    <item lstImg="assets/images/post-2.jpg" lstHeaderText="SMELL MAGIC IN THE AIR. OR MAYBE BARBECUE" lstContentText="With what mingled joy and sorrow do I take up the pen to wr.."/>
+                    <item lstImg="assets/images/post-3.jpg" lstHeaderText="SMELL MAGIC IN THE AIR. OR MAYBE BARBECUE" lstContentText="With what mingled joy and sorrow do I take up the pen to wr.."/>
+                    <item lstImg="assets/images/post-4.jpg" lstHeaderText="SMELL MAGIC IN THE AIR. OR MAYBE BARBECUE" lstContentText="With what mingled joy and sorrow do I take up the pen to wr.."/>
+                    <item lstImg="assets/images/post-5.jpg" lstHeaderText="SMELL MAGIC IN THE AIR. OR MAYBE BARBECUE" lstContentText="With what mingled joy and sorrow do I take up the pen to wr.."/>
+                </data>
+            </listview>
+            <hbox width="50%" height="100%">
+                <stack id="stack1" width="100%" height="100%">
+
+                    <vbox style="background-color:black" width="100%" height="100%">
+                        <scrollview width="100%" height="100%">
+                            <vbox>
+
+                            <image resource="assets/images/post-1.jpg" width="100%" height="100%" />
+                            <label id="lstHeaderText" styleName="h1" width="100%" textAlign="justify" style="color:white; font-size:16px; margin:0; padding:0" text="SMELL MAGIC IN THE AIR. OR MAYBE BARBECUE"/>
+                            <spacer height="2" />
+                            <label id="lstContentText" styleName="p" textAlign="justify" style="color:white; font-size:12px; margin:0; padding:0;" text="With what mingled joy and sorrow do I take up the pen to wr..." />
+                            <spacer height="8" />
+                            <label id="lstDateText" text="Sep 18, 2018" style="color:white; font-size:10px; margin:0; padding:0;" horizontalAlign="left"/>
+                        </vbox>
+                                                </scrollview>
+                    </vbox>
+                    <box style="background-color:black" width="100%" height="100%"><label text="Content 1B" verticalAlign="center" horizontalAlign="center" /></box>
+                    <box style="background-color:black" width="100%" height="100%"><label text="Content 1C" verticalAlign="center" horizontalAlign="center" /></box>
+                </stack>
+            </hbox>
+        </hbox>
+        <spacer height="5%" />
+        <hbox width="100%" height="8%">
+            <vbox width="80%">
+                <label width="100%" textAlign="justify" style="color:white; font-size:12px; margin:0; padding:0;" text="Loading textures.." />
+                <progress horizontalAlign="left" verticalAlign="center" width="60%" pos="30" text="12" />
+            </vbox>
+            <button styleName="btn-success" horizontalAlign="center" width="15%" height="100%" text="Update" textAlign="center" style="font-size:1.02rem; padding-left:10px; margin-left:10px;" />
+        </hbox>
+    </vbox>
+</vbox>

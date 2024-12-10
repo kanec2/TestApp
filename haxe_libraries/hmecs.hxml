@@ -1,0 +1,3 @@
+# @install: lix --silent download "gh://github.com/onehundredfeet/hmecs#f26892deb3c97533a586fe229b5582cb6ef0f544" into hmecs/0.3.0/github/f26892deb3c97533a586fe229b5582cb6ef0f544
+-cp ${HAXE_LIBCACHE}/hmecs/0.3.0/github/f26892deb3c97533a586fe229b5582cb6ef0f544/src/
+-D hmecs=0.3.0
