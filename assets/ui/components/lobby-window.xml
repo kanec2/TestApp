@@ -1,4 +1,4 @@
-<box style="padding: 0px;" width="40%" height="100%">
+<box style="padding: 0px;" width="40%" height="100%" layout="vertical">
     <label text="GAME LOBBY" />
     <hbox>
         <vbox>
