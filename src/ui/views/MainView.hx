@@ -1,8 +1,8 @@
-package views;
+package ui.views;
 
 import haxe.ui.containers.VBox;
 
-@:build(haxe.ui.ComponentBuilder.build("assets/views/main-view.xml"))
+@:build(haxe.ui.ComponentBuilder.build("assets/ui/views/main-view.xml"))
 class MainView extends VBox {
     public function new() {
         super();

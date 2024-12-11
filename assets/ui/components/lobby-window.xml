@@ -1,0 +1,37 @@
+<box style="padding: 0px;" width="40%" height="100%">
+    <label text="GAME LOBBY" />
+    <hbox>
+        <vbox>
+            <label id="otherField" horizontalAlign="right" style="color:#009F42;font-size:10px;padding-right: 2px;" />
+            <vbox verticalAlign="center" horizontalAlign="center">
+                <label id="title" style="color: #009F42;font-size:20px;" horizontalAlign="center" text="Foo"/>
+                <label id="subTitle" style="color: #009F42;" horizontalAlign="center" text="Foo item description"/>
+            </vbox>
+        </vbox>
+        <vbox>
+            <listview id="lv1" width="450" height="200" style="background-color: #009F42;border:0px solid #009F42;background-opacity: .0;">
+                <my-list-view-item-renderer style="background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+                <data>
+                    <item username="ianharrigan" firstName="Ian" lastName="Harrigan" active="true" />
+                    <item username="bbarker" firstName="Bob" lastName="Barker" active="false" />
+                    <item username="timmyt" firstName="Tim" lastName="Tiny" active="true" />
+                    <item username="blue_b" firstName="Bobby" lastName="Blues" active="false" />
+                    <item username="jjonas" firstName="Jimmy" lastName="Jonas" active="false" />
+                    <item username="foo_bar" firstName="Fooby" lastName="Barby" active="true" />
+                </data>
+            </listview>
+            <vbox>
+                <label text="TEXT CHAT" horizontalAlign="center"/>
+                <hbox>
+                    <label htmlText="you:" style="color:#B41C2B;"/> <label text="LF orc/elf for some practice not_you: inv me pls hggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggj \n " style="color:#B41C2B;" />
+                </hbox>
+                
+                <hbox>
+                    <textfield placeholder="ENTER TEXT" width="80%"/>
+                    <button text="SEND" width="20%"/>
+                </hbox>
+            </vbox>
+        </vbox>
+    </hbox>
+    
+</box>

@@ -1,4 +1,5 @@
-import views.MainView;
+import ui.views.MainView;
+import ui.views.MenuVIew;
 import haxe.ui.HaxeUIApp;
 import systems.Render3D;
 import ecs.Workflow;
@@ -11,7 +12,7 @@ class Main{
         app.ready(function() {
             HaxeUIApp.instance.icon = "assets/images/favicon.png";
             HaxeUIApp.instance.title = "GoodGames | Community and Store HTML Game Template";
-            app.addComponent(new MainView());
+            app.addComponent(new MenuView());
 
             app.start();
         });

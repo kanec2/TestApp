@@ -1,0 +1,12 @@
+<box style="padding: 0px;" width="100%" height="100%">
+    <vbox layout="vertical" verticalAlign = "center" horizontalAlign="center">
+        <button text="Start" />
+        <button text="Settings" />
+        <button text="Profile" />
+        <button id="actionNotificationCallbackButton" text="Show lobby invite" />
+    </vbox>
+    <vbox id="contentHold"/>
+</box>
+
+
+ 

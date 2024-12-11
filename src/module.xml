@@ -1,0 +1,11 @@
+<module>
+    <resources>
+        <resource path="assets" prefix="assets" />
+    </resources>
+    <components>
+        <class package="." />
+        <class package="ui" />
+        <class package="components" />
+        <class package="ui.components" />
+    </components>
+</module>
