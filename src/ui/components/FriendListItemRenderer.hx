@@ -1,5 +1,6 @@
 package ui.components;
 
+import haxe.ui.components.Image;
 import haxe.ui.util.Color;
 import haxe.ui.core.ItemRenderer;
 
@@ -23,10 +24,12 @@ class FriendListItemRenderer extends ItemRenderer {
 
         //var fullName = data.firstName + " " + data.lastName + " (" + data.username + ")";
         nickName.text = data.nickName;
-        var profile = data.profileImg;
-        if (profile == null)
-            profile = "assets/images/profile_placeholder.png";
-        profileImage.resource = profile;
+        
+        //var profile = data.profileImage;
+        if (data.image == null)
+            profileImage.resource = "assets/images/profile_placeholder.png";
+        else 
+            profileImage.resource = data.image; //data.profileImageUrl;
         if (data.active == "true") { // TODO: need to autoconvert basic types (this used to work!)
             statusLabel.text = "online";
             statusLabel.backgroundColor = Color.fromString("green");

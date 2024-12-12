@@ -1,5 +1,7 @@
 package ui.views;
 
+import ui.models.FriendModel;
+import hx.concurrent.collection.SynchronizedArray;
 import ui.components.LobbyWindow;
 import haxe.ui.notifications.NotificationData.NotificationActionData;
 import haxe.ui.events.MouseEvent;
@@ -14,13 +16,26 @@ class MenuView extends Box {
         joinLobby("fddsfsd3223");
     }
    
-
+    var getFriendsCommand:(userId:String) -> Void;
+    var friendsDataSource:Array<FriendModel> = new Array<FriendModel>();
     @:bind(NotificationManager.instance, NotificationEvent.ACTION)
     private function onNotificationManagerAction(event:NotificationEvent) {
         var actionData = event.data;//.actionData;
         //trace(event.value);
         //trace("You chose " + actionData.text + "!");
         //actionNotificationEventLabel.text = "You chose " + actionData.text + "!";
+    }
+
+    public function init(getFriendList:(userId:String) -> Void) {
+        getFriendsCommand = getFriendList;
+    }
+
+    public function setFriends(friends:SynchronizedArray<FriendModel>){
+        trace("we have new friends");
+        var arr:Array<FriendModel> = new Array<FriendModel>();
+        for (friend in friends)
+            arr.push(friend);
+        friendList.dataSource.data = arr;
     }
 
     @:bind(actionNotificationCallbackButton, MouseEvent.CLICK)
@@ -45,6 +60,7 @@ class MenuView extends Box {
         var lobbyId = "YUFhkw3423";
         if(decision == "Accept")
             joinLobby(lobbyId);
+        else getFriendsCommand("dsads");
         trace("You chose " + actionData.text + "!");
         //actionNotificationCallbackLabel.text = "You chose " + actionData.text + "!";
         return true; // return value indicates if the notification should close or not
