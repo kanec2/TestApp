@@ -1,4 +1,17 @@
 <box style="padding: 0px;" width="100%" height="100%">
+    <vbox width="40%" verticalAlign = "center" horizontalAlign="left">
+        <listview width="100%" id="friendList" selectedIndex="0">
+            <friend-list-item-renderer id="friendList" style="background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+            <data>
+                <item nickName="ianharrigan" profileImg="https://placehold.co/32x32/png"    active="true" />
+                <item nickName="bbarker"         active="false" />
+                <item nickName="timmyt"          active="true" />
+                <item nickName="blue_b"                         active="false" />
+                <item nickName="jjonas"                         active="false" />
+                <item nickName="foo_bar"                        active="true" />
+            </data>
+        </listview>
+    </vbox>
     <vbox layout="vertical" verticalAlign = "center" horizontalAlign="center">
         <button text="Start" />
         <button text="Settings" />

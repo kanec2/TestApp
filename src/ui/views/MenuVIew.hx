@@ -11,6 +11,7 @@ import haxe.ui.containers.Box;
 class MenuView extends Box {
     public function new() {
         super();
+        joinLobby("fddsfsd3223");
     }
    
 
