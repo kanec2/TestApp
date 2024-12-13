@@ -1,0 +1,6 @@
+# @install: lix --silent download "gh://github.com/core-haxe/http#cf6527c7c1eb3c2b34df50f309ccf301e3f118de" into http/0.0.0/github/cf6527c7c1eb3c2b34df50f309ccf301e3f118de
+-lib logging
+-lib promises
+-lib queues-core
+-cp ${HAXE_LIBCACHE}/http/0.0.0/github/cf6527c7c1eb3c2b34df50f309ccf301e3f118de/src
+-D http=0.0.0

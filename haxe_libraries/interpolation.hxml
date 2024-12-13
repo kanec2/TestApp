@@ -1,0 +1,3 @@
+# @install: lix --silent download "haxelib:/interpolation#0.9.1" into interpolation/0.9.1/haxelib
+-cp ${HAXE_LIBCACHE}/interpolation/0.9.1/haxelib/
+-D interpolation=0.9.1

@@ -1,0 +1,7 @@
+# @install: lix --silent download "gh://github.com/core-haxe/queues-core#42c64bae87940015e4d233c74f22d9876752672e" into queues-core/0.0.0/github/42c64bae87940015e4d233c74f22d9876752672e
+-lib promises
+-cp ${HAXE_LIBCACHE}/queues-core/0.0.0/github/42c64bae87940015e4d233c74f22d9876752672e/src
+-D queues-core=0.0.0
+--macro queues.macros.QueueTypes.register("simple-queue", "queues.SimpleQueue")
+--macro queues.macros.QueueTypes.register("non-queue", "queues.NonQueue")
+

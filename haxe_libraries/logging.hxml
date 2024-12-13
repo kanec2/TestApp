@@ -1,0 +1,4 @@
+# @install: lix --silent download "haxelib:/logging#0.1.7" into logging/0.1.7/haxelib
+-lib interpolation
+-cp ${HAXE_LIBCACHE}/logging/0.1.7/haxelib/
+-D logging=0.1.7
