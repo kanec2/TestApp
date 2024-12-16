@@ -6,7 +6,10 @@
 -lib hlsdl
 -lib haxeui-heaps
 -lib haxe-concurrent
+-lib haxe-files
 -lib http
+-lib json2object
+
 -D concurrent
 -D resourcesPath=assets
 -D windowFixed

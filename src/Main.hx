@@ -1,3 +1,17 @@
+import haxe.ui.loaders.image.HttpImageLoader;
+import haxe.ui.Toolkit;
+import ui.models.FriendsModelRoot;
+import hx.files.File.FileWriteMode;
+import hl.uv.Fs;
+import hl.Api;
+import hx.files.Dir;
+import hx.files.Path;
+import hx.concurrent.ConcurrentException;
+import haxe.Exception;
+import haxe.ds.Either;
+import haxe.Json;
+import haxe.Http;
+import hx.concurrent.event.AsyncEventDispatcher;
 import http.HttpResponse;
 import promises.Promise;
 import http.HttpError;
@@ -20,16 +34,91 @@ import components.ResourceComponent;
 import components.*;
 import ecs.Entity;
 
+typedef AppEventBase = {
+    event:String, 
+    data:Dynamic
+}
+
 class Main{
     static var friends:SynchronizedArray<FriendModel>;
     var menuView:MenuView;
-    var getFriendsExecutor:Executor;
-    var usersGetUrl = "http://localhost:5017/arnest/api/get-running-machine-checks-devices";//"http://jsonplaceholder.typicode.com/users";
+    //var getFriendsExecutor:Executor;
+    //var usersGetUrl = "http://localhost:5017/arnest/api/get-running-machine-checks-devices";
+    var usersGetUrl = "http://jsonplaceholder.typicode.com/users";
+    var appInitEvent:AppEventBase;
+    var friendsLoadedEvent:AppEventBase;
+    var executor:Executor;
+    var appInited:Bool = false;
+    var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
+    var cacheFolder:Dir;
+    var appFolder:Dir;
     public function new() {
-        trace("Start ecs things");
-        
+
         friends = new SynchronizedArray<FriendModel>();
+        executor = Executor.create(5);
+        asyncDispatcher = new AsyncEventDispatcher<AppEventBase>(executor);
+        asyncDispatcher.subscribe(onFriendsLoaded);
+        asyncDispatcher.subscribe(onAppInited);
+
+        checkFiles();
+        fetchData();
+        //initApp();
+        //fetchLocalStorage();
+        /*
         
+        
+        fetchData();
+        initECS();
+        */
+        
+    }
+
+    function checkFiles(){
+        var applicationDirectory = Sys.programPath();
+        
+        var appPath = Path.of(applicationDirectory);
+        appFolder = appPath.parent.toDir();
+
+        var cachePath = appPath.parent.join("cache");
+        if(!cachePath.exists()) cachePath.toDir().create();
+        cacheFolder = cachePath.toDir();
+
+        var friendCache = cachePath.join("friends.json");
+        if (!friendCache.exists()) friendCache.toFile().touch();
+    }
+
+    function onFriendsLoaded(event:AppEventBase){
+        if(event.event != "FriendsLoaded") return;
+        if(!appInited) return;
+        menuView.setFriends(friends);
+    }
+
+    function onAppInited(event:AppEventBase){
+        if(event.event != "AppInited") return;
+        appInited = true;
+        if(friends != null) menuView.setFriends(friends);
+    }
+
+    function initApp(){
+        var app = new HaxeUIApp();
+
+        app.ready(function() {
+            menuView = new MenuView();
+            menuView.init(getFriendList);//,getFriendList);
+            HaxeUIApp.instance.icon = "assets/images/favicon.png";
+            HaxeUIApp.instance.title = "GoodGames | Community and Store HTML Game Template";
+            app.addComponent(menuView);
+            var ev:AppEventBase = {
+                event: "AppInited",
+                data: null
+            }
+            asyncDispatcher.fire(ev);
+            app.start();
+        });
+    }
+
+    function initECS(){
+        trace("Start ecs things");
         Workflow.addSystem(new Render3D());
         Workflow.addSystem(new systems.UISystem());
         Workflow.addSystem(new systems.ResourceProduce());
@@ -42,18 +131,139 @@ class Main{
         resources.add(new ResourceComponent("STONE",100));
         player.add(new PlayerComponent(player,resources));
         trace("End ecs things");
-        var app = new HaxeUIApp();
-
-        app.ready(function() {
-            menuView = new MenuView();
-            menuView.init(getFriendList);//,getFriendList);
-            HaxeUIApp.instance.icon = "assets/images/favicon.png";
-            HaxeUIApp.instance.title = "GoodGames | Community and Store HTML Game Template";
-            app.addComponent(menuView);
-
-            app.start();
-        });
     }
+
+    function fetchData(){
+        var apiCallTask = () -> {
+            trace("Start api call");
+            var result = Http.requestUrl(usersGetUrl);
+            trace(result);
+            return result;
+        }
+        var storageCallTask = () ->{
+            trace("Start local read");
+            var friendCache = cacheFolder.path.join("friends.json").toFile();
+            var inputStream = friendCache.openInput(true);
+    
+            var rawData = inputStream.readAll();
+            var rawJson = rawData.toString();
+            trace(rawJson);
+            var json:api.models.JsonModels.RootFriendsData = Json.parse(rawJson);
+            return json;
+        }
+        trace("Submit storage call task");
+        var storageCallPromise = executor.submit(storageCallTask);
+        trace("Submit api call task");
+        var apiCallPromise = executor.submit(apiCallTask);
+        trace("Set storage completion");
+        storageCallPromise.onCompletion(result->{
+            trace("start read local");
+            var result:api.models.JsonModels.RootFriendsData = switch (result){
+                case VALUE(value, time, _): value;
+                case FAILURE(ex, time, _): null;
+                case PENDING(_): null;
+                default: null;
+            };
+            if(result != null && result.friends != null)
+                for (rawFriend in result.friends) {
+                    friends.add(new FriendModel(rawFriend.nickName,rawFriend.profileImageUrl,rawFriend.id,rawFriend.profileImageLocalUrl));
+                }
+            var ev:AppEventBase = {
+                event: "FriendsLoaded",
+                data: null
+            };
+            asyncDispatcher.fire(ev);
+        });
+        
+        var transformJsonToFriendsTask = function ():Bool {
+            apiCallPromise.awaitCompletion(-1);
+            storageCallPromise.awaitCompletion(-1);
+            trace("start transform");
+
+            var apiResult:Dynamic = switch (apiCallPromise.result){
+                case VALUE(value, time, _): value;
+                case FAILURE(ex, time, _): null;
+                case PENDING(_): null;
+                default: null;
+            }
+            if(apiResult == null) trace("No api data");//return false;
+            
+            var storageResult:Dynamic = switch (storageCallPromise.result){
+                case VALUE(value, time, _): value;
+                case FAILURE(ex, time, _): null;
+                case PENDING(_): null;
+                default: null;
+            }
+            if(storageResult == null) trace("No storage data");//return false;
+            
+            var mockFriendsJson:api.models.JsonModels.RootFriendsData = Mock.getMockJsonFriends();
+
+            //friendCache.openOutput(FileWriteMode.APPEND)
+            
+            for (rawFriend in mockFriendsJson.friends) {
+                var isFriendAlreadyExist = false;
+                var i = 0;
+                for (friend in friends) {
+                    i++;
+                    if(friend.id != rawFriend.id) continue;
+                    isFriendAlreadyExist = true;
+                    break;
+                }
+                if(!isFriendAlreadyExist){
+                    friends.add(new FriendModel(rawFriend.nickName,rawFriend.profileImageUrl,rawFriend.id,rawFriend.profileImageLocalUrl));
+                }
+            }
+            var ev:AppEventBase = {
+                event: "FriendsLoaded",
+                data: null
+            };
+            asyncDispatcher.fire(ev);
+            return true;
+        };
+        trace("Submit transform task");
+        var transformJsonPromise = executor.submit(transformJsonToFriendsTask);
+        trace("Set transform completion");
+        transformJsonPromise.onCompletion(_->{
+            trace("start loading images");
+            
+            for(friend in friends){
+                var url = "";
+                if(friend.profileImageLocalUrl != null && friend.profileImageLocalUrl != "") url = friend.profileImageLocalUrl;
+                else if (friend.profileImageUrl != null && friend.profileImageUrl != "") url = friend.profileImageUrl;
+                else continue;
+                trace("selected url: "+url);
+                var task = createLoadImageTask(url);
+                var future = executor.submit(task);
+                var idx = friends.indexOf(friend);
+                future.onCompletion(result->{
+                    switch(result) {
+                        case VALUE(value, time, _): {
+                            trace(value.toImageData());
+                            trace('Successfully execution at ${Date.fromTime(time)} with result: $value');
+                            friends[idx].image = value.toImageData();
+                            menuView.setFriends(friends);
+                        }
+                        case FAILURE(ex, time, _):  trace('Execution failed at ${Date.fromTime(time)} with exception: $ex');
+                        case PENDING(_):      trace("Nothing is happening");
+                        
+                    }
+                });
+            }
+            var friendModelRoot = new FriendsModelRoot();
+            friendModelRoot.fromSyncArray(friends);
+            var friendCache = cacheFolder.path.join("friends.json").toFile();
+            var writer = new json2object.JsonWriter<FriendsModelRoot>();
+            var friendsArrayJson = writer.write(friendModelRoot);
+            friendCache.writeString(friendsArrayJson);
+
+            //var output = friendCache.openOutput(FileWriteMode.REPLACE);
+            //output.writeBytes(friendsArrayJson)
+            
+        });
+        transformJsonPromise.awaitCompletion(-1);
+        
+    }
+
     function gg():Void {
         var unused:hx.concurrent.Future.FutureCompletionListener<Void> = null;
         /*
@@ -67,34 +277,23 @@ class Main{
            
            
         };*/
-        friends = friends.map((friend:FriendModel)->{
-        try{
-            trace(friend.profileImageUrl);
-            if(friend.profileImageUrl != null){
-            ImageLoader.instance.load(friend.profileImageUrl,(inf:ImageInfo)->{
-            trace(inf);
-            if(inf != null && inf.data != null){
-                friend.image = inf.data;
-                //friends[idx].image = inf.data;
-                //menuView.setFriends(friends);
-                
-            }
-        });
+        
     }
-        }
-        return friend;
-    });
-    menuView.setFriends(friends);
-     }
+
 
     function createLoadImageTask(url:String):Void->Variant{
         return ()->{
+            trace("Well im here");
             var imgData:Variant = null;
             var compl:Bool = false;
-            ImageLoader.instance.load(url,(inf:ImageInfo)->{
+            var httpImgLoader:HttpImageLoader = new HttpImageLoader();
+            trace("so what");
+            httpImgLoader.load(url,(inf:ImageInfo)->{
+                trace("and here");
                 if(inf != null && inf.data != null) { trace(inf.data); imgData = inf.data;}
                 trace("agagaga: "+imgData);
                 compl = true;
+                //return imgData;
             });
             while(!compl) Sys.sleep(0.1);
             return imgData;
@@ -145,7 +344,7 @@ class Main{
         return newfriends;*/
     }
 
-    
+    /*
     function getFriendList(userId:String){
         var unused:hx.concurrent.Future.FutureCompletionListener<Void> = null;
         
@@ -187,10 +386,14 @@ class Main{
             }
             menuView.setFriends(users);
         });
+    }*/
+    function getFriendList(userId:String) {
+        
     }
 
 
     public static function main(){
         new Main();
     }
+
 }
