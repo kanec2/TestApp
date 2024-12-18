@@ -1,0 +1,529 @@
+digraph graphname {
+	node [shape=plaintext];
+n151253[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151253) BKConditional</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151252[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151252) BKConditional</td></tr>
+	<tr><td port="e0" align="left">url = friend.profileImageUrl</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151251[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151251) BKNormal</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151250[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151250) BKConditional</td></tr>
+	<tr><td port="e0" align="left">tmp = false</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151249[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151249) BKConditional</td></tr>
+	<tr><td port="e0" align="left">tmp = friend.profileImageUrl != \"\"</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151248[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151248) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var tmp</td></tr>
+	<tr><td port="e1" align="left">var tmp = friend.profileImageUrl != null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151247[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151247) BKConditional</td></tr>
+	<tr><td port="e0" align="left">url = friend.profileImageLocalUrl</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151246[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151246) BKNormal</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151245[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151245) BKConditional</td></tr>
+	<tr><td port="e0" align="left">tmp = false</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151244[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151244) BKConditional</td></tr>
+	<tr><td port="e0" align="left">tmp = friend.profileImageLocalUrl != \"\"</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151243[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151243) BKNormal</td></tr>
+	<tr><td port="e0" align="left">transformJsonPromise.onCompletion(\"fun\"(151229))</td></tr>
+	<tr><td port="e1" align="left">var tmp</td></tr>
+	<tr><td port="e2" align="left">var tmp = friend.profileImageLocalUrl != null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151242[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151242) BKNormal</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151241[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151241) BKNormal</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151240[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151240) BKNormal</td></tr>
+	<tr><td port="e0" align="left">haxe.Log.trace(\"r url: \", {fileName : \"src/Main.hx\", lineNumber : 253, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151239[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151239) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var `this = `this.imageCachePath</td></tr>
+	<tr><td port="e1" align="left">var this = `this.imageCacheMapping</td></tr>
+	<tr><td port="e2" align="left">var value = cast this.get(key)</td></tr>
+	<tr><td port="e3" align="left">var value = hx.strings.internal._Either2._Either2.a(value)</td></tr>
+	<tr><td port="e4" align="left">var this</td></tr>
+	<tr><td port="e5" align="left">this = value</td></tr>
+	<tr><td port="e6" align="left">var tmp = cast this</td></tr>
+	<tr><td port="e7" align="left">friend.profileImageLocalUrl = `this.join(@:implicitCast tmp, null).getAbsolutePath()</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151238[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151238) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var friend = friend.next()</td></tr>
+	<tr><td port="e1" align="left">var url = \"\"</td></tr>
+	<tr><td port="e2" align="left">var key = friend.id</td></tr>
+	<tr><td port="e3" align="left">var this = `this.imageCacheMapping</td></tr>
+	<tr><td port="e4" align="left">var tmp = cast this.exists(key)</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151237[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151237) BKConditional</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151236[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151236) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var tmp = ! ((friend.hasNext()))</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151235[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151235) BKLoopHead</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151234[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151234) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var friend = _this._sync.execute(\"fun\"(151232), null)</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151233[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151233) BKFunctionEnd</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151232[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151232) BKFunctionBegin</td></tr>
+	<tr><td port="e0" align="left">var _this = _gthis._items</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151231[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151231) BKSub</td></tr>
+	<tr><td port="e0" align="left">var _this = cast Main.friends</td></tr>
+	<tr><td port="e1" align="left">var _gthis = _this</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151230[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151230) BKFunctionEnd</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151229[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151229) BKFunctionBegin</td></tr>
+	<tr><td port="e0" align="left">haxe.Log.trace(\"start loading images\", {fileName : \"src/Main.hx\", lineNumber : 246, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="e1" align="left">var promises = new Array()</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151228[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151228) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var transformJsonToFriendsTask = \"fun\"(151191)</td></tr>
+	<tr><td port="e1" align="left">haxe.Log.trace(\"Submit transform task\", {fileName : \"src/Main.hx\", lineNumber : 242, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="e2" align="left">var transformJsonPromise = this.executor</td></tr>
+	<tr><td port="e3" align="left">var value = hx.concurrent.internal._Either2._Either2.a(transformJsonToFriendsTask)</td></tr>
+	<tr><td port="e4" align="left">var this</td></tr>
+	<tr><td port="e5" align="left">this = value</td></tr>
+	<tr><td port="e6" align="left">var transformJsonPromise = cast this</td></tr>
+	<tr><td port="e7" align="left">var transformJsonPromise = transformJsonPromise.submit(@:implicitCast transformJsonPromise, null)</td></tr>
+	<tr><td port="e8" align="left">haxe.Log.trace(\"Set transform completion\", {fileName : \"src/Main.hx\", lineNumber : 244, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151227[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151227) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var ev = {event : \"FriendsLoaded\", data : null}</td></tr>
+	<tr><td port="e1" align="left">`this.asyncDispatcher.fire(ev)</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151226[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151226) BKNormal</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151225[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151225) BKNormal</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151224[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151224) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var transformJsonToFriendsTask = cast Main.friends</td></tr>
+	<tr><td port="e1" align="left">transformJsonToFriendsTask.add(new ui.models.FriendModel(rawFriend.nickName, rawFriend.profileImageUrl, rawFriend.id, rawFriend.profileImageLocalUrl))</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151223[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151223) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var transformJsonToFriendsTask = ! isFriendAlreadyExist</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151222[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151222) BKNormal</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151221[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151221) BKNormal</td></tr>
+	<tr><td port="e0" align="left">isFriendAlreadyExist = true</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151220[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151220) BKConditional</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151219[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151219) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var transformJsonToFriendsTask = friend.id != rawFriend.id</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151218[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151218) BKSub</td></tr>
+	<tr><td port="e0" align="left">i = i + 1</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151217[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151217) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var friend = friend.next()</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151216[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151216) BKConditional</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151215[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151215) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var transformJsonToFriendsTask = ! ((friend.hasNext()))</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151214[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151214) BKLoopHead</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151213[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151213) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var friend = _this._sync.execute(\"fun\"(151211), null)</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151212[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151212) BKFunctionEnd</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151211[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151211) BKFunctionBegin</td></tr>
+	<tr><td port="e0" align="left">var _this = _gthis._items</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151210[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151210) BKSub</td></tr>
+	<tr><td port="e0" align="left">var _this = cast Main.friends</td></tr>
+	<tr><td port="e1" align="left">var _gthis = _this</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151209[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151209) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var rawFriend = `[`]</td></tr>
+	<tr><td port="e1" align="left">` = ` + 1</td></tr>
+	<tr><td port="e2" align="left">var isFriendAlreadyExist = false</td></tr>
+	<tr><td port="e3" align="left">var i = 0</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151208[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151208) BKConditional</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151207[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151207) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var transformJsonToFriendsTask = ! ((` &lt; `.length))</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151206[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151206) BKLoopHead</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151205[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151205) BKSub</td></tr>
+	<tr><td port="e0" align="left">var ` = 0</td></tr>
+	<tr><td port="e1" align="left">var ` = mockFriendsJson.friends</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151204[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151204) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var mockFriendsJson = Mock.getMockJsonFriends()</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151203[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151203) BKConditional</td></tr>
+	<tr><td port="e0" align="left">haxe.Log.trace(\"No storage data\", {fileName : \"src/Main.hx\", lineNumber : 216, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151202[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151202) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var transformJsonToFriendsTask = storageResult == null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151201[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151201) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = `[0]</td></tr>
+	<tr><td port="e1" align="left">storageResult = null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151200[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151200) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = `[0]</td></tr>
+	<tr><td port="e1" align="left">var ` = `[1]</td></tr>
+	<tr><td port="e2" align="left">var ` = `[2]</td></tr>
+	<tr><td port="e3" align="left">var ex = `</td></tr>
+	<tr><td port="e4" align="left">var time = `</td></tr>
+	<tr><td port="e5" align="left">storageResult = null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151199[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151199) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = `[0]</td></tr>
+	<tr><td port="e1" align="left">var ` = `[1]</td></tr>
+	<tr><td port="e2" align="left">var ` = `[2]</td></tr>
+	<tr><td port="e3" align="left">var value = `</td></tr>
+	<tr><td port="e4" align="left">var time = `</td></tr>
+	<tr><td port="e5" align="left">storageResult = value</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151198[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151198) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var storageResult</td></tr>
+	<tr><td port="e1" align="left">var ` = storageCallPromise.result</td></tr>
+	<tr><td port="e2" align="left">var storageResult = @:exhaustive enumIndex `</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151197[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151197) BKConditional</td></tr>
+	<tr><td port="e0" align="left">haxe.Log.trace(\"No api data\", {fileName : \"src/Main.hx\", lineNumber : 208, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151196[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151196) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var transformJsonToFriendsTask = apiResult == null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151195[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151195) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = `[0]</td></tr>
+	<tr><td port="e1" align="left">apiResult = null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151194[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151194) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = `[0]</td></tr>
+	<tr><td port="e1" align="left">var ` = `[1]</td></tr>
+	<tr><td port="e2" align="left">var ` = `[2]</td></tr>
+	<tr><td port="e3" align="left">var ex = `</td></tr>
+	<tr><td port="e4" align="left">var time = `</td></tr>
+	<tr><td port="e5" align="left">apiResult = null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151193[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151193) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = `[0]</td></tr>
+	<tr><td port="e1" align="left">var ` = `[1]</td></tr>
+	<tr><td port="e2" align="left">var ` = `[2]</td></tr>
+	<tr><td port="e3" align="left">var value = `</td></tr>
+	<tr><td port="e4" align="left">var time = `</td></tr>
+	<tr><td port="e5" align="left">apiResult = value</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151192[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151192) BKFunctionEnd</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151191[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151191) BKFunctionBegin</td></tr>
+	<tr><td port="e0" align="left">apiCallPromise.awaitCompletion(-1)</td></tr>
+	<tr><td port="e1" align="left">storageCallPromise.awaitCompletion(-1)</td></tr>
+	<tr><td port="e2" align="left">haxe.Log.trace(\"start transform\", {fileName : \"src/Main.hx\", lineNumber : 200, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="e3" align="left">var apiResult</td></tr>
+	<tr><td port="e4" align="left">var ` = apiCallPromise.result</td></tr>
+	<tr><td port="e5" align="left">var apiResult = @:exhaustive enumIndex `</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151190[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151190) BKNormal</td></tr>
+	<tr><td port="e0" align="left">storageCallPromise.onCompletion(\"fun\"(151174))</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151189[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151189) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var ev = {event : \"FriendsLoaded\", data : null}</td></tr>
+	<tr><td port="e1" align="left">`this.asyncDispatcher.fire(ev)</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151188[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151188) BKNormal</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151187[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151187) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var rawFriend = `[`]</td></tr>
+	<tr><td port="e1" align="left">` = ` + 1</td></tr>
+	<tr><td port="e2" align="left">var tmp = cast Main.friends</td></tr>
+	<tr><td port="e3" align="left">tmp.add(new ui.models.FriendModel(rawFriend.nickName, rawFriend.profileImageUrl, rawFriend.id, rawFriend.profileImageLocalUrl))</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151186[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151186) BKConditional</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151185[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151185) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var tmp = ! ((` &lt; `.length))</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151184[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151184) BKLoopHead</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151183[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151183) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = 0</td></tr>
+	<tr><td port="e1" align="left">var ` = result.friends</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151182[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151182) BKNormal</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151181[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151181) BKConditional</td></tr>
+	<tr><td port="e0" align="left">tmp = false</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151180[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151180) BKConditional</td></tr>
+	<tr><td port="e0" align="left">tmp = result.friends != null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151179[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151179) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var tmp</td></tr>
+	<tr><td port="e1" align="left">var tmp = result != null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151178[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151178) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = result[0]</td></tr>
+	<tr><td port="e1" align="left">result = null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151177[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151177) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = result[0]</td></tr>
+	<tr><td port="e1" align="left">var ` = result[1]</td></tr>
+	<tr><td port="e2" align="left">var ` = result[2]</td></tr>
+	<tr><td port="e3" align="left">var ex = `</td></tr>
+	<tr><td port="e4" align="left">var time = `</td></tr>
+	<tr><td port="e5" align="left">result = null</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151176[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151176) BKConditional</td></tr>
+	<tr><td port="e0" align="left">var ` = result[0]</td></tr>
+	<tr><td port="e1" align="left">var ` = result[1]</td></tr>
+	<tr><td port="e2" align="left">var ` = result[2]</td></tr>
+	<tr><td port="e3" align="left">var value = `</td></tr>
+	<tr><td port="e4" align="left">var time = `</td></tr>
+	<tr><td port="e5" align="left">result = value</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151175[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151175) BKFunctionEnd</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151174[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151174) BKFunctionBegin</td></tr>
+	<tr><td port="e0" align="left">haxe.Log.trace(\"start read local\", {fileName : \"src/Main.hx\", lineNumber : 179, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="e1" align="left">var result</td></tr>
+	<tr><td port="e2" align="left">var result = @:exhaustive enumIndex result</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151173[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151173) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var storageCallTask = \"fun\"(151171)</td></tr>
+	<tr><td port="e1" align="left">haxe.Log.trace(\"Submit storage call task\", {fileName : \"src/Main.hx\", lineNumber : 173, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="e2" align="left">var storageCallPromise = this.executor</td></tr>
+	<tr><td port="e3" align="left">var value = hx.concurrent.internal._Either2._Either2.a(storageCallTask)</td></tr>
+	<tr><td port="e4" align="left">var this</td></tr>
+	<tr><td port="e5" align="left">this = value</td></tr>
+	<tr><td port="e6" align="left">var storageCallPromise = cast this</td></tr>
+	<tr><td port="e7" align="left">var storageCallPromise = storageCallPromise.submit(@:implicitCast storageCallPromise, null)</td></tr>
+	<tr><td port="e8" align="left">haxe.Log.trace(\"Submit api call task\", {fileName : \"src/Main.hx\", lineNumber : 175, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="e9" align="left">var apiCallPromise = this.executor</td></tr>
+	<tr><td port="e10" align="left">var value = hx.concurrent.internal._Either2._Either2.a(apiCallTask)</td></tr>
+	<tr><td port="e11" align="left">var this</td></tr>
+	<tr><td port="e12" align="left">this = value</td></tr>
+	<tr><td port="e13" align="left">var apiCallPromise = cast this</td></tr>
+	<tr><td port="e14" align="left">var apiCallPromise = apiCallPromise.submit(@:implicitCast apiCallPromise, null)</td></tr>
+	<tr><td port="e15" align="left">haxe.Log.trace(\"Set storage completion\", {fileName : \"src/Main.hx\", lineNumber : 177, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151172[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151172) BKFunctionEnd</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151171[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151171) BKFunctionBegin</td></tr>
+	<tr><td port="e0" align="left">haxe.Log.trace(\"Start local read\", {fileName : \"src/Main.hx\", lineNumber : 163, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="e1" align="left">var `this = `this.cacheFolder.path</td></tr>
+	<tr><td port="e2" align="left">var value = hx.strings.internal._Either2._Either2.a(\"friends.json\")</td></tr>
+	<tr><td port="e3" align="left">var this</td></tr>
+	<tr><td port="e4" align="left">this = value</td></tr>
+	<tr><td port="e5" align="left">var _this = cast this</td></tr>
+	<tr><td port="e6" align="left">var _this = `this.join(@:implicitCast _this, null)</td></tr>
+	<tr><td port="e7" align="left">var friendCache = hx.files.File.of(@:implicitCast cast hx.strings.internal._Either2._Either2.b(_this), null)</td></tr>
+	<tr><td port="e8" align="left">var inputStream = friendCache.openInput(true)</td></tr>
+	<tr><td port="e9" align="left">var rawData = inputStream.readAll(null)</td></tr>
+	<tr><td port="e10" align="left">var rawJson = rawData.toString()</td></tr>
+	<tr><td port="e11" align="left">haxe.Log.trace(rawJson, {fileName : \"src/Main.hx\", lineNumber : 169, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="e12" align="left">var json = new haxe.format.JsonParser(rawJson).doParse()</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151170[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151170) BKNormal</td></tr>
+	<tr><td port="e0" align="left">var apiCallTask = \"fun\"(151168)</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151169[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151169) BKFunctionEnd</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151168[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151168) BKFunctionBegin</td></tr>
+	<tr><td port="e0" align="left">haxe.Log.trace(\"Start api call\", {fileName : \"src/Main.hx\", lineNumber : 157, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="e1" align="left">var result = sys.Http.requestUrl(`this.usersGetUrl)</td></tr>
+	<tr><td port="e2" align="left">haxe.Log.trace(result, {fileName : \"src/Main.hx\", lineNumber : 159, className : \"Main\", methodName : \"fetchData\"})</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151167[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151167) BKFunctionEnd</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n151166[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(151166) BKFunctionBegin</td></tr>
+	<tr><td port="e0" align="left">var `this = this</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n1[label=<<table BORDER="0" CELLBORDER="1" CELLSPACING="0">
+	<tr><td port="in" bgcolor="lightgray">(1) BKRoot</td></tr>
+	<tr><td port="out"></td></tr>
+</table>>];
+n1:out -> n151166:in[label="CFGFunction"];
+}

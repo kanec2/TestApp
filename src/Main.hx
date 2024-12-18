@@ -1,5 +1,13 @@
+import hx.concurrent.collection.SynchronizedMap;
+import sys.thread.EventLoop;
+import haxe.ui.components.Image;
+import hx.files.File;
+import haxe.io.BytesData;
+import haxe.io.Bytes;
 import haxe.ui.loaders.image.HttpImageLoader;
+import haxe.ui.loaders.image.FileImageLoader;
 import haxe.ui.Toolkit;
+import haxe.ui.backend.BackendImpl;
 import ui.models.FriendsModelRoot;
 import hx.files.File.FileWriteMode;
 import hl.uv.Fs;
@@ -33,6 +41,7 @@ import ecs.Workflow;
 import components.ResourceComponent;
 import components.*;
 import ecs.Entity;
+import hxd.BitmapData;
 
 typedef AppEventBase = {
     event:String, 
@@ -41,7 +50,8 @@ typedef AppEventBase = {
 
 class Main{
     static var friends:SynchronizedArray<FriendModel>;
-    var menuView:MenuView;
+    //var menuView:MenuView;
+    var menuView:HeapsMain;
     //var getFriendsExecutor:Executor;
     //var usersGetUrl = "http://localhost:5017/arnest/api/get-running-machine-checks-devices";
     var usersGetUrl = "http://jsonplaceholder.typicode.com/users";
@@ -52,17 +62,28 @@ class Main{
     var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
     var cacheFolder:Dir;
     var appFolder:Dir;
-    public function new() {
 
+    var imageCacheMapping:SynchronizedMap<String,String>;
+    var imageCachePath:Path;
+    var imageMappingFile:File;
+    public function new() {
+        
+        //Toolkit.init({manualUpdate: true}); // Init HaxeUI
+        Toolkit.onAfterInit = startup;
         friends = new SynchronizedArray<FriendModel>();
+        //imageCacheMapping = new SynchronizedMap<String,String>();
         executor = Executor.create(5);
         asyncDispatcher = new AsyncEventDispatcher<AppEventBase>(executor);
         asyncDispatcher.subscribe(onFriendsLoaded);
         asyncDispatcher.subscribe(onAppInited);
+        menuView = new HeapsMain();
+        //heapsApp.
+        //var future = executor.submit(haxeuiupdate, FIXED_RATE(200));
+        // check if the task is scheduled to be executed (again) in the future
+        //if (!future.isStopped) {
+        //    trace('The task is scheduled for further executions with schedule: ${future.schedule}');
+        //}
 
-        checkFiles();
-        fetchData();
-        //initApp();
         //fetchLocalStorage();
         /*
         
@@ -72,7 +93,16 @@ class Main{
         */
         
     }
-
+    function haxeuiupdate(){
+        trace("executed");
+        BackendImpl.update(); // Update HaxeUI
+    }
+    function startup(){
+        trace("Im here");
+        checkFiles();
+        fetchData();
+        //initApp();
+    }
     function checkFiles(){
         var applicationDirectory = Sys.programPath();
         
@@ -85,6 +115,15 @@ class Main{
 
         var friendCache = cachePath.join("friends.json");
         if (!friendCache.exists()) friendCache.toFile().touch();
+
+        var imageMappingPath = cachePath.join("image_mapping.json");
+        if (!imageMappingPath.exists()) imageMappingPath.toFile().touch();
+
+        imageMappingFile = imageMappingPath.toFile();
+        imageCachePath = cachePath.join("images");
+        if (!imageCachePath.exists()) imageCachePath.toDir().create();
+        
+
     }
 
     function onFriendsLoaded(event:AppEventBase){
@@ -100,7 +139,7 @@ class Main{
     }
 
     function initApp(){
-        var app = new HaxeUIApp();
+        /*var app = new HaxeUIApp();
 
         app.ready(function() {
             menuView = new MenuView();
@@ -114,7 +153,7 @@ class Main{
             }
             asyncDispatcher.fire(ev);
             app.start();
-        });
+        });*/
     }
 
     function initECS(){
@@ -149,6 +188,20 @@ class Main{
             var rawJson = rawData.toString();
             trace(rawJson);
             var json:api.models.JsonModels.RootFriendsData = Json.parse(rawJson);
+
+            var mappingStream = imageMappingFile.openInput(true);
+            var rawMappingData = mappingStream.readAll();
+            var rawMappingJson = rawMappingData.toString();
+
+            var parser = new json2object.JsonParser<Map<String,String>>();
+            parser.fromJson(rawMappingJson,"err");
+
+            imageCacheMapping = SynchronizedMap.from(parser.value);
+            //var mappedImg = imageCacheMapping.get("1FF897E4-1564-4054-8F92-C5DF80912C23");
+        
+            //var abs = imageCachePath.join(mappedImg).getAbsolutePath();
+            trace("Well look here: ");
+            //trace(abs);
             return json;
         }
         trace("Submit storage call task");
@@ -225,16 +278,28 @@ class Main{
         trace("Set transform completion");
         transformJsonPromise.onCompletion(_->{
             trace("start loading images");
-            
+            var promises:Array<TaskFuture<Void>> = new Array<TaskFuture<Void>>();
             for(friend in friends){
                 var url = "";
+                var key = friend.id;
+
+                if(imageCacheMapping.exists(key)){
+                    var fullPath = imageCachePath.join(imageCacheMapping.get(key)).getAbsolutePath();
+                    trace("Path is:");
+                    trace(fullPath);
+                    friend.profileImageLocalUrl = fullPath;//imageCachePath.join(imageCacheMapping.get(key)).getAbsolutePath();
+
+                }
+                trace("r url: "+friend.profileImageLocalUrl);
                 if(friend.profileImageLocalUrl != null && friend.profileImageLocalUrl != "") url = friend.profileImageLocalUrl;
                 else if (friend.profileImageUrl != null && friend.profileImageUrl != "") url = friend.profileImageUrl;
                 else continue;
                 trace("selected url: "+url);
-                var task = createLoadImageTask(url);
-                var future = executor.submit(task);
                 var idx = friends.indexOf(friend);
+                var task = createLoadImageTask(idx,url);
+                var future = executor.submit(task);
+                promises.push(future);
+                /*
                 future.onCompletion(result->{
                     switch(result) {
                         case VALUE(value, time, _): {
@@ -247,8 +312,36 @@ class Main{
                         case PENDING(_):      trace("Nothing is happening");
                         
                     }
-                });
+                });*/
             }
+            for(p in promises) p.awaitCompletion(-1);
+            for(friend in friends){
+                var img = friend.image;
+                if(img == null) continue;
+                var imgData = img.toImageData();
+
+                var imgCacheName = friend.id + "_profile";
+                if(imageCacheMapping.exists(imgCacheName)) continue;
+
+                var cacheFile = imageCachePath.join(imgCacheName + ".png");
+                
+                var imageBytes = imgData.toPNG();
+                //cacheFile.toFile().touch();
+                try{
+                    cacheFile.toFile().writeBytes(imageBytes,false);
+                }
+                catch(e){}
+                imageCacheMapping.set(friend.id,imgCacheName + ".png");
+                friend.profileImageLocalUrl = imgCacheName + ".png";
+                trace("image saved");
+                //trace("result bytes: ");
+                //trace(bb);
+                //var bytes:Bytes = Bytes.ofData
+                //var stream = cacheFile.toFile().openOutput(FileWriteMode.APPEND,true);
+                //stream.write();
+                //cacheFile.writeBytes(img.toImageData());
+            }
+            trace("I waited for eternity");
             var friendModelRoot = new FriendsModelRoot();
             friendModelRoot.fromSyncArray(friends);
             var friendCache = cacheFolder.path.join("friends.json").toFile();
@@ -256,11 +349,19 @@ class Main{
             var friendsArrayJson = writer.write(friendModelRoot);
             friendCache.writeString(friendsArrayJson);
 
+            var imageWriter = new json2object.JsonWriter<Map<String,String>>();
+            var syncMapping:Map<String,String> = new Map<String,String>();
+            for(key in imageCacheMapping.keys()){
+                var value = imageCacheMapping.get(key);
+                syncMapping.set(key,value);
+            }
+            var imageJson = imageWriter.write(syncMapping);
+            imageMappingFile.writeString(imageJson);
             //var output = friendCache.openOutput(FileWriteMode.REPLACE);
             //output.writeBytes(friendsArrayJson)
             
         });
-        transformJsonPromise.awaitCompletion(-1);
+        //transformJsonPromise.awaitCompletion(-1);
         
     }
 
@@ -279,25 +380,116 @@ class Main{
         };*/
         
     }
+/*
+    function decodePNG(src:haxe.io.Bytes, width:Int, height:Int, requestedFmt:hxd.PixelFormat) {
+		var outFmt = requestedFmt;
+        var gg:format.hl.Reader = new format.hl.Reader();
+        var dt:format.hl.Data = gg.read();
+        
+		var ifmt:format.hl.Native. = switch (requestedFmt) {
+			case RGBA: RGBA;
+			case BGRA: BGRA;
+			case ARGB: ARGB;
+			case R16U: cast 12;
+			case RGB16U: cast 13;
+			case RGBA16U: cast 14;
+			case RG16U: cast 15;
+			default:
+				outFmt = BGRA;
+				BGRA;
+		};
+		var stride = 4; // row_stride is the step, in png_byte or png_uint_16 units	as appropriate, between adjacent rows
+		var pxsize = 4;
+		switch (outFmt) {
+			case R16U:
+				stride = 1;
+				pxsize = 2;
+			case RG16U:
+				stride = 2;
+				pxsize = 4;
+			case RGB16U:
+				stride = 3;
+				pxsize = 6;
+			case RGBA16U:
+				stride = 4;
+				pxsize = 8;
+			default:
+		}
+		var dst = haxe.io.Bytes.alloc(width * height * pxsize);
+		if (!format.hl.Native.decodePNG(src.getData(), src.length, dst.getData(), width, height, width * stride, ifmt, 0))
+			return null;
+		var pix = new hxd.Pixels(width, height, dst, outFmt);
+		return pix;
+	}*/
 
-
-    function createLoadImageTask(url:String):Void->Variant{
+    function createLoadImageTask(idx:Int,url:String):Void->Void{
         return ()->{
             trace("Well im here");
-            var imgData:Variant = null;
-            var compl:Bool = false;
-            var httpImgLoader:HttpImageLoader = new HttpImageLoader();
-            trace("so what");
-            httpImgLoader.load(url,(inf:ImageInfo)->{
-                trace("and here");
-                if(inf != null && inf.data != null) { trace(inf.data); imgData = inf.data;}
-                trace("agagaga: "+imgData);
-                compl = true;
-                //return imgData;
-            });
-            while(!compl) Sys.sleep(0.1);
-            return imgData;
-        }; 
+            if(url.indexOf("http") > -1){
+                var httpImgLoader:ImageLoader = ImageLoader.instance;
+                trace("so what htt");
+                httpImgLoader.load(url,(inf:ImageInfo)->{
+                    if(inf != null && inf.data != null) { 
+                        trace(inf.data); 
+                        friends[idx].image = inf.data;
+                        trace(menuView);
+                        menuView.setFriends(friends);
+                        trace("and here");
+                    }
+                });
+            }
+            else{
+                //var imgFile = File.of(url);
+                //var bytes = imgFile.readAsBytes();
+                //var hlBytes = hl.Bytes.fromBytes(bytes);
+                /*var innerBitmap:{
+                    pixels:hl.Bytes,
+                    width:Int,
+                    height:Int,
+                } = ;
+                var bitmapData = BitmapData.fromNative(innerBitmap);
+                friends[idx] = bitmapData;
+                menuView.setFriends(friends);*/
+                //var bitmapData:DitmapData = new BitmapData(32,32);
+
+                //var i = sys.io.File.read(url,true);
+                var imgFile = File.of(url);
+                var input = imgFile.openInput(true);
+                var data = new format.png.Reader(input).read();
+                var bytes = format.png.Tools.extract32(data);
+                var header = format.png.Tools.getHeader(data);
+                input.close();
+                //var imgFile = File.of(url);
+                //var bytes = imgFile.readAsBytes();
+                //var pixels = decodePNG(bytes, 32, 32, null);
+				//if (pixels == null)
+				//	throw "Failed to decode PNG";
+                //hl.Bytes.fromBytes
+                var hlBytes = hl.Bytes.fromBytes(bytes);
+                var innerBitmap:BitmapInnerData = new BitmapInnerData();
+                innerBitmap.height = header.height;
+                innerBitmap.width = header.width;
+                innerBitmap.pixels = hlBytes;
+                var bitmapData:BitmapData = BitmapData.fromNative(innerBitmap);
+                trace(bitmapData);
+                //var bitmap:ImageInfo = new ImageInfo(32,null,32,bitmapData);
+                friends[idx].image = bitmapData;
+                menuView.setFriends(friends);
+                /*
+                var httpImgLoader:ImageLoader = ImageLoader.instance;
+                trace("so what fil");
+                httpImgLoader.load(url,(inf:ImageInfo)->{
+                    if(inf != null && inf.data != null) { 
+                        trace(inf.data); 
+                        friends[idx].image = inf.data;
+                        trace(menuView);
+                        menuView.setFriends(friends);
+                        trace("and here");
+                    }
+                });*/
+                
+            }
+        }
     }
 
     function createLoadImageTasks(urls:Array<String>):Array<Void->Variant>{

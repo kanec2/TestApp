@@ -9,6 +9,7 @@
 -lib haxe-files
 -lib http
 -lib json2object
+-lib format
 
 -D concurrent
 -D resourcesPath=assets

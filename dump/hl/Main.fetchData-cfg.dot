@@ -1,0 +1,113 @@
+digraph graphname {
+n151253 [shape=box,label="(151253)"];
+n151252 [shape=box,label="(151252)\nurl = friend.profileImageUrl"];
+n151251 [shape=box,label="(151251)"];
+n151250 [shape=box,label="(151250)\ntmp = false"];
+n151249 [shape=box,label="(151249)\ntmp = friend.profileImageUrl != \"\""];
+n151248 [shape=box,label="(151248)\nvar tmp\nvar tmp = friend.profileImageUrl != null"];
+n151247 [shape=box,label="(151247)\nurl = friend.profileImageLocalUrl"];
+n151246 [shape=box,label="(151246)"];
+n151245 [shape=box,label="(151245)\ntmp = false"];
+n151244 [shape=box,label="(151244)\ntmp = friend.profileImageLocalUrl != \"\""];
+n151243 [shape=box,label="(151243)\ntransformJsonPromise.onCompletion(\"fun\"(151229))\nvar tmp\nvar tmp = friend.profileImageLocalUrl != null"];
+n151242 [shape=box,label="(151242)"];
+n151241 [shape=box,label="(151241)"];
+n151240 [shape=box,label="(151240)\nLoops: 3\nhaxe.Log.trace(\"r url: \", {fileName : \"src/Main.hx\", lineNumber : 253, className : \"Main\", methodName : \"fetchData\"})"];
+n151239 [shape=box,label="(151239)\nLoops: 3\nvar `this = `this.imageCachePath\nvar this = `this.imageCacheMapping\nvar value = cast this.get(key)\nvar value = hx.strings.internal._Either2._Either2.a(value)\nvar this\nthis = value\nvar tmp = cast this\nfriend.profileImageLocalUrl = `this.join(@:implicitCast tmp, null).getAbsolutePath()"];
+n151238 [shape=box,label="(151238)\nLoops: 3\nvar friend = friend.next()\nvar url = \"\"\nvar key = friend.id\nvar this = `this.imageCacheMapping\nvar tmp = cast this.exists(key)"];
+n151237 [shape=box,label="(151237)\nLoops: 3"];
+n151236 [shape=box,label="(151236)\nLoops: 3\nvar tmp = ! ((friend.hasNext()))"];
+n151235 [shape=box,label="<loop-head>
+(151235)\nLoops: 3"];
+n151234 [shape=box,label="(151234)\nvar friend = _this._sync.execute(\"fun\"(151232), null)"];
+n151233 [shape=box,label="<function-end>
+(151233)"];
+n151232 [shape=box,label="<function-begin>
+(151232)\nvar _this = _gthis._items"];
+n151231 [shape=box,label="(151231)\nvar _this = cast Main.friends\nvar _gthis = _this"];
+n151230 [shape=box,label="<function-end>
+(151230)"];
+n151229 [shape=box,label="<function-begin>
+(151229)\nhaxe.Log.trace(\"start loading images\", {fileName : \"src/Main.hx\", lineNumber : 246, className : \"Main\", methodName : \"fetchData\"})\nvar promises = new Array()"];
+n151228 [shape=box,label="(151228)\nvar transformJsonToFriendsTask = \"fun\"(151191)\nhaxe.Log.trace(\"Submit transform task\", {fileName : \"src/Main.hx\", lineNumber : 242, className : \"Main\", methodName : \"fetchData\"})\nvar transformJsonPromise = this.executor\nvar value = hx.concurrent.internal._Either2._Either2.a(transformJsonToFriendsTask)\nvar this\nthis = value\nvar transformJsonPromise = cast this\nvar transformJsonPromise = transformJsonPromise.submit(@:implicitCast transformJsonPromise, null)\nhaxe.Log.trace(\"Set transform completion\", {fileName : \"src/Main.hx\", lineNumber : 244, className : \"Main\", methodName : \"fetchData\"})"];
+n151227 [shape=box,label="(151227)\nvar ev = {event : \"FriendsLoaded\", data : null}\n`this.asyncDispatcher.fire(ev)"];
+n151226 [shape=box,label="(151226)"];
+n151225 [shape=box,label="(151225)\nLoops: 1"];
+n151224 [shape=box,label="(151224)\nLoops: 1\nvar transformJsonToFriendsTask = cast Main.friends\ntransformJsonToFriendsTask.add(new ui.models.FriendModel(rawFriend.nickName, rawFriend.profileImageUrl, rawFriend.id, rawFriend.profileImageLocalUrl))"];
+n151223 [shape=box,label="(151223)\nLoops: 1\nvar transformJsonToFriendsTask = ! isFriendAlreadyExist"];
+n151222 [shape=box,label="(151222)\nLoops: 1"];
+n151221 [shape=box,label="(151221)\nLoops: 2, 1\nisFriendAlreadyExist = true"];
+n151220 [shape=box,label="(151220)\nLoops: 2, 1"];
+n151219 [shape=box,label="(151219)\nLoops: 2, 1\nvar transformJsonToFriendsTask = friend.id != rawFriend.id"];
+n151218 [shape=box,label="(151218)\nLoops: 2, 1\ni = i + 1"];
+n151217 [shape=box,label="(151217)\nLoops: 2, 1\nvar friend = friend.next()"];
+n151216 [shape=box,label="(151216)\nLoops: 2, 1"];
+n151215 [shape=box,label="(151215)\nLoops: 2, 1\nvar transformJsonToFriendsTask = ! ((friend.hasNext()))"];
+n151214 [shape=box,label="<loop-head>
+(151214)\nLoops: 2, 1"];
+n151213 [shape=box,label="(151213)\nLoops: 1\nvar friend = _this._sync.execute(\"fun\"(151211), null)"];
+n151212 [shape=box,label="<function-end>
+(151212)\nLoops: 1"];
+n151211 [shape=box,label="<function-begin>
+(151211)\nLoops: 1\nvar _this = _gthis._items"];
+n151210 [shape=box,label="(151210)\nLoops: 1\nvar _this = cast Main.friends\nvar _gthis = _this"];
+n151209 [shape=box,label="(151209)\nLoops: 1\nvar rawFriend = `[`]\n` = ` + 1\nvar isFriendAlreadyExist = false\nvar i = 0"];
+n151208 [shape=box,label="(151208)\nLoops: 1"];
+n151207 [shape=box,label="(151207)\nLoops: 1\nvar transformJsonToFriendsTask = ! ((` < `.length))"];
+n151206 [shape=box,label="<loop-head>
+(151206)\nLoops: 1"];
+n151205 [shape=box,label="(151205)\nvar ` = 0\nvar ` = mockFriendsJson.friends"];
+n151204 [shape=box,label="(151204)\nvar mockFriendsJson = Mock.getMockJsonFriends()"];
+n151203 [shape=box,label="(151203)\nhaxe.Log.trace(\"No storage data\", {fileName : \"src/Main.hx\", lineNumber : 216, className : \"Main\", methodName : \"fetchData\"})"];
+n151202 [shape=box,label="(151202)\nvar transformJsonToFriendsTask = storageResult == null"];
+n151201 [shape=box,label="(151201)\nvar ` = `[0]\nstorageResult = null"];
+n151200 [shape=box,label="(151200)\nvar ` = `[0]\nvar ` = `[1]\nvar ` = `[2]\nvar ex = `\nvar time = `\nstorageResult = null"];
+n151199 [shape=box,label="(151199)\nvar ` = `[0]\nvar ` = `[1]\nvar ` = `[2]\nvar value = `\nvar time = `\nstorageResult = value"];
+n151198 [shape=box,label="(151198)\nvar storageResult\nvar ` = storageCallPromise.result\nvar storageResult = @:exhaustive enumIndex `"];
+n151197 [shape=box,label="(151197)\nhaxe.Log.trace(\"No api data\", {fileName : \"src/Main.hx\", lineNumber : 208, className : \"Main\", methodName : \"fetchData\"})"];
+n151196 [shape=box,label="(151196)\nvar transformJsonToFriendsTask = apiResult == null"];
+n151195 [shape=box,label="(151195)\nvar ` = `[0]\napiResult = null"];
+n151194 [shape=box,label="(151194)\nvar ` = `[0]\nvar ` = `[1]\nvar ` = `[2]\nvar ex = `\nvar time = `\napiResult = null"];
+n151193 [shape=box,label="(151193)\nvar ` = `[0]\nvar ` = `[1]\nvar ` = `[2]\nvar value = `\nvar time = `\napiResult = value"];
+n151192 [shape=box,label="<function-end>
+(151192)"];
+n151191 [shape=box,label="<function-begin>
+(151191)\napiCallPromise.awaitCompletion(-1)\nstorageCallPromise.awaitCompletion(-1)\nhaxe.Log.trace(\"start transform\", {fileName : \"src/Main.hx\", lineNumber : 200, className : \"Main\", methodName : \"fetchData\"})\nvar apiResult\nvar ` = apiCallPromise.result\nvar apiResult = @:exhaustive enumIndex `"];
+n151190 [shape=box,label="(151190)\nstorageCallPromise.onCompletion(\"fun\"(151174))"];
+n151189 [shape=box,label="(151189)\nvar ev = {event : \"FriendsLoaded\", data : null}\n`this.asyncDispatcher.fire(ev)"];
+n151188 [shape=box,label="(151188)"];
+n151187 [shape=box,label="(151187)\nLoops: 0\nvar rawFriend = `[`]\n` = ` + 1\nvar tmp = cast Main.friends\ntmp.add(new ui.models.FriendModel(rawFriend.nickName, rawFriend.profileImageUrl, rawFriend.id, rawFriend.profileImageLocalUrl))"];
+n151186 [shape=box,label="(151186)\nLoops: 0"];
+n151185 [shape=box,label="(151185)\nLoops: 0\nvar tmp = ! ((` < `.length))"];
+n151184 [shape=box,label="<loop-head>
+(151184)\nLoops: 0"];
+n151183 [shape=box,label="(151183)\nvar ` = 0\nvar ` = result.friends"];
+n151182 [shape=box,label="(151182)"];
+n151181 [shape=box,label="(151181)\ntmp = false"];
+n151180 [shape=box,label="(151180)\ntmp = result.friends != null"];
+n151179 [shape=box,label="(151179)\nvar tmp\nvar tmp = result != null"];
+n151178 [shape=box,label="(151178)\nvar ` = result[0]\nresult = null"];
+n151177 [shape=box,label="(151177)\nvar ` = result[0]\nvar ` = result[1]\nvar ` = result[2]\nvar ex = `\nvar time = `\nresult = null"];
+n151176 [shape=box,label="(151176)\nvar ` = result[0]\nvar ` = result[1]\nvar ` = result[2]\nvar value = `\nvar time = `\nresult = value"];
+n151175 [shape=box,label="<function-end>
+(151175)"];
+n151174 [shape=box,label="<function-begin>
+(151174)\nhaxe.Log.trace(\"start read local\", {fileName : \"src/Main.hx\", lineNumber : 179, className : \"Main\", methodName : \"fetchData\"})\nvar result\nvar result = @:exhaustive enumIndex result"];
+n151173 [shape=box,label="(151173)\nvar storageCallTask = \"fun\"(151171)\nhaxe.Log.trace(\"Submit storage call task\", {fileName : \"src/Main.hx\", lineNumber : 173, className : \"Main\", methodName : \"fetchData\"})\nvar storageCallPromise = this.executor\nvar value = hx.concurrent.internal._Either2._Either2.a(storageCallTask)\nvar this\nthis = value\nvar storageCallPromise = cast this\nvar storageCallPromise = storageCallPromise.submit(@:implicitCast storageCallPromise, null)\nhaxe.Log.trace(\"Submit api call task\", {fileName : \"src/Main.hx\", lineNumber : 175, className : \"Main\", methodName : \"fetchData\"})\nvar apiCallPromise = this.executor\nvar value = hx.concurrent.internal._Either2._Either2.a(apiCallTask)\nvar this\nthis = value\nvar apiCallPromise = cast this\nvar apiCallPromise = apiCallPromise.submit(@:implicitCast apiCallPromise, null)\nhaxe.Log.trace(\"Set storage completion\", {fileName : \"src/Main.hx\", lineNumber : 177, className : \"Main\", methodName : \"fetchData\"})"];
+n151172 [shape=box,label="<function-end>
+(151172)"];
+n151171 [shape=box,label="<function-begin>
+(151171)\nhaxe.Log.trace(\"Start local read\", {fileName : \"src/Main.hx\", lineNumber : 163, className : \"Main\", methodName : \"fetchData\"})\nvar `this = `this.cacheFolder.path\nvar value = hx.strings.internal._Either2._Either2.a(\"friends.json\")\nvar this\nthis = value\nvar _this = cast this\nvar _this = `this.join(@:implicitCast _this, null)\nvar friendCache = hx.files.File.of(@:implicitCast cast hx.strings.internal._Either2._Either2.b(_this), null)\nvar inputStream = friendCache.openInput(true)\nvar rawData = inputStream.readAll(null)\nvar rawJson = rawData.toString()\nhaxe.Log.trace(rawJson, {fileName : \"src/Main.hx\", lineNumber : 169, className : \"Main\", methodName : \"fetchData\"})\nvar json = new haxe.format.JsonParser(rawJson).doParse()"];
+n151170 [shape=box,label="(151170)\nvar apiCallTask = \"fun\"(151168)"];
+n151169 [shape=box,label="<function-end>
+(151169)"];
+n151168 [shape=box,label="<function-begin>
+(151168)\nhaxe.Log.trace(\"Start api call\", {fileName : \"src/Main.hx\", lineNumber : 157, className : \"Main\", methodName : \"fetchData\"})\nvar result = sys.Http.requestUrl(`this.usersGetUrl)\nhaxe.Log.trace(result, {fileName : \"src/Main.hx\", lineNumber : 159, className : \"Main\", methodName : \"fetchData\"})"];
+n151167 [shape=box,label="<function-end>
+(151167)"];
+n151166 [shape=box,label="<function-begin>
+(151166)\nvar `this = this"];
+n1 [shape=box,label="<root>
+(1)"];
+n1 -> n151166[label="function"];
+}

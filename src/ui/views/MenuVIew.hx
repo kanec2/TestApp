@@ -30,12 +30,9 @@ class MenuView extends Box {
         getFriendsCommand = getFriendList;
     }
 
-    public function setFriends(friends:SynchronizedArray<FriendModel>){
+    public function setFriends(friends:Array<FriendModel>){
         trace("we have new friends");
-        var arr:Array<FriendModel> = new Array<FriendModel>();
-        for (friend in friends)
-            arr.push(friend);
-        friendList.dataSource.data = arr;
+        friendList.dataSource.data = friends;
     }
 
     @:bind(actionNotificationCallbackButton, MouseEvent.CLICK)
