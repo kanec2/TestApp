@@ -67,41 +67,24 @@ class Main{
     var imageCachePath:Path;
     var imageMappingFile:File;
     public function new() {
-        
-        //Toolkit.init({manualUpdate: true}); // Init HaxeUI
         Toolkit.onAfterInit = startup;
         friends = new SynchronizedArray<FriendModel>();
-        //imageCacheMapping = new SynchronizedMap<String,String>();
         executor = Executor.create(5);
         asyncDispatcher = new AsyncEventDispatcher<AppEventBase>(executor);
         asyncDispatcher.subscribe(onFriendsLoaded);
         asyncDispatcher.subscribe(onAppInited);
-        menuView = new HeapsMain();
-        //heapsApp.
-        //var future = executor.submit(haxeuiupdate, FIXED_RATE(200));
-        // check if the task is scheduled to be executed (again) in the future
-        //if (!future.isStopped) {
-        //    trace('The task is scheduled for further executions with schedule: ${future.schedule}');
-        //}
+        menuView = new HeapsMain(asyncDispatcher);
 
-        //fetchLocalStorage();
+        
         /*
-        
-        
-        fetchData();
         initECS();
         */
         
     }
-    function haxeuiupdate(){
-        trace("executed");
-        BackendImpl.update(); // Update HaxeUI
-    }
     function startup(){
-        trace("Im here");
+        //trace("Im here");
         checkFiles();
         fetchData();
-        //initApp();
     }
     function checkFiles(){
         var applicationDirectory = Sys.programPath();
@@ -134,30 +117,13 @@ class Main{
 
     function onAppInited(event:AppEventBase){
         if(event.event != "AppInited") return;
+        //trace("App inited");
         appInited = true;
         if(friends != null) menuView.setFriends(friends);
     }
 
-    function initApp(){
-        /*var app = new HaxeUIApp();
-
-        app.ready(function() {
-            menuView = new MenuView();
-            menuView.init(getFriendList);//,getFriendList);
-            HaxeUIApp.instance.icon = "assets/images/favicon.png";
-            HaxeUIApp.instance.title = "GoodGames | Community and Store HTML Game Template";
-            app.addComponent(menuView);
-            var ev:AppEventBase = {
-                event: "AppInited",
-                data: null
-            }
-            asyncDispatcher.fire(ev);
-            app.start();
-        });*/
-    }
-
     function initECS(){
-        trace("Start ecs things");
+        //trace("Start ecs things");
         Workflow.addSystem(new Render3D());
         Workflow.addSystem(new systems.UISystem());
         Workflow.addSystem(new systems.ResourceProduce());
@@ -169,24 +135,24 @@ class Main{
         resources.add(new ResourceComponent("WOOD",100));
         resources.add(new ResourceComponent("STONE",100));
         player.add(new PlayerComponent(player,resources));
-        trace("End ecs things");
+        //trace("End ecs things");
     }
 
     function fetchData(){
         var apiCallTask = () -> {
-            trace("Start api call");
+            //trace("Start api call");
             var result = Http.requestUrl(usersGetUrl);
-            trace(result);
+            //trace(result);
             return result;
         }
         var storageCallTask = () ->{
-            trace("Start local read");
+            //trace("Start local read");
             var friendCache = cacheFolder.path.join("friends.json").toFile();
             var inputStream = friendCache.openInput(true);
     
             var rawData = inputStream.readAll();
             var rawJson = rawData.toString();
-            trace(rawJson);
+            //trace(rawJson);
             var json:api.models.JsonModels.RootFriendsData = Json.parse(rawJson);
 
             var mappingStream = imageMappingFile.openInput(true);
@@ -197,20 +163,16 @@ class Main{
             parser.fromJson(rawMappingJson,"err");
 
             imageCacheMapping = SynchronizedMap.from(parser.value);
-            //var mappedImg = imageCacheMapping.get("1FF897E4-1564-4054-8F92-C5DF80912C23");
-        
-            //var abs = imageCachePath.join(mappedImg).getAbsolutePath();
-            trace("Well look here: ");
-            //trace(abs);
+           
             return json;
         }
-        trace("Submit storage call task");
+        //trace("Submit storage call task");
         var storageCallPromise = executor.submit(storageCallTask);
-        trace("Submit api call task");
+        //trace("Submit api call task");
         var apiCallPromise = executor.submit(apiCallTask);
-        trace("Set storage completion");
+        //trace("Set storage completion");
         storageCallPromise.onCompletion(result->{
-            trace("start read local");
+            //trace("start read local");
             var result:api.models.JsonModels.RootFriendsData = switch (result){
                 case VALUE(value, time, _): value;
                 case FAILURE(ex, time, _): null;
@@ -231,7 +193,7 @@ class Main{
         var transformJsonToFriendsTask = function ():Bool {
             apiCallPromise.awaitCompletion(-1);
             storageCallPromise.awaitCompletion(-1);
-            trace("start transform");
+            //trace("start transform");
 
             var apiResult:Dynamic = switch (apiCallPromise.result){
                 case VALUE(value, time, _): value;
@@ -239,7 +201,7 @@ class Main{
                 case PENDING(_): null;
                 default: null;
             }
-            if(apiResult == null) trace("No api data");//return false;
+            if(apiResult == null){} //trace("No api data");//return false;
             
             var storageResult:Dynamic = switch (storageCallPromise.result){
                 case VALUE(value, time, _): value;
@@ -247,7 +209,7 @@ class Main{
                 case PENDING(_): null;
                 default: null;
             }
-            if(storageResult == null) trace("No storage data");//return false;
+            if(storageResult == null){} //trace("No storage data");//return false;
             
             var mockFriendsJson:api.models.JsonModels.RootFriendsData = Mock.getMockJsonFriends();
 
@@ -255,9 +217,7 @@ class Main{
             
             for (rawFriend in mockFriendsJson.friends) {
                 var isFriendAlreadyExist = false;
-                var i = 0;
                 for (friend in friends) {
-                    i++;
                     if(friend.id != rawFriend.id) continue;
                     isFriendAlreadyExist = true;
                     break;
@@ -266,6 +226,15 @@ class Main{
                     friends.add(new FriendModel(rawFriend.nickName,rawFriend.profileImageUrl,rawFriend.id,rawFriend.profileImageLocalUrl));
                 }
             }
+            var i = 0;
+            for (friend in friends){
+                var key = friend.id;
+                if(imageCacheMapping.exists(key)){
+                    var fullPath = imageCachePath.join(imageCacheMapping.get(key)).getAbsolutePath();
+                    friends[i].profileImageLocalUrl = fullPath;
+                }
+                i++;
+            }
             var ev:AppEventBase = {
                 event: "FriendsLoaded",
                 data: null
@@ -273,46 +242,37 @@ class Main{
             asyncDispatcher.fire(ev);
             return true;
         };
-        trace("Submit transform task");
+        //trace("Submit transform task");
         var transformJsonPromise = executor.submit(transformJsonToFriendsTask);
-        trace("Set transform completion");
-        transformJsonPromise.onCompletion(_->{
-            trace("start loading images");
+
+        var loadImagesTask = function ():Array<TaskFuture<Void>>{
+            transformJsonPromise.awaitCompletion(-1);
+            //trace("start loading images");
             var promises:Array<TaskFuture<Void>> = new Array<TaskFuture<Void>>();
             for(friend in friends){
                 var url = "";
-                var key = friend.id;
 
-                if(imageCacheMapping.exists(key)){
-                    var fullPath = imageCachePath.join(imageCacheMapping.get(key)).getAbsolutePath();
-                    trace("Path is:");
-                    trace(fullPath);
-                    friend.profileImageLocalUrl = fullPath;//imageCachePath.join(imageCacheMapping.get(key)).getAbsolutePath();
-
-                }
-                trace("r url: "+friend.profileImageLocalUrl);
+                //trace("r url: "+friend.profileImageLocalUrl);
                 if(friend.profileImageLocalUrl != null && friend.profileImageLocalUrl != "") url = friend.profileImageLocalUrl;
                 else if (friend.profileImageUrl != null && friend.profileImageUrl != "") url = friend.profileImageUrl;
                 else continue;
-                trace("selected url: "+url);
+                //trace("selected url: "+url);
                 var idx = friends.indexOf(friend);
                 var task = createLoadImageTask(idx,url);
                 var future = executor.submit(task);
                 promises.push(future);
-                /*
-                future.onCompletion(result->{
-                    switch(result) {
-                        case VALUE(value, time, _): {
-                            trace(value.toImageData());
-                            trace('Successfully execution at ${Date.fromTime(time)} with result: $value');
-                            friends[idx].image = value.toImageData();
-                            menuView.setFriends(friends);
-                        }
-                        case FAILURE(ex, time, _):  trace('Execution failed at ${Date.fromTime(time)} with exception: $ex');
-                        case PENDING(_):      trace("Nothing is happening");
-                        
-                    }
-                });*/
+            }
+            return promises;
+        }
+        var loadImagesPromise = executor.submit(loadImagesTask);
+
+        var saveImagesTask = function():Void{
+            loadImagesPromise.awaitCompletion(-1);
+            var promises:Array<TaskFuture<Void>> = switch (loadImagesPromise.result){
+                case VALUE(value, time, _): value;
+                case FAILURE(ex, time, _): null;
+                case PENDING(_): null;
+                default: null;
             }
             for(p in promises) p.awaitCompletion(-1);
             for(friend in friends){
@@ -333,15 +293,13 @@ class Main{
                 catch(e){}
                 imageCacheMapping.set(friend.id,imgCacheName + ".png");
                 friend.profileImageLocalUrl = imgCacheName + ".png";
-                trace("image saved");
-                //trace("result bytes: ");
-                //trace(bb);
-                //var bytes:Bytes = Bytes.ofData
-                //var stream = cacheFile.toFile().openOutput(FileWriteMode.APPEND,true);
+                //trace("image saved");
+                ////trace("result bytes: ");
+                ////trace(bb);
                 //stream.write();
                 //cacheFile.writeBytes(img.toImageData());
             }
-            trace("I waited for eternity");
+            //trace("I waited for eternity");
             var friendModelRoot = new FriendsModelRoot();
             friendModelRoot.fromSyncArray(friends);
             var friendCache = cacheFolder.path.join("friends.json").toFile();
@@ -360,7 +318,8 @@ class Main{
             //var output = friendCache.openOutput(FileWriteMode.REPLACE);
             //output.writeBytes(friendsArrayJson)
             
-        });
+        };
+        executor.submit(saveImagesTask);
         //transformJsonPromise.awaitCompletion(-1);
         
     }
@@ -372,7 +331,7 @@ class Main{
            //Sys.sleep(2);
            friends.add(friend);
            var idx = friends.indexOf(friend);
-           trace("done");
+           //trace("done");
            
            menuView.setFriends(friends);
            
@@ -424,17 +383,17 @@ class Main{
 
     function createLoadImageTask(idx:Int,url:String):Void->Void{
         return ()->{
-            trace("Well im here");
+            //trace("Well im here");
             if(url.indexOf("http") > -1){
                 var httpImgLoader:ImageLoader = ImageLoader.instance;
-                trace("so what htt");
+                //trace("so what htt");
                 httpImgLoader.load(url,(inf:ImageInfo)->{
                     if(inf != null && inf.data != null) { 
-                        trace(inf.data); 
+                        //trace(inf.data); 
                         friends[idx].image = inf.data;
-                        trace(menuView);
+                        //trace(menuView);
                         menuView.setFriends(friends);
-                        trace("and here");
+                        //trace("and here");
                     }
                 });
             }
@@ -471,27 +430,27 @@ class Main{
                 innerBitmap.width = header.width;
                 innerBitmap.pixels = hlBytes;
                 var bitmapData:BitmapData = BitmapData.fromNative(innerBitmap);
-                trace(bitmapData);
+                //trace(bitmapData);
                 //var bitmap:ImageInfo = new ImageInfo(32,null,32,bitmapData);
                 friends[idx].image = bitmapData;
                 menuView.setFriends(friends);
                 /*
                 var httpImgLoader:ImageLoader = ImageLoader.instance;
-                trace("so what fil");
+                //trace("so what fil");
                 httpImgLoader.load(url,(inf:ImageInfo)->{
                     if(inf != null && inf.data != null) { 
-                        trace(inf.data); 
+                        //trace(inf.data); 
                         friends[idx].image = inf.data;
-                        trace(menuView);
+                        //trace(menuView);
                         menuView.setFriends(friends);
-                        trace("and here");
+                        //trace("and here");
                     }
                 });*/
                 
             }
         }
     }
-
+    /*
     function createLoadImageTasks(urls:Array<String>):Array<Void->Variant>{
         var tasks:Array<Void->Variant> = new Array<Void->Variant>();
         for(url in urls){
@@ -499,8 +458,8 @@ class Main{
                 var imgData:Variant = null;
                 var compl:Bool = false;
                 ImageLoader.instance.load(url,(inf:ImageInfo)->{
-                    if(inf != null && inf.data != null) { trace(inf.data); imgData = inf.data;}
-                    trace("agagaga: "+imgData);
+                    if(inf != null && inf.data != null) { //trace(inf.data); imgData = inf.data;}
+                    //trace("agagaga: "+imgData);
                     compl = true;
                 });
                 while(!compl) Sys.sleep(0.1);
@@ -509,7 +468,7 @@ class Main{
             tasks.push(task);
         }
         return tasks;
-    }
+    }*/
     function loadUsers():Promise<HttpResponse>{
         var client = new HttpClient();
         client.followRedirects = false; // defaults to true
@@ -522,10 +481,10 @@ class Main{
         //client.responseTransformers = [new MyResponseTransformerA(), new MyResponseTransformerB()];
         var promise = client.get(usersGetUrl,null,["Content-Type"=>"Application/json"]);/*.then(response -> {
             var foo = response.bodyAsJson;
-            trace(foo);
+            //trace(foo);
         }, (error:HttpError) -> {
             // error
-            trace(error);
+            //trace(error);
         });*/
         return promise;
         /*Sys.sleep(4);
@@ -566,13 +525,13 @@ class Main{
                 future.onCompletion(result->{
                     switch(result) {
                         case VALUE(value, time, _): {
-                            trace(value.toImageData());
-                            trace('Successfully execution at ${Date.fromTime(time)} with result: $value');
+                            //trace(value.toImageData());
+                            //trace('Successfully execution at ${Date.fromTime(time)} with result: $value');
                             users[idx].image = value.toImageData();
                             menuView.setFriends(users);
                         }
-                        case FAILURE(ex, time, _):  trace('Execution failed at ${Date.fromTime(time)} with exception: $ex');
-                        case PENDING(_):      trace("Nothing is happening");
+                        case FAILURE(ex, time, _):  //trace('Execution failed at ${Date.fromTime(time)} with exception: $ex');
+                        case PENDING(_):      //trace("Nothing is happening");
                     }
                 });
             }

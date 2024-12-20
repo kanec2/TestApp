@@ -1,0 +1,13 @@
+<vbox width="100%" height="100%">
+    <listview id="lobbyPlayerList" width="100%" height="40%" style="background-color: #009F42;border:0px solid #009F42;background-opacity: .0;">
+        <my-list-view-item-renderer style="background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+        <data>
+            <item username="ianharrigan" firstName="Ian" lastName="Harrigan" active="true" />
+            <item username="bbarker" firstName="Bob" lastName="Barker" active="false" />
+            <item username="timmyt" firstName="Tim" lastName="Tiny" active="true" />
+            <item username="blue_b" firstName="Bobby" lastName="Blues" active="false" />
+            <item username="jjonas" firstName="Jimmy" lastName="Jonas" active="false" />
+            <item username="foo_bar" firstName="Fooby" lastName="Barby" active="true" />
+        </data>
+    </listview>
+</vbox>

@@ -1,6 +1,15 @@
 <box style="padding: 0px;" width="100%" height="100%">
-    <vbox width="40%" verticalAlign = "center" horizontalAlign="left">
-        <listview width="100%" id="friendList" selectedIndex="0">
+    <vbox width="40%" height="30%" verticalAlign = "center" horizontalAlign="left">
+        <label text="Friend list" horizontalAlign="center" textAlign="center" width="100%" style="background-color: #009F42;"/>
+        <box id="noFriendBox" width="100%" height="20%" style="background-color: #729F42;" visible="${friendList.dataSource.size == 0}" >
+            <hbox verticalAlign="center" horizontalAlign="center">
+                <label verticalAlign="center" text="NO FRIENDS YET!" />
+                <button text="Add friend"/>
+            </hbox>
+
+        </box>
+        
+        <listview id="friendList" width="100%" selectedIndex="0" visible="${friendList.dataSource.size > 0}">
             <friend-list-item-renderer id="friendList" style="background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
             <data>
                 <item nickName="ianharrigan" profileImg="https://placehold.co/32x32/png"    active="true" />

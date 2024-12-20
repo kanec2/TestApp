@@ -1,0 +1,16 @@
+<vbox width="100%" height="100%">
+    <item-renderer width="100" height="100">
+        <label id="teamName" width = "100%" textAlign="left"/>
+        <listview id="teamLobbyList" selectedIndex="0">
+            <my-list-view-item-renderer style="background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+            <data>
+                <item text="" />
+            </data>
+        </listview>
+    </item-renderer>
+    <data>
+        <item teamName="Red team" teamName.color="red" />
+        <item teamName="Blue team" teamName.color="blue" />
+        <item teamName="Yellow team" teamName.color="yellow" />
+    </data>
+</vbox>
