@@ -47,7 +47,7 @@ class Mock {
             "hostId":"ruewi4389rr",
             "rules":"Standard rules",
             "lobbyCapacity": 6,
-            "gameMode":"2x2x2"
+            "gameMode":"2x2x2x2"
         }';
 
         var parser = new json2object.JsonParser<api.models.JsonModels.LobbyData>();
@@ -59,7 +59,3 @@ class Mock {
         return json;
     }
 }
-black = 0
-blue = 1
-red = 2
-yellow = 3

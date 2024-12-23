@@ -1,14 +1,18 @@
 package ui.components;
 
+import Main.TeamLobbyData;
+import api.models.JsonModels.LobbyUser;
 import haxe.ui.events.ItemEvent;
 import haxe.ui.containers.VBox;
-
+import hx.strings.collection.SortedStringMap;
 using itertools.Extensions;
+using hx.strings.Strings;
 @:build(haxe.ui.ComponentBuilder.build("assets/ui/components/lobby-window.xml"))
 class LobbyWindow extends VBox {
     public function new() {
         super();
     }
+    /*
     @:bind(lv1, ItemEvent.COMPONENT_CLICK_EVENT)
     private function onItemEventClick(event:ItemEvent) {
         var item = lv1.dataSource.get(event.itemIndex);
@@ -26,43 +30,46 @@ class LobbyWindow extends VBox {
                 lv1.invalidateComponentData();
         }
     }
-
+    */
     private function emptyTeam(i:Int){
         var teamColor = switch(i){
-            case 0: "black";
+            case 0: "orange";
             case 1: "blue";
             case 2: "red";
             case 3: "yellow";
-            default : "black";
+            default : "orange";
         }
+        return teamColor;
     }
     private function emptyTeamName(i:Int){
         var teamName = switch(i){
-            case 0: "Black team";
+            case 0: "Orange team";
             case 1: "Blue team";
             case 2: "Red team";
             case 3: "Yellow team";
-            default : "Black team";
+            default : "Orange team";
         }
+        return teamName;
     }
     private function emptyLobbyPlayer(spot:Int = 0){
         return {
-            userName:"None",
+            nickName:"None",
             firstName:"",
             lastName:"",
             active:true,
-            lobbySpot:spot
+            lobbySpot:spot,
+            team:""
         };
     }
     
 	public function setLobbyInfo(lobbyInfo:api.models.JsonModels.LobbyData) {
-		lv1.dataSource.clear();
+		//lv1.dataSource.clear();
         var gameModeString = lobbyInfo.gameMode;
         var gameMode = switch(gameModeString){
             case "2x2" | "2x2x2" | "2x2x2x2" : "team";
             default : "free";
         };
-
+        trace("Game mode: "+gameMode);
         //username="ianharrigan" firstName="Ian" lastName="Harrigan" active="true"
         var numPlayers = lobbyInfo.lobbyCapacity;
         var players = lobbyInfo.players;
@@ -74,22 +81,26 @@ class LobbyWindow extends VBox {
                 case "2x2x2x2" : 4;
                 default : 2;
             };
-            var teams = players.groupBy(x -> x.team).toMapProj(g->g.key, g -> g.values.toArray()).sort();
+            trace("Num teams: "+numTeams);
+            var teams = players.groupBy(x -> x.team).toMapProj(g->g.key, g -> g.values.toArray());//.sort();
             var sortedTeams:SortedStringMap<Array<LobbyUser>> = new SortedStringMap<Array<LobbyUser>>();
+            var teamNames:Array<String> = new Array<String>();
             for(key in teams.keys()){
                 var value = teams.get(key);
                 sortedTeams.set(key,value);
             }
-            var teamNames = sortedTeams.keys();
-            var teamLobbyData:{
-                teams:Array<{teamName:String, teamColor:String, teamPlayers:Array<{userName:String, firstName:String, lastName:String, active:Bool, lobbySpot:Int}> }>,
-                rules:String,
-                hostId:String,
-                lobbyCapacity:Int,
-                gameMode:String,
-                numTeams:Int,
-                lobbyId:String
+            for(key in sortedTeams.keys()){
+                teamNames.push(key);
             }
+            var teamLobbyData:TeamLobbyData = {
+                teams:null,
+                rules:"",
+                hostId:"",
+                lobbyCapacity:0,
+                gameMode:"",
+                numTeams:0,
+                lobbyId:""
+            };
             teamLobbyData.rules = lobbyInfo.rules;
             teamLobbyData.hostId = lobbyInfo.hostId;
             teamLobbyData.lobbyCapacity = lobbyInfo.lobbyCapacity;
@@ -97,15 +108,49 @@ class LobbyWindow extends VBox {
             teamLobbyData.numTeams = numTeams;
             teamLobbyData.lobbyId = lobbyInfo.lobbyId;
 
-            var lobbyTeamData = new Array<{teamName:String, teamColor:String, teamPlayers:Array<{userName:String, firstName:String, lastName:String, active:Bool, lobbySpot:Int}> }>
-
-            for(i in 0...numTeams){
-                var teamName = teamNames[i] ?? emptyTeamName(i);
-                var teamColor = teamNames[i].replaceAll(" team","").toLowerCase();
-                var teamPlayers = teamNames[i] != null ? teams.get(teamName) : new Array<LobbyUser>();
-                var teamLobbyPlayers = new Array<{userName:String, firstName:String, lastName:String, active:Bool, lobbySpot:Int}>();
+            var lobbyTeamData = new Array<{
+                teamName:String, 
+                teamColor:String, 
+                teamPlayers:Array<{
+                    nickName:String, 
+                    firstName:String, 
+                    lastName:String, 
+                    active:Bool,
+                    team:String,
+                    lobbySpot:Int}> 
+                }>();
+            
+            for(i in 0...numTeams+1){
+                var nameToFind = emptyTeamName(i);
+                var founded = false;
+                for(tdata in lobbyTeamData){
+                    if(tdata.teamName==nameToFind){
+                        founded = true;
+                        break;
+                    }
+                }
+                if(founded==true) continue;
+                var teamName = teamNames[i] ?? nameToFind;
+                var teamColor = teamName.replaceAll(" team","").toLowerCase();
+                var teamPlayers = teamName != null ? teams.get(teamName) : new Array<LobbyUser>();
+                var teamLobbyPlayers = new Array<{nickName:String, firstName:String, lastName:String, active:Bool,team:String,lobbySpot:Int}>();
                 for(j in 0...2){
-                    var playerItem = transformLobbyPlayerItem(teamPlayers[j]) ?? emptyLobbyPlayer(j);
+                    var playerItem:{
+                        nickName:String, 
+                        firstName:String, 
+                        lastName:String, 
+                        active:Bool,
+                        team:String,
+                        lobbySpot:Int
+                    };
+                    
+                    playerItem = emptyLobbyPlayer(j);
+                    if(teamPlayers != null && teamPlayers.length > j)
+                        playerItem =  transformLobbyPlayerItem(teamPlayers[j]);
+                    //trace(teamPlayers[j]);
+                    //if(teamPlayers != null && teamPlayers[i]!=null) playerItem =  transformLobbyPlayerItem(teamPlayers[j]);
+                    trace(playerItem);
+                    playerItem.team = teamName;
                     teamLobbyPlayers.push(playerItem);
                 }
                 var team = {
@@ -113,17 +158,23 @@ class LobbyWindow extends VBox {
                     teamColor: teamColor,
                     teamPlayers: teamLobbyPlayers
                 }
-
+                lobbyTeamData.push(team);
+                
             }
+            trace(lobbyTeamData);
+            //teamLobbyData.teams = lobbyTeamData;
+            var teamLobbyRenderer = new TeamLobbyRenderer();
+            lobbyBox.itemRenderer = teamLobbyRenderer;
+            lobbyBox.dataSource.data = lobbyTeamData;
             //dataSource = lobbyTeamData;
         }
         else {
-            var newData = new Array<{userName:String, firstName:String, lastName:String, active:Bool}>();
+            var newData = new Array<{nickName:String, firstName:String, lastName:String, active:Bool,team:String}>();
             for(i in 0...numPlayers){
                 var playerItem = transformLobbyPlayerItem(players[i]) ?? emptyLobbyPlayer();
                 newData.push(playerItem);
             }
-            lv1.dataSource.data = newData;
+            //lv1.dataSource.data = newData;
         }
 	}
     /*
@@ -140,11 +191,12 @@ class LobbyWindow extends VBox {
 	function transformLobbyPlayerItem(player:api.models.JsonModels.LobbyUser) {
         if(player == null) return null;
 		return {
-            userName:player.nickName,
+            nickName:player.nickName,
             firstName:player.playerId,
             lastName:player.selectedRace,
             active:true,
-            lobbySpot:player.lobbySpot
+            lobbySpot:player.lobbySpot,
+            team:player.team
         };
 	}
 }

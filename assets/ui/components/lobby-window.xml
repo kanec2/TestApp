@@ -8,8 +8,10 @@
                 <label id="subTitle" style="color: #009F42;" horizontalAlign="center" text="Foo item description"/>
             </vbox>
         </vbox>
-        <vbox id="lobby_box" width="60%" height="100%">
-            <listview id="lv1" width="100%" height="40%" style="background-color: #009F42;border:0px solid #009F42;background-opacity: .0;">
+        <vbox width="80%" height="100%">
+            <vbox id="lobbyBox" width="100%" height="80%"/>
+            
+            <!-- <listview id="lv1" width="100%" height="40%" style="background-color: #009F42;border:0px solid #009F42;background-opacity: .0;">
                 <my-list-view-item-renderer style="background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
                 <data>
                     <item username="ianharrigan" firstName="Ian" lastName="Harrigan" active="true" />
@@ -30,7 +32,7 @@
                     <textfield placeholder="ENTER TEXT" width="80%"/>
                     <button text="SEND" width="20%"/>
                 </hbox>
-            </vbox>
+            </vbox> -->
         </vbox>
     </hbox>
 </box>

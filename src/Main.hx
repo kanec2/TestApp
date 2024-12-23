@@ -548,3 +548,12 @@ class Main{
     }
 
 }
+typedef TeamLobbyData = {
+    teams:Array<{teamName:String, teamColor:String, teamPlayers:Array<{userName:String, firstName:String, lastName:String, active:Bool, lobbySpot:Int}> }>,
+    rules:String,
+    hostId:String,
+    lobbyCapacity:Int,
+    gameMode:String,
+    numTeams:Int,
+    lobbyId:String
+}

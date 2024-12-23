@@ -10,6 +10,7 @@
 -lib http
 -lib json2object
 -lib format
+-lib itertools
 
 -D concurrent
 -D resourcesPath=assets
