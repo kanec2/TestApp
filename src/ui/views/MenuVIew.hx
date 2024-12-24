@@ -14,7 +14,7 @@ class MenuView extends Box {
 
     public function new() {
         super();
-        joinLobby("fddsfsd3223");
+        //joinLobby("fddsfsd3223");
         /*
         friendList.dataSource.onChange = function(){
             if(friendList.dataSource.size == 0){

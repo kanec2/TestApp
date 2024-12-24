@@ -15,7 +15,8 @@
 -D concurrent
 -D resourcesPath=assets
 -D windowFixed
--D windowSize=1280x980
+-D windowSize=1280x720
+#-D windowSize=1280x1024
 -D windowTitle=GoodGames | Community and Store HTML Game Template
 -D no-deprecation-warnings
 -hl build/heaps/hl/Main.hl
