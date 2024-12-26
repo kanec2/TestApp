@@ -19,7 +19,26 @@ export class MyRoom extends Room<State> {
     this.setState(new State());
     //this.setState(new State());
     let int:number = 0;
-    
+    // handle player input
+    this.onMessage(0, (client, payload) => {
+      // get reference to the player who sent the message
+      const player = this.state.players.get(client.sessionId);
+      const velocity = 2;
+
+      if (payload.left) {
+        player.x -= velocity;
+
+      } else if (payload.right) {
+        player.x += velocity;
+      }
+
+      if (payload.up) {
+        player.y -= velocity;
+
+      } else if (payload.down) {
+        player.y += velocity;
+      }
+    });
     this.onMessage("type", (client, message) => {
       //
       // handle "type" message
@@ -28,9 +47,9 @@ export class MyRoom extends Room<State> {
   }
 
   onJoin (client: Client, options: any) {
-    console.log("well gg");
-    //console.log(client.sessionId, "joined!");
-      /*const mapWidth = 800;
+    console.log(client.sessionId, "joined!");
+
+        const mapWidth = 800;
         const mapHeight = 600;
 
         // create Player instance
@@ -42,12 +61,12 @@ export class MyRoom extends Room<State> {
 
         // place player in the map of players by its sessionId
         // (client.sessionId is unique per connection!)
-        this.state.players.set(client.sessionId, player);*/
+        this.state.players.set(client.sessionId, player);
   }
 
   onLeave (client: Client, consented: boolean) {
     console.log(client.sessionId, "left!");
-    //this.state.players.delete(client.sessionId);
+    this.state.players.delete(client.sessionId);
   }
 
   onDispose() {

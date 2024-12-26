@@ -1,6 +1,6 @@
-# @install: lix --silent download "haxelib:/colyseus#0.15.4" into colyseus/0.15.4/haxelib
+# @install: lix --silent download "haxelib:/colyseus#0.15.2" into colyseus/0.15.2/haxelib
 -lib colyseus-websocket
--lib tink_http
+-lib tink_await
 -lib tink_url
--cp ${HAXE_LIBCACHE}/colyseus/0.15.4/haxelib/src/
--D colyseus=0.15.4
+-cp ${HAXE_LIBCACHE}/colyseus/0.15.2/haxelib/src/
+-D colyseus=0.15.2
