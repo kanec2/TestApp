@@ -11,6 +11,10 @@
 -lib json2object
 -lib format
 -lib itertools
+-lib colyseus
+-lib tink_url
+-lib tink_http
+-lib colyseus-websocket
 
 -D concurrent
 -D resourcesPath=assets
@@ -21,5 +25,5 @@
 -D no-deprecation-warnings
 -hl build/heaps/hl/Main.hl
 
---cmd "D:\Dev\hashlink-1.14.0-win\hl build/heaps/hl/Main.hl"
+#--cmd "D:\Dev\hashlink-1.14.0-win\hl build/heaps/hl/Main.hl"
 #--cmd '/home/unidev/Загрузки/hashlink-1.14/hl build/heaps/hl/Main.hl'

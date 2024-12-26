@@ -1,5 +1,4 @@
 import hx.concurrent.collection.SynchronizedMap;
-import sys.thread.EventLoop;
 import haxe.ui.components.Image;
 import hx.files.File;
 import haxe.io.BytesData;
@@ -10,8 +9,6 @@ import haxe.ui.Toolkit;
 import haxe.ui.backend.BackendImpl;
 import ui.models.FriendsModelRoot;
 import hx.files.File.FileWriteMode;
-import hl.uv.Fs;
-import hl.Api;
 import hx.files.Dir;
 import hx.files.Path;
 import hx.concurrent.ConcurrentException;
@@ -66,6 +63,7 @@ class Main{
     var imageCacheMapping:SynchronizedMap<String,String>;
     var imageCachePath:Path;
     var imageMappingFile:File;
+    
     public function new() {
         Toolkit.onAfterInit = startup;
         friends = new SynchronizedArray<FriendModel>();
