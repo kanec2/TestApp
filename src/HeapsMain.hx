@@ -12,6 +12,11 @@ import Main.AppEventBase;
 import io.colyseus.Client;
 import io.colyseus.Room;
 import network.states.State;
+import tweenxcore.structure.FloatChange;
+import tweenxcore.structure.FloatChangePart;
+
+using tweenxcore.Tools;
+
 class HeapsMain extends hxd.App {
     public var menuView:MenuView;
     var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
@@ -22,7 +27,7 @@ class HeapsMain extends hxd.App {
 
     // we will assign each player visual representation here
     // by their `sessionId`
-    var playerEntities:Map<String,String> = new Map<String,String>();// {[sessionId: string]: any} = {};
+    var playerEntities:Map<String,TestEntity> = new Map<String,TestEntity>();// {[sessionId: string]: any} = {};
     // local input cache
     var inputPayload = {
         left: false,
@@ -53,6 +58,8 @@ class HeapsMain extends hxd.App {
     override function init() {
 		hxd.Res.initEmbed();
 		Toolkit.init({root: s2d,manualUpdate: false});
+        var vv = new h2d.Text(hxd.res.DefaultFont.get(), s2d);
+        vv.text= "dsadwq";
         //client 
         var client = new Client("localhost",2567);//client;
         //client.auth.token = "123456";
@@ -64,9 +71,10 @@ class HeapsMain extends hxd.App {
         //    trace("signInAnonymously => err: " + err.code + ", data: " + data);
         //});
         client.getAvailableRooms("my_room",function(err:MatchMakeError, room) {
-            trace(err.message);
-            trace(room);
+            //trace(err.message);
+            //trace(room);
         });
+
 /*
         client.create("my_room",[],State,function(err:io.colyseus.error.HttpException, room:Room<State>) {
             trace(err.message);
@@ -83,13 +91,27 @@ class HeapsMain extends hxd.App {
 			}
             trace("set on add");
             
-            room.state.players.onAdd(function(player, sessionId) {
-                var entity = "player: x="+player.x + " y="+player.y;  //this.physics.add.image(player.x, player.y, 'ship_0001');
+            //room.onMessage()
 
+            room.state.players.onAdd(function(player, sessionId) {
+                var entity = new TestEntity(new h2d.Text(hxd.res.DefaultFont.get(), s2d), player.x, player.y);
+                cast(entity.getView(),h2d.Text).text = "user: x:"+player.x + " y:"+player.y;
+                //  "player: x="+player.x + " y="+player.y;  //this.physics.add.image(player.x, player.y, 'ship_0001');
+                //entity.text = "user: x:"+player.x + " y:"+player.y;
                 // keep a reference of it on `playerEntities`
-                this.playerEntities.set(sessionId,entity);
+                
                 trace("A player has joined! Their unique session id is", sessionId);
+                
+                player.onChange((real) -> {
+                    // update local position immediately
+                    
+                    entity.setData('serverX',player.x);
+                    entity.setData('serverY',player.y);
+                    cast(entity.getView(),h2d.Text).text = "user: x:"+player.x + " y:"+player.y;
+                });
+                this.playerEntities.set(sessionId,entity);
             });
+
             room.state.players.onRemove(function(player, sessionId) {
                 var entity = this.playerEntities.get(sessionId);
                 
@@ -138,12 +160,29 @@ class HeapsMain extends hxd.App {
         BackendImpl.update();
         
         if (this.room == null) { return; }
-
+        
         // send input to the server
         this.inputPayload.left = hxd.Key.isDown( hxd.Key.LEFT );
         this.inputPayload.right = hxd.Key.isDown( hxd.Key.RIGHT );
         this.inputPayload.up = hxd.Key.isDown( hxd.Key.UP );
         this.inputPayload.down = hxd.Key.isDown( hxd.Key.DOWN );
+        //trace(this.inputPayload);
         this.room.send(0, this.inputPayload);
+
+        for (sessionId in playerEntities.keys()) {
+            // interpolate all player entities
+            var entity = this.playerEntities.get(sessionId);
+            var data = entity.getAllData;
+            var serverX = data.get('serverX');
+            var serverY = data.get('serverY');
+            //const { serverX, serverY } = entity.data.values;
+            entity.setX(FloatTools.lerp(0.2,entity.getX(),serverX));
+            entity.setY(FloatTools.lerp(0.2,entity.getY(),serverY));
+            /*
+            entity.setX()
+            entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
+            entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);*/
+        }
     }
+
 }
