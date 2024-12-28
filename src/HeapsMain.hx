@@ -20,14 +20,8 @@ using tweenxcore.Tools;
 class HeapsMain extends hxd.App {
     public var menuView:MenuView;
     var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
-    private var client:Client = null;
-    private var room: Room<State>;
-    //var playerEntities:
-    var endpoint = "ws://localhost:2567";
+    
 
-    // we will assign each player visual representation here
-    // by their `sessionId`
-    var playerEntities:Map<String,TestEntity> = new Map<String,TestEntity>();// {[sessionId: string]: any} = {};
     // local input cache
     var inputPayload = {
         left: false,
@@ -58,10 +52,9 @@ class HeapsMain extends hxd.App {
     override function init() {
 		hxd.Res.initEmbed();
 		Toolkit.init({root: s2d,manualUpdate: false});
-        var vv = new h2d.Text(hxd.res.DefaultFont.get(), s2d);
-        vv.text= "dsadwq";
+      
         //client 
-        var client = new Client("localhost",2567);//client;
+        //client;
         //client.auth.token = "123456";
         //client.auth.onChange(function (user) {
         //    trace('auth.onChange', user);
@@ -83,7 +76,7 @@ class HeapsMain extends hxd.App {
 */
         
         // room
-        
+
 		client.joinOrCreate("my_room", [], State, function(err:MatchMakeError, room:Room<State>) {
 			if (err != null) {
 				trace(err.message);
@@ -94,14 +87,16 @@ class HeapsMain extends hxd.App {
             //room.onMessage()
 
             room.state.players.onAdd(function(player, sessionId) {
+                trace("A player has joined! Their unique session id is", sessionId);
                 var entity = new TestEntity(new h2d.Text(hxd.res.DefaultFont.get(), s2d), player.x, player.y);
                 cast(entity.getView(),h2d.Text).text = "user: x:"+player.x + " y:"+player.y;
                 //  "player: x="+player.x + " y="+player.y;  //this.physics.add.image(player.x, player.y, 'ship_0001');
                 //entity.text = "user: x:"+player.x + " y:"+player.y;
                 // keep a reference of it on `playerEntities`
-                
-                trace("A player has joined! Their unique session id is", sessionId);
-                
+                if (sessionId == this.room.sessionId) {
+                    this.currentPlayer = entity;
+                    cast(entity.getView(),h2d.Text).textColor = 0x990000;
+                }
                 player.onChange((real) -> {
                     // update local position immediately
                     
@@ -114,11 +109,12 @@ class HeapsMain extends hxd.App {
 
             room.state.players.onRemove(function(player, sessionId) {
                 var entity = this.playerEntities.get(sessionId);
-                
+                trace("player "+sessionId+" disconnected!");
                 if (entity != null) {
                     
                     // destroy entity
-                    //entity.destroy();
+                    s2d.removeChild(entity.getView());
+                    entity = null;
             
                     // clear local reference
                     this.playerEntities.remove(sessionId);
@@ -156,11 +152,7 @@ class HeapsMain extends hxd.App {
         
     }
 
-    override function update(dt:Float) {
-        BackendImpl.update();
-        
-        if (this.room == null) { return; }
-        
+    function fixedTick(time, dt){
         // send input to the server
         this.inputPayload.left = hxd.Key.isDown( hxd.Key.LEFT );
         this.inputPayload.right = hxd.Key.isDown( hxd.Key.RIGHT );
@@ -168,20 +160,50 @@ class HeapsMain extends hxd.App {
         this.inputPayload.down = hxd.Key.isDown( hxd.Key.DOWN );
         //trace(this.inputPayload);
         this.room.send(0, this.inputPayload);
+        var velocity = 2;
+        if (this.inputPayload.left) {
+            this.currentPlayer.setX(this.currentPlayer.getX() - velocity);
+
+        } else if (this.inputPayload.right) {
+            this.currentPlayer.setX(this.currentPlayer.getX() + velocity);
+        }
+
+        if (this.inputPayload.up) {
+            this.currentPlayer.setY(this.currentPlayer.getY() - velocity);
+
+        } else if (this.inputPayload.down) {
+            this.currentPlayer.setY(this.currentPlayer.getY() + velocity);
+        }
 
         for (sessionId in playerEntities.keys()) {
             // interpolate all player entities
+            if (sessionId == this.room.sessionId) {
+                continue;
+            }
             var entity = this.playerEntities.get(sessionId);
-            var data = entity.getAllData;
+            var data = entity.getAllData();
             var serverX = data.get('serverX');
             var serverY = data.get('serverY');
-            //const { serverX, serverY } = entity.data.values;
             entity.setX(FloatTools.lerp(0.2,entity.getX(),serverX));
             entity.setY(FloatTools.lerp(0.2,entity.getY(),serverY));
-            /*
-            entity.setX()
-            entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
-            entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);*/
+        }
+    }
+
+    var elapsedTime = .0;
+    var fixedTimeStep = 1/60;
+    override function update(dt:Float) {
+        BackendImpl.update();
+        
+        if (this.room == null) { return; }
+        if (this.currentPlayer == null) { return; }
+        
+        //hxd.Timer.elapsedTime
+        //hxd.Timer.lastTimeStamp
+
+        elapsedTime += dt;
+        while(elapsedTime >= fixedTimeStep){
+            elapsedTime -= fixedTimeStep;
+            fixedTick(hxd.Timer.lastTimeStamp, fixedTimeStep);
         }
     }
 

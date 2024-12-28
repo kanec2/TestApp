@@ -12,8 +12,66 @@ import haxe.ui.containers.Box;
 @:build(haxe.ui.ComponentBuilder.build("assets/ui/views/menu-view.xml"))
 class MenuView extends Box {
 
+    private var client:Client = null;
+    private var room: Room<State>;
+    //var playerEntities:
+    var endpoint = "ws://localhost:2567";
+    var lobby:Room;
+    var allRooms:Array<Room>;
+        // we will assign each player visual representation here
+    // by their `sessionId`
+    var playerEntities:Map<String,TestEntity> = new Map<String,TestEntity>();// {[sessionId: string]: any} = {};
+    var currentPlayer: TestEntity;
+
+    function onjoin() {
+        lobby.onMessage("rooms", (rooms) => {
+            allRooms = rooms;
+            update_full_list();
+
+            console.log("Received full list of rooms:", allRooms);
+        });
+
+        lobby.onMessage("+", ([roomId, room]) => {
+            const roomIndex = allRooms.findIndex((room) => room.roomId === roomId);
+            if (roomIndex !== -1) {
+                console.log("Room update:", room);
+                allRooms[roomIndex] = room;
+
+            } else {
+                console.log("New room", room);
+                allRooms.push(room);
+            }
+            update_full_list();
+        });
+
+        lobby.onMessage("-", (roomId) => {
+            console.log("Room removed", roomId);
+            allRooms = allRooms.filter((room) => room.roomId !== roomId);
+            update_full_list();
+        });
+
+        lobby.onLeave(() => {
+            allRooms = [];
+            update_full_list();
+            console.log("Bye, bye!");
+        });
+    }
+
+    function join () {
+        // Logged into your app and Facebook.
+        client.joinOrCreate("lobby").then(room_instance => {
+            lobby = room_instance;
+            onjoin();
+            console.log("Joined lobby room!");
+
+        }).catch(e => {
+            console.error("Error", e);
+        });
+      }
+
     public function new() {
         super();
+        client = new Client("localhost",2567);
         //joinLobby("fddsfsd3223");
         /*
         friendList.dataSource.onChange = function(){
@@ -28,6 +86,23 @@ class MenuView extends Box {
         }*/
     }
    
+    function leave() {
+        if (lobby) {
+          lobby.leave();
+
+        } else {
+          console.warn("Not connected.");
+        }
+      }
+
+    function update_full_list() {
+        var el = document.getElementById('all_rooms');
+        el.innerHTML = allRooms.map(function(room) {
+            return "<li><code>" + JSON.stringify(room) + "</code></li>";
+        }).join("\n");
+
+      }
+
     var getFriendsCommand:(userId:String) -> Void;
     var friendsDataSource:Array<FriendModel> = new Array<FriendModel>();
     @:bind(NotificationManager.instance, NotificationEvent.ACTION)
@@ -47,7 +122,14 @@ class MenuView extends Box {
         friendList.dataSource.data = friends;
     }
 
-    
+    @:bind(quickMatchBtn, MouseEvent.CLICK)
+    private function onQuickMatchClick(e){
+        client.joinOrCreate("lobby", [], State, function(err:MatchMakeError, room:Room<State>) {
+            lobby = room;
+            onjoin();
+            console.log("Joined lobby room!");
+        });
+    }
 
     @:bind(actionNotificationCallbackButton, MouseEvent.CLICK)
     private function onActionNotificationCallback(_) {

@@ -1,4 +1,4 @@
-import { Room, Client } from "@colyseus/core";
+import { Room, Client, updateLobby } from "@colyseus/core";
 import { State, Player } from "./schema/State";
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 
@@ -15,29 +15,53 @@ class State extends Schema {
 export class MyRoom extends Room<State> {
   maxClients = 4;
 
+  update(deltaTime: number) {
+    const velocity = 2;
+
+    this.state.players.forEach(player => {
+        let input: any;
+
+        // dequeue player inputs
+        while (input = player.inputQueue.shift()) {
+            if (input.left) {
+                player.x -= velocity;
+
+            } else if (input.right) {
+                player.x += velocity;
+            }
+
+            if (input.up) {
+                player.y -= velocity;
+
+            } else if (input.down) {
+                player.y += velocity;
+            }
+        }
+    });
+}
   onCreate (options: any) {
     this.setState(new State());
-    //this.setState(new State());
-    let int:number = 0;
+    //
+    // This is just a demonstration
+    // on how to call `updateLobby` from your Room
+    //
+    this.clock.setTimeout(() => {
+
+      this.setMetadata({
+        customData: "Hello world!"
+      }).then(() => updateLobby(this));
+
+    }, 5000);
+    this.setSimulationInterval((deltaTime) => {
+      this.update(deltaTime);
+    });
     // handle player input
     this.onMessage(0, (client, payload) => {
       // get reference to the player who sent the message
       const player = this.state.players.get(client.sessionId);
-      const velocity = 2;
 
-      if (payload.left) {
-        player.x -= velocity;
-
-      } else if (payload.right) {
-        player.x += velocity;
-      }
-
-      if (payload.up) {
-        player.y -= velocity;
-
-      } else if (payload.down) {
-        player.y += velocity;
-      }
+      // enqueue input to user input buffer.
+      player.inputQueue.push(payload);
     });
     this.onMessage("type", (client, message) => {
       //

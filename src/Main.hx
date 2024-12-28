@@ -44,7 +44,7 @@ typedef AppEventBase = {
     event:String, 
     data:Dynamic
 }
-
+//https://gigglingcorpse.com/2021/11/22/hello-world-heaps-on-android/
 class Main{
     static var friends:SynchronizedArray<FriendModel>;
     //var menuView:MenuView;
