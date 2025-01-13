@@ -1,12 +1,13 @@
 import config from "@colyseus/tools";
 import { monitor } from "@colyseus/monitor";
 import { playground } from "@colyseus/playground";
-
+import { TeamLobbyRoom } from "./rooms/TeamLobbyRoom";
 /**
  * Import your Room files
  */
 import { MyRoom } from "./rooms/MyRoom";
 import { LobbyRoom } from "colyseus";
+import { CustomLobbyRoom } from "./rooms/CustomLobbyRoom";
 
 export default config({
 
@@ -16,10 +17,14 @@ export default config({
          */
         
         // Expose the "lobby" room.
-        gameServer.define("lobby", LobbyRoom);
+        gameServer.define("lobby", CustomLobbyRoom,{
+            gameMode:"1x1"
+        });
         // Expose your game room with realtime listing enabled.
         gameServer.define('my_room', MyRoom);//.enableRealtimeListing();
-        
+        gameServer.define("team_lobby", TeamLobbyRoom,{
+            gameMode:"2x2"
+        });
 
         gameServer.simulateLatency(200);
     },
