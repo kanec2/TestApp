@@ -1,9 +1,10 @@
 import { Server } from "colyseus";
 
 import express from "express";
-import http from "http";
+import {IncomingMessage} from "http";
 import { Room, Client } from "colyseus";
 import { TeamLobbyPlayer, LobbyTeam, TeamLobbyState } from "./schema/TeamLobbyState";
+import { JWT } from "@colyseus/auth";
 
 // Define the TeamLobbyRoom
 export class TeamLobbyRoom extends Room<TeamLobbyState> {
@@ -11,7 +12,10 @@ export class TeamLobbyRoom extends Room<TeamLobbyState> {
     
     //private teams: { [key: string]: Client[] } = {};
     //private playerNames: { [key: string]: string } = {};
-
+    static async onAuth(token: string, req: IncomingMessage) {
+        console.log("COOKIE:", req.headers.cookie);
+        return (token) ? await JWT.verify(token) : { guest: true };
+      }
     onCreate(options: any) {
         let numTeams = 2;
         switch (options.gameMode) {
@@ -43,7 +47,7 @@ export class TeamLobbyRoom extends Room<TeamLobbyState> {
 
     onJoin(client: Client, options: any) {
         console.log(`Client ${client.sessionId} joined!`);
-
+        console.log(client.auth);
         const playerData = this.getPlayerData(client.id);
         const player:TeamLobbyPlayer = new TeamLobbyPlayer();
         player.nickName = playerData.nickName;

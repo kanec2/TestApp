@@ -4,14 +4,21 @@
         <hbox width="100%" height="100%" horizontalAlign="center" padding="10">
             <spacer width="19%" />
             <button id="quickMatchBtn" width="9%" text="Quick match" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <button width="9%" text="Lobby list" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <button width="9%" text="Tutorial" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+            <button id="lobbyListButton" width="9%" text="Lobby list" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+            <button id="tutorialButton" width="9%" text="Tutorial" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
             <spacer width="8%" />
-            <button width="9%" text="News" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <button width="9%" text="Inventory" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <button width="9%" text="Settings" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+            <button id="newsButton" width="9%" text="News" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+            <button id="inventoryButton" width="9%" text="Inventory" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+            <button id="settingsButton" width="9%" text="Settings" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
             <spacer width="13%" />
-            <button width="5%" height="100%" text= "profile" style="border-left:3px solid #B41C2B;border-top:3px solid #B41C2B;border-right:3px solid #2D70E7;border-bottom:3px solid #2D70E7;background:#B41C2B #2D70E7;background-opacity:.2;border-bottom-right-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;"/>
+            <button id="profileButton" visible="true" width="5%" height="100%" text= "profile not" style="border-left:3px solid #B41C2B;border-top:3px solid #B41C2B;border-right:3px solid #2D70E7;border-bottom:3px solid #2D70E7;background:#B41C2B #2D70E7;background-opacity:.2;border-bottom-right-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;"/>
+            <menubar id="profileMenu" visible="false" width="5%" height="100%" text= "profile" style="border-left:3px solid #B41C2B;border-top:3px solid #B41C2B;border-right:3px solid #2D70E7;border-bottom:3px solid #2D70E7;background:#B41C2B #2D70E7;background-opacity:.2;border-bottom-right-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;">
+                <menu text="Item">
+                    <menuitem text="My profile" />
+                    <menuitem text="Statistics" />
+                    <menuitem text="Leave account" />
+                </menu>
+            </menubar>
         </hbox>
         <label text="Maverick" horizontalAlign="center" verticalAlign="bottom" style="padding:-30px; font-size: 30px; color: #729F42; font-bold: true;"/>
     </box>
@@ -42,7 +49,7 @@
             <listview id="friendList" width="100%" selectedIndex="0" visible="${friendList.dataSource.size > 0}">
                 <friend-list-item-renderer id="friendList" style="background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
                 <data>
-                    <item nickName="ianharrigan" profileImg="https://placehold.co/32x32/png"    active="true" />
+                    <item nickName="ianharrigan" profileImg="https://placehold.co/32x32/png"   active="true" />
                     <item nickName="bbarker" active="false" />
                     <item nickName="timmyt"  active="true" />
                     <item nickName="blue_b"  active="false" />

@@ -22,12 +22,12 @@ export class CustomLobbyRoom extends Room<CustomLobbyState> {
 
     onJoin(client: Client, options: any) {
         
-        console.log(client.sessionId, "joined!");
+        console.log(client.sessionId, "joined!",new Date());
         this.addPlayer(client);
     }
 
     onLeave(client: Client) {
-        console.log(client.sessionId, "left!");
+        console.log(client.sessionId, "left!",new Date());
         this.allowReconnection(client,60*30);
         this.removePlayer(client);
     }

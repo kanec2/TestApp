@@ -79,6 +79,7 @@ class Main{
         */
         
     }
+
     function startup(){
         //trace("Im here");
         checkFiles();

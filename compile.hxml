@@ -16,6 +16,7 @@
 -lib tink_http
 -lib colyseus-websocket
 -lib tweenxcore
+-lib partials
 
 -D concurrent
 -D resourcesPath=assets

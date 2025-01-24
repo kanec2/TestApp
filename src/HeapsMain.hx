@@ -1,3 +1,4 @@
+import extensions.Auth;
 import haxe.ui.backend.heaps.KeyboardHelper;
 import hxd.Key;
 import io.colyseus.error.MatchMakeError;
@@ -20,7 +21,19 @@ using tweenxcore.Tools;
 class HeapsMain extends hxd.App {
     public var menuView:MenuView;
     var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
-    
+    var userToken:String;
+
+    var auth = new Auth("localhost", 2567);
+    var client = new Client("localhost",2567);
+
+    var signedId:Bool = false;
+
+    var userProfile:{
+        name:String,
+        rank:String,
+        locale:String,
+        rating:Int
+    }
 
     // local input cache
     var inputPayload = {
@@ -47,12 +60,94 @@ class HeapsMain extends hxd.App {
     public function new(asyncDispatcher:AsyncEventDispatcher<AppEventBase>) {
         super();
         this.asyncDispatcher = asyncDispatcher;
+        asyncDispatcher.subscribe(onLogin);
+        asyncDispatcher.subscribe(onRegister);
+    }
+    function onLogin(event:AppEventBase){
+        if(event.event != "LoginFailure" || event.event != "LoginSucessful") return;
+
+        if(event.event == "LoginSucessful"){
+            userToken = event.data;
+            trace(userToken);
+        }
+    }
+    function onRegister(event:AppEventBase){
+        if(event.event != "RegisterFailure" || event.event != "RegisterSucessful") return;
+
+        if(event.event == "RegisterSucessful"){
+            userToken = event.data;
+            trace(userToken);
+        }
+    }
+
+    function register(email,pass){
+        trace("try to register");
+
+        var token:String = "";
+        var userData:Dynamic = null;
+        auth.registerWithEmailAndPassword("wtf22@mail.com", "123", (regErr, regData) ->{
+            if(regErr!=null){
+                asyncDispatcher.fire({
+                    event: "RegisterFailure",
+                    data: regErr.message
+                });
+            }
+            if(regData != null){
+                token = regData.token;
+                userData = regData.user;
+                asyncDispatcher.fire({
+                    event: "RegisterSucessful",
+                    data: token
+                });
+            }
+        });
+    }
+
+    function signIn(email,pass){
+        trace("try to login");
+        
+        auth.signInWithEmailAndPassword("wtf22@mail.com", "123", (err, data) ->{
+            trace("Auth?");
+            if(err != null){
+                asyncDispatcher.fire({
+                    event: "LoginFailure",
+                    data: err.message
+                });
+            }
+            if(data != null){
+                trace(data);
+                asyncDispatcher.fire({
+                    event: "LoginSucessful",
+                    data: data.token
+                });
+            }
+        });
     }
 
     override function init() {
 		hxd.Res.initEmbed();
 		Toolkit.init({root: s2d,manualUpdate: false});
-      
+
+        /*Storage.getItem("user-settings").handle(function(settings) {
+            this.token = token;
+        });
+        Storage.getItem("user-settings").handle(function(settings) {
+            this.token = token;
+        });
+        */
+        
+        try{
+            register("wtf22@mail.com", "123");
+        }
+        catch(e){ trace("register failed"); }
+
+        try {
+            signIn("wtf22@mail.com", "123");
+        }
+        catch(e){ trace("login failed"); }
+        /*client.auth.signInWithEmailAndPassword("wtf@mail.com","123",(res,err)->{
+            trace("Good");
+        });*/
         //client 
         //client;
         //client.auth.token = "123456";

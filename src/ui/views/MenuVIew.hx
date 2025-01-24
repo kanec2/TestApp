@@ -1,5 +1,8 @@
 package ui.views;
 
+import partials.Partial;
+import haxe.ui.containers.dialogs.Dialog.DialogEvent;
+import ui.components.SignInWindow;
 import network.states.LobbyState;
 import io.colyseus.events.EventHandler;
 import io.colyseus.Room;
@@ -26,9 +29,61 @@ class MenuView extends Box {
     // by their `sessionId`
     var playerEntities:Map<String,TestEntity> = new Map<String,TestEntity>();// {[sessionId: string]: any} = {};
     var currentPlayer: TestEntity;
+    var signed:Bool;
+    public var signedIn(get,set):Bool;
 
-    function leaveHandler(){
+    /**
+     * [Menu handlers]
+     */
 
+    @:bind(quickMatchButton,MouseEvent.CLICK)
+    private function onQuickMatchButtonClick(e){
+        // client.joinOrCreate("lobby", [], Dynamic, function(err:MatchMakeError, room:Room<Dynamic>) {
+        //     lobby = room;
+        //     onjoin();
+        //     trace("Joined lobby room!");
+        // });
+    }
+
+    @:bind(lobbyListButton,MouseEvent.CLICK)
+    private function onLobbyListButtonClick(e){
+
+    }
+
+    @:bind(tutorialButton,MouseEvent.CLICK)
+    private function onTutorialButtonClick(e){
+
+    }
+
+    @:bind(newsButton,MouseEvent.CLICK)
+    private function onNewsButtonClick(e){
+
+    }
+
+    @:bind(inventoryButton,MouseEvent.CLICK)
+    private function onInventoryButtonClick(e){
+
+    }
+
+    @:bind(settingsButton,MouseEvent.CLICK)
+    private function onSettingsButtonClick(e){
+
+    }
+
+    @:bind(profileButton,MouseEvent.CLICK)
+    private function onProfileButtonClick(e){
+        if(signedIn == false){
+            showSignInWindow();
+        }
+        else {
+            //showAccountSettingsWindow();
+        }
+    }
+
+
+
+    function leaveProfileHandler(){
+        
     }
     
     function onjoin() {
@@ -97,6 +152,8 @@ class MenuView extends Box {
 
     public function new() {
         super();
+
+        /*
         client = new Client("localhost",2567);
         
         client.joinOrCreate("lobby",[],LobbyState,(err, rom) ->{
@@ -109,7 +166,7 @@ class MenuView extends Box {
                 //rom.onMessage("+", ())
             }
         });
-
+*/
         //joinLobby("fddsfsd3223");
         /*
         friendList.dataSource.onChange = function(){
@@ -141,9 +198,37 @@ class MenuView extends Box {
         }).join("\n");
 
       }*/
+    
+    function get_signedIn():Bool {
+		return signed;
+	}
 
+	function set_signedIn(value:Bool):Bool {
+        profileButton.hide();
+        profileMenu.show();
+		signed = value;
+        return signed;
+	}
+
+    function showSignInWindow(){
+        var dialog = new SignInWindow();
+        dialog.onDialogClosed = function(e:DialogEvent) {
+            //trace(e.button);
+            //trace(e.data);
+            signedIn = dialog.validationResult;
+            trace(signedIn);
+        }
+        dialog.showDialog();
+    }
+
+    @:bind(profileButton,MouseEvent.CLICK)
+    private function onProfileButtonClick(e){
+        
+    }
+    
     var getFriendsCommand:(userId:String) -> Void;
     var friendsDataSource:Array<FriendModel> = new Array<FriendModel>();
+
     @:bind(NotificationManager.instance, NotificationEvent.ACTION)
     private function onNotificationManagerAction(event:NotificationEvent) {
         var actionData = event.data;//.actionData;
@@ -163,11 +248,7 @@ class MenuView extends Box {
 
     @:bind(quickMatchBtn, MouseEvent.CLICK)
     private function onQuickMatchClick(e){
-        // client.joinOrCreate("lobby", [], Dynamic, function(err:MatchMakeError, room:Room<Dynamic>) {
-        //     lobby = room;
-        //     onjoin();
-        //     trace("Joined lobby room!");
-        // });
+
     }
 
     @:bind(actionNotificationCallbackButton, MouseEvent.CLICK)
@@ -206,4 +287,6 @@ class MenuView extends Box {
         this.addComponent(lobbyWindow);
     }
    
+
+
 }
