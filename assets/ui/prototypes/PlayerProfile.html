@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Profile</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif; /* Body font */
+            background-color: #f4f4f4; /* Light background */
+            padding: 20px;
+        }
+        .profile-container {
+            background-color: white; /* White background for the profile */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto; /* Center the profile container */
+        }
+        .avatar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .avatar img {
+            border-radius: 50%; /* Circular avatar */
+            width: 100px; /* Size of the avatar */
+            height: 100px;
+        }
+        .stats, .customization {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ddd; /* Light border color */
+            border-radius: 5px;
+        }
+        .stats h3, .customization h3 {
+            margin: 0 0 10px 0; /* Separate headings from content */
+            color: #007bff; /* Bright blue for section headings */
+        }
+        .customization-options {
+            display: flex; /* Flex container for options */
+            justify-content: center;
+            gap: 10px; /* Spacing between options */
+        }
+        .option {
+            padding: 10px;
+            background-color: #007bff; /* Bright blue for buttons */
+            color: white; /* Text color */
+            border-radius: 5px;
+            cursor: pointer; /* Pointer on hover */
+            text-align: center;
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+        .option:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="profile-container">
+    <div class="avatar">
+        <img src="https://via.placeholder.com/100" alt="Player Avatar">
+    </div>
+    
+    <div class="stats">
+        <h3>Player Stats</h3>
+        <p><strong>Wins:</strong> 150</p>
+        <p><strong>Losses:</strong> 50</p>
+        <p><strong>Highest Score:</strong> 2500</p>
+    </div>
+    
+    <div class="customization">
+        <h3>Customization Options</h3>
+        <div class="customization-options">
+            <div class="option">Skins</div>
+            <div class="option">Titles</div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

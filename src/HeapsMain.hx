@@ -1,3 +1,5 @@
+import ui.views.BuildingMenu;
+import ui.views.MainView;
 import extensions.Auth;
 import haxe.ui.backend.heaps.KeyboardHelper;
 import hxd.Key;
@@ -20,6 +22,7 @@ using tweenxcore.Tools;
 
 class HeapsMain extends hxd.App {
     public var menuView:MenuView;
+    public var otherMenu:BuildingMenu;
     var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
     var userToken:String;
 
@@ -237,6 +240,8 @@ class HeapsMain extends hxd.App {
         menuView = new MenuView();
         Screen.instance.addComponent(menuView);
         asyncDispatcher.fire(ev);
+        //otherMenu = new BuildingMenu();
+        //Screen.instance.addComponent(otherMenu);
         //Window.getInstance().displayMode = Windowed;
         //Window.getInstance().resize(600,350);
         //preloader = new PreloaderView();

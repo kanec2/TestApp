@@ -1,69 +1,359 @@
 <box style="padding: 0px;" width="100%" height="100%">
+    <style>        
+        .dot {
+            width: 100%;
+            height: 100%;
+            background-color: $selection-background-color;
+            border: 2px solid $selection-background-color;
+            border-radius: 30px;
+        }
+        
+        .dot-container:grow {
+            animation: sizedotitem 0.2s ease 0s 1;
+        }
+        
+        .dot-container:shrink {
+            animation: sizedotitem 0.2s ease 0s 1 reverse backwards;
+        }
+        
+        .dot:grow {
+            animation: colordot 0.2s ease 0s 1;
+        }
+        
+        .dot:shrink {
+            animation: colordot 0.2s ease 0s 1 reverse backwards;
+        }
+    
+        @keyframes sizedotitem {
+            0% {
+                padding-top: 10px;
+                padding-left: 10px;
+                padding-bottom: 10px;
+                padding-right: 10px;
+            }
+            100% {
+                padding-top: 0px;
+                padding-left: 0px;
+                padding-bottom: 0px;
+                padding-right: 0px;
+            }
+        }
+    
+        @keyframes colordot {
+            0% {
+                background-color: $selection-background-color;
+            }
+            100% {
+                background-color: $solid-background-color;
+            }
+        }
+        .top-menu{
+            background-opacity:0;
+        }
+        .menu {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+        .menuitem {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+        .menubar-button {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+        .menu-filler {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+        /************************************************************************
+        ** MENUBAR
+        *************************************************************************/
+        .menubar {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menubar-button {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menubar.rounded .menubar-button {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menubar-button:hover {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        /*
+        .menubar-button:active {
+            background-color: $selection-background-color-hover;
+            color: $hover-text-color;
+        }
+        */
+
+        .menubar-button:down {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menubar-button-no-children {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menubar-button-no-children:hover {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menubar-button-no-children:down {
+            background-color: $secondary-background-color;
+            color: $down-text-color;
+            border: 1px solid $normal-border-color;
+        }
+
+        .menubar-button:disabled {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        /************************************************************************
+        ** MENU
+        *************************************************************************/
+        .menu {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menu.rounded {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menu.primary-menu.rounded {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menu.auto-width {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menu.expanded {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menu-filler {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        /************************************************************************
+        ** MENUITEMS
+        *************************************************************************/
+        .menuitem {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menuitem-label, .menuitem-checkbox, .menuitem-optionbox, .menuitem-shortcut-label {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menuitem-label:disabled, .menuitem-shortcut-label:disabled {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menuitem-shortcut-label {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menuitem-icon {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menuitem:hover, .menuitem:selected {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menuitem .label:hover, .menuitem .label:selected,
+        .menuitem-checkbox:hover, .menuitem-checkbox:selected,
+        .menuitem-optionbox:hover, .menuitem-optionbox:selected {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menuitem-expandable {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menuseparator {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menuseparator-line {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menu.rounded .menuitem {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+
+        .menu.rounded .menuseparator {
+            color: red; 
+            background-color: #009F42;
+            border:1px solid #009F42;
+            background-opacity: .1;
+        }
+        .bitmap-button {
+            background: none;
+            padding: 6px 8px;
+            border: none;
+            color: #CCCCCC;
+            background-image: "images/brand_logo.png";
+            /*background-image-clip: 0px 0px 26px 65px;
+            background-image-slice: 3px 3px 24px 62px;*/
+        }
+        
+        .bitmap-button:hover {
+            color: white;
+        }
+        .dot-container {
+            height:100%;
+        }
+        .bitmap-button:down {
+            /*background-image-clip: 0px 68px 26px 133px;*/
+        }
+        button {
+            /^width: 100%;^/
+            /*padding: 10px;*/
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #quickMatchButton{
+            height:1000px;
+        }
+        button > .dot-container {
+            height:100%;
+        }
+    </style>
     <!--header-->
-    <box width="100%" height="10%" backgroundImage="images/bg_top_bar.png" verticalAlign="top">
-        <hbox width="100%" height="100%" horizontalAlign="center" padding="10">
-            <spacer width="19%" />
-            <button id="quickMatchBtn" width="9%" text="Quick match" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <button id="lobbyListButton" width="9%" text="Lobby list" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <button id="tutorialButton" width="9%" text="Tutorial" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <spacer width="8%" />
-            <button id="newsButton" width="9%" text="News" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <button id="inventoryButton" width="9%" text="Inventory" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <button id="settingsButton" width="9%" text="Settings" style="color: red; background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-            <spacer width="13%" />
-            <button id="profileButton" visible="true" width="5%" height="100%" text= "profile not" style="border-left:3px solid #B41C2B;border-top:3px solid #B41C2B;border-right:3px solid #2D70E7;border-bottom:3px solid #2D70E7;background:#B41C2B #2D70E7;background-opacity:.2;border-bottom-right-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;"/>
-            <menubar id="profileMenu" visible="false" width="5%" height="100%" text= "profile" style="border-left:3px solid #B41C2B;border-top:3px solid #B41C2B;border-right:3px solid #2D70E7;border-bottom:3px solid #2D70E7;background:#B41C2B #2D70E7;background-opacity:.2;border-bottom-right-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;">
+    <box  width="100%" height="10%" backgroundImage="images/bg_top_bar.png" verticalAlign="top">
+        <label text="Maverick" horizontalAlign="center" verticalAlign="bottom" style="padding:-30px; font-size: 30px; color: #729F42; font-bold: true;"/>
+        <menubar width="100%" height="100%" styleName="top-menu" horizontalAlign="center" padding="10" id="topBar" >
+            <button  width="15%" height="100%"                     onclick="contentHold.selectedIndex = 0"              styleName="bitmap-button"/>
+            <spacer  width="10%" />
+            <menu    width="9%"  height="100%" text="Quick match"  onclick="contentHold.selectedIndex = 1" userData="0" styleName="dot-container" />
+            <menu    width="9%"  height="100%" text="Lobby list"   onclick="contentHold.selectedIndex = 2" userData="1" styleName="menuitem" />
+            <menu    width="9%"  height="100%" text="Single play"  onclick="contentHold.selectedIndex = 3" userData="2" styleName="menuitem" />
+            <menu    width="9%"  height="100%" text="News"         onclick="contentHold.selectedIndex = 4" userData="3" styleName="menuitem" />
+            <menu    width="9%"  height="100%" text="Inventory"    onclick="contentHold.selectedIndex = 5" userData="4" styleName="menuitem"/>
+            <menu    width="9%"  height="100%" text="Settings"     onclick="contentHold.selectedIndex = 6" userData="5" styleName="menuitem"/>
+            <spacer  width="60%" />
+            <menu    width="5%"  height="100%" text= "profile not" visible="true"                          userData="6"  id="profileButton"/>
+            <menubar width="5%"  height="100%" text= "profile"     visible="false"                         userData="7"  id="profileMenu"   >
                 <menu text="Item">
                     <menuitem text="My profile" />
                     <menuitem text="Statistics" />
                     <menuitem text="Leave account" />
                 </menu>
             </menubar>
-        </hbox>
-        <label text="Maverick" horizontalAlign="center" verticalAlign="bottom" style="padding:-30px; font-size: 30px; color: #729F42; font-bold: true;"/>
+        </menubar>
     </box>
-    <box width="100" height="100" verticalAlign="center" horizontalAlign="center" includeInLayout="true" backgroundImage="images/bg_logo.png" />
+    <box  width="100"  height="100" verticalAlign="center" horizontalAlign="center" includeInLayout="true" backgroundImage="images/bg_logo.png" />
     <!--Main content-->
-    <vbox width="100%" height="90%" verticalAlign="bottom">
-        <!--left side-->
-        <box width="30%" height="100%">
-            <vbox width="70%" height="70%" backgroundImage="images/info_panel.png" style="padding:0px 30px 40px 20px; background-color: #009F42;">
-                
-            </vbox>
-            
-            <vbox height="15%" horizontalAlign="left" verticalAlign="bottom" style="padding:0px 30px 20px 20px; background-color: #000042;">
-                <label text="RELEASE FEATURES" style="padding:0px; font-size: 30px; color: #e2dfd6;"/>
-                <label text="lorem ipsum dolorem" style="padding:0px; font-size: 20px; color: #bfb7a1;"/>
-            </vbox>
-        </box>
-        
-        <vbox visible="false" width="40%" height="30%" verticalAlign = "center" horizontalAlign="left">
-            <label text="Friend list" horizontalAlign="center" textAlign="center" width="100%" style="background-color: #009F42;"/>
-            <box id="noFriendBox" width="100%" height="20%" style="background-color: #729F42;" visible="${friendList.dataSource.size == 0}" >
-                <hbox verticalAlign="center" horizontalAlign="center">
-                    <label verticalAlign="center" text="NO FRIENDS YET!" />
-                    <button text="Add friend"/>
-                </hbox>
-            </box>
-            
-            <listview id="friendList" width="100%" selectedIndex="0" visible="${friendList.dataSource.size > 0}">
-                <friend-list-item-renderer id="friendList" style="background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
-                <data>
-                    <item nickName="ianharrigan" profileImg="https://placehold.co/32x32/png"   active="true" />
-                    <item nickName="bbarker" active="false" />
-                    <item nickName="timmyt"  active="true" />
-                    <item nickName="blue_b"  active="false" />
-                    <item nickName="jjonas"  active="false" />
-                    <item nickName="foo_bar" active="true" />
-                </data>
-            </listview>
-        </vbox>
+    <hbox width="100%" height="90%" verticalAlign="bottom">
+        <stack id="contentHold" visible="true" width="100%" height="100%">
+            <main-menu-content />
+            <quick-match-options />
+            <lobby-list />
+            <single-menu />
+            <news-menu />
+        </stack>
+
         <vbox visible="false" layout="vertical" verticalAlign = "center" horizontalAlign="center">
             <button text="Start" />
             <button text="Settings" />
             <button text="Profile" />
-            <button id="actionNotificationCallbackButton" text="Show lobby invite" />
+            <button text="Show lobby invite" id="actionNotificationCallbackButton"  />
         </vbox>
-        <vbox id="contentHold" visible="false"/>
-    </vbox>
+    </hbox>
 </box>

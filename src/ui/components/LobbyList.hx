@@ -10,66 +10,117 @@ typedef SelectedFilter = {
     gameMaps: Map<String, Bool>
   }
   @:xml('
-  <vbox width="100%" style="padding:10px;">
+    <vbox width="100%" height="100%">
     <style>
-        #myCustomTabView .tabbar-button {
-            font-weight: bold;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
         }
 
-        #myCustomTabView .tabview-content {
-            padding: 1px;
+        .header {
+            background-color: #4CAF50;
+            padding: 3px;
+        }
+        .header-label{
+            color: white;
+            text-align: center;
+            font-bold: true;
+            font-size: 20px;
         }
 
-        #myCustomTabView #redTabButton {
-            color: red;
-        }
-        #myCustomTabView #greenTabButton {
-            color: green;
-        }
-        #myCustomTabView #blueTabButton {
-            color: blue;
+        .container {
+
+            /*margin: 20px auto;*/
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
         }
 
-        #myCustomTabView #redTabButton.tabbar-button-selected {
-            border-top-color: red;
-            border-bottom-color: #FFEEEE;
-            background-color: #FFEEEE;
+        .lobby-item {
+            /*display: flex;*/
+            justify-content: space-between;
+            align-items: center;
+            /*padding: 10px;*/
+            border-bottom: 1px solid #ddd;
         }
-        #myCustomTabView #greenTabButton.tabbar-button-selected {
-            border-top-color: green;
-            border-bottom-color: #EEFFEE;
-            background-color: #EEFFEE;
+
+        .lobby-item:last-child {
+            border-bottom: none;
         }
-        #myCustomTabView #blueTabButton.tabbar-button-selected {
-            border-top-color: blue;
-            border-bottom-color: #EEEEFF;
-            background-color: #EEEEFF;
+
+        .lobby-name {
+            font-size: 18px;
+            font-bold: true;
+        }
+
+        .lobby-status {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .join-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .join-button:hover {
+            background-color: #45a049;
+        }
+        .join-button:disabled {
+            background-color: #2f2c27;
         }
     </style>
+        <box styleName="header" width="100%">
+            <label width="100%" styleName="header-label" text="Lobby List"/>
+        </box>
 
-    <tabview id="myCustomTabView" width="300" height="100" styleName="rounded-tabs full-width-buttons">
-        <box id="red" width="100%" height="100%" text="Red" style="background-color: #FFEEEE" />
-        <box id="green" width="100%" height="100%" text="Green" style="background-color: #EEFFEE" />
-        <box id="blue" width="100%" height="100%" text="Blue" style="background-color: #EEEEFF" />
-    </tabview>
-</vbox>
+        <vbox styleName="container" width="100%" height="100%">
+            <item-renderer width="100%">
+                <hbox styleName="lobby-item" width="100%">
+                    <vbox>
+                        <label id="lobbyName" styleName="lobby-name"/>
+                        <label id="lobbyStatus" styleName="lobby-status"/>
+                    </vbox>
+                    <button width="100px" id="joinButton" text="Join" styleName="join-button"/>
+                </hbox>
+            </item-renderer>
+            <data>
+                <item lobbyName="Casual Game" lobbyStatus="5/10 players" />
+                <item lobbyName="Tournament Lobby" lobbyStatus="2/6 players"/>
+                <item lobbyName="Practice Room" lobbyStatus="8/8 players" joinButton = "Full" joinButton.disabled = "${true}" />
+            </data>
+        </vbox>
+    </vbox>
   ')
 class LobbyList extends VBox{
     var gameModes: Map<String, Bool> = new Map<String, Bool>();
     var rooms:Array<RoomAvailable>; //RoomAvailable
-    public function new(appData: AppData) {
+    public function new() {
         super();
         
         for (mode in Settings.GAME_MODES) {
           gameModes.set(mode, true);
         }
-
+        /*
         var client:Client = appData.client;
         client.getAvailableRooms("team_lobby",(err, serverRooms)->{
-            for(room in serverRooms){
-                rooms.push(room);
+            if(err != null){
+                
             }
-        });
+            if(serverRooms != null){
+                for(room in serverRooms){
+                    rooms.push(room);
+                }
+            }
+        });*/
     }
 
     function joinRoom(roomId:String){

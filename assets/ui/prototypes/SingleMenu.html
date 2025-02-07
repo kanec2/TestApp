@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Menu - RTS Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2e2e2e;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .tutorial-menu-container {
+            background-color: #444;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            width: 400px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .tutorial-list {
+            margin-bottom: 20px;
+        }
+        
+        .tutorial-item {
+            background-color: #555;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        
+        .tutorial-item h2 {
+            margin: 0;
+        }
+        
+        .tutorial-item p {
+            margin: 5px 0 10px;
+        }
+        
+        button.start-button {
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button.start-button:hover {
+            background-color: #0056b3;
+        }
+        
+        button.back-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #dc3545;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        button.back-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+    <script>
+        function startTutorial(tutorialNumber) {
+            // Logic to initiate the specific tutorial
+            alert('Starting Tutorial ' + tutorialNumber);
+            // You can replace this with your actual tutorial starting logic
+        }
+        
+        document.getElementById('back-button').addEventListener('click', function () {
+            // Logic to return to the main menu
+            alert('Returning to Main Menu');
+            // Replace with actual navigation or UI logic
+        });
+    </script>
+</head>
+<body>
+    <div class="tutorial-menu-container">
+        <h1>Tutorial Menu</h1>
+        <div class="tutorial-list">
+            <div class="tutorial-item">
+                <h2>Tutorial 1: Game Basics</h2>
+                <p>Learn the fundamental mechanics of the game, including controls and interface.</p>
+                <button class="start-button" onclick="startTutorial(1)">Start Tutorial</button>
+            </div>
+            <div class="tutorial-item">
+                <h2>Tutorial 2: Resource Management</h2>
+                <p>Understand how to gather resources and manage your economy effectively.</p>
+                <button class="start-button" onclick="startTutorial(2)">Start Tutorial</button>
+            </div>
+            <div class="tutorial-item">
+                <h2>Tutorial 3: Building Structures</h2>
+                <p>Learn how to build bases and upgrade your defenses and offense.</p>
+                <button class="start-button" onclick="startTutorial(3)">Start Tutorial</button>
+            </div>
+            <div class="tutorial-item">
+                <h2>Tutorial 4: Combat Strategies</h2>
+                <p>Master the art of warfare and learn different strategies to defeat your enemies.</p>
+                <button class="start-button" onclick="startTutorial(4)">Start Tutorial</button>
+            </div>
+        </div>
+        
+        <button id="back-button" class="back-button">Back to Main Menu</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

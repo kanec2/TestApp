@@ -1,0 +1,37 @@
+<hbox width="100%" height="100%"> 
+    <!--left side-->
+    <vbox  height="100%" >
+        <vbox width="100%" height="70%" backgroundImage="images/info_panel.png" style=" background-color: #009F42;">
+            
+        </vbox>
+        <spacer height="15%" />
+        <vbox height="15%" horizontalAlign="left" verticalAlign="bottom" style=" background-color: #000042;">
+            <label text="RELEASE FEATURES" style="padding:0px; font-size: 30px; color: #e2dfd6;"/>
+            <label text="lorem ipsum dolorem" style="padding:0px; font-size: 20px; color: #bfb7a1;"/>
+        </vbox>
+    </vbox>
+
+    <box width="72%" height="100%" style="background-color: #999900">
+    </box>
+    <vbox visible="true" width="30%" height="100%">
+        <label text="Friend list" horizontalAlign="center" textAlign="center" width="100%" style="background-color: #009F42;"/>
+        <box id="noFriendBox" width="100%" height="20%" style="background-color: #729F42;" visible="${friendList.dataSource.size == 0}" >
+            <hbox verticalAlign="center" horizontalAlign="center">
+                <label verticalAlign="center" text="NO FRIENDS YET!" />
+                <button text="Add friend"/>
+            </hbox>
+        </box>
+        
+        <listview id="friendList" width="100%" selectedIndex="0" visible="${friendList.dataSource.size > 0}">
+            <friend-list-item-renderer id="friendList" style="background-color: #009F42;border:1px solid #009F42;background-opacity: .1;"/>
+            <data>
+                <item nickName="ianharrigan" profileImg="https://placehold.co/32x32/png"   active="true" />
+                <item nickName="bbarker" active="false" />
+                <item nickName="timmyt"  active="true" />
+                <item nickName="blue_b"  active="false" />
+                <item nickName="jjonas"  active="false" />
+                <item nickName="foo_bar" active="true" />
+            </data>
+        </listview>
+    </vbox>
+</hbox>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In-Game Interface</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif; /* Body font */
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-bar {
+            background-color: #333; /* Dark top bar */
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* Center items vertically */
+        }
+        .health-bar {
+            width: 30%;
+            background: #f44336; /* Health bar background color */
+            height: 20px;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .health-bar span {
+            display: block;
+            height: 100%;
+            background: #4caf50; /* Health percentage color */
+            width: 75%; /* Set the player's health percentage here */
+            transition: width 0.3s; /* Smooth health transition */
+        }
+        .resources {
+            display: flex;
+            align-items: center;
+        }
+        .resources div {
+            margin-right: 20px;
+            color: #ddd; /* Subdued color for resource labels */
+        }
+        .game-container {
+            display: flex;
+            flex: 1;
+        }
+        .left-sidebar {
+            width: 25%;
+            background: #f9f9f9; /* Light background for the sidebar */
+            padding: 10px;
+            border-right: 2px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-window {
+            flex: 1;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+            overflow-y: auto;
+            padding: 10px;
+            height: 150px; /* Set height for the chat window */
+        }
+        .wave-counter {
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #007bff; /* Bright blue for wave counter */
+        }
+        .main-game {
+            flex: 1;
+            position: relative;
+            background: url('https://via.placeholder.com/800x600') center / cover; /* Replace with your game background */
+        }
+        .minimap {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 150px;
+            height: 150px;
+            border: 2px solid #000;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            padding: 10px; /* Padding for better display */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow to lift the element */
+        }
+        .tower-placement-area {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 300px;
+            height: 150px;
+            border: 1px dashed #333;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            text-align: center; /* Center text */
+            padding-top: 50px; /* Space for the text */
+            color: #333; /* Dark text color */
+            font-weight: bold; /* Bold for emphasis */
+        }
+        /* Icons for possible resources (optional) */
+        .resources img {
+            width: 20px; /* Set icon size */
+            height: 20px; /* Set icon size */
+            margin-right: 5px; /* Spacing between icon and text */
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="health-bar">
+        <span></span>
+    </div>
+    <div class="resources">
+        <div><strong>Gold:</strong> <span>1000</span></div>
+        <div><strong>Mana:</strong> <span>500</span></div>
+    </div>
+</div>
+
+<div class="game-container">
+    <div class="left-sidebar">
+        <div class="wave-counter">Wave: 1</div>
+        <div class="chat-window">
+            <div>User1: Ready to start?</div>
+            <div>User2: Let’s go!</div>
+            <div>User3: I need more mana!</div>
+            <div>User4: Watch out for the next wave!</div>
+        </div>
+    </div>
+
+    <div class="main-game">
+        <div class="minimap">
+            <p>Minimap</p>
+        </div>
+        <div class="tower-placement-area">
+            <p>Place Towers Here</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

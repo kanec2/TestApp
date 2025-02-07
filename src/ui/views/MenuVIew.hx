@@ -1,5 +1,8 @@
 package ui.views;
 
+import haxe.ui.events.MenuEvent;
+import model.AppData;
+import ui.components.LobbyList;
 import partials.Partial;
 import haxe.ui.containers.dialogs.Dialog.DialogEvent;
 import ui.components.SignInWindow;
@@ -13,6 +16,7 @@ import ui.components.LobbyWindow;
 import haxe.ui.notifications.NotificationData.NotificationActionData;
 import haxe.ui.events.MouseEvent;
 import haxe.ui.events.NotificationEvent;
+
 import haxe.ui.notifications.NotificationManager;
 import haxe.ui.containers.VBox;
 import haxe.ui.containers.Box;
@@ -30,46 +34,14 @@ class MenuView extends Box {
     var playerEntities:Map<String,TestEntity> = new Map<String,TestEntity>();// {[sessionId: string]: any} = {};
     var currentPlayer: TestEntity;
     var signed:Bool;
+    var appData:AppData;
     public var signedIn(get,set):Bool;
 
     /**
      * [Menu handlers]
      */
-
-    @:bind(quickMatchButton,MouseEvent.CLICK)
-    private function onQuickMatchButtonClick(e){
-        // client.joinOrCreate("lobby", [], Dynamic, function(err:MatchMakeError, room:Room<Dynamic>) {
-        //     lobby = room;
-        //     onjoin();
-        //     trace("Joined lobby room!");
-        // });
-    }
-
-    @:bind(lobbyListButton,MouseEvent.CLICK)
-    private function onLobbyListButtonClick(e){
-
-    }
-
-    @:bind(tutorialButton,MouseEvent.CLICK)
-    private function onTutorialButtonClick(e){
-
-    }
-
-    @:bind(newsButton,MouseEvent.CLICK)
-    private function onNewsButtonClick(e){
-
-    }
-
-    @:bind(inventoryButton,MouseEvent.CLICK)
-    private function onInventoryButtonClick(e){
-
-    }
-
-    @:bind(settingsButton,MouseEvent.CLICK)
-    private function onSettingsButtonClick(e){
-
-    }
-
+    //#region listeners
+    
     @:bind(profileButton,MouseEvent.CLICK)
     private function onProfileButtonClick(e){
         if(signedIn == false){
@@ -80,10 +52,45 @@ class MenuView extends Box {
         }
     }
 
-
-
-    function leaveProfileHandler(){
+    //#endregion
+    private var _currentDotIndex:Int = 0;
+    
+    /*@:bind(quickMatchButton, MouseEvent.CLICK)
+    private function onPrev(_) {
         
+        var newIndex = _currentDotIndex - 1;
+        if (newIndex < 0) {
+            newIndex = theDots.childComponents.length - 1;
+        }
+        setDotIndex(newIndex);
+    }*/
+    private function setHighlight(idx){
+        trace("well");
+        trace(idx);
+    }
+    /*@:bind(buttonNext, MouseEvent.CLICK)
+    private function onNext(_) {
+        var newIndex = _currentDotIndex + 1;
+        if (newIndex > theDots.childComponents.length - 1) {
+            newIndex = 0;
+        }
+        setDotIndex(newIndex);
+    }
+    
+    private function setDotIndex(index:Int) {
+        theDots.childComponents[_currentDotIndex].swapClass(':shrink', ':grow', true, true);
+        _currentDotIndex = index;
+        theDots.childComponents[_currentDotIndex].swapClass(':grow', ':shrink', true, true);
+    }*/
+
+    //onMenuSelected:MenuEvent->Void
+    @:bind(topBar,MenuEvent.MENU_SELECTED)
+    function menuSelectionChanged(e:MenuEvent){
+        //switch(e)
+        //quickMatchButton.
+        trace(e.menu.userData);
+        trace(e.menuItem);
+        trace("changed");
     }
     
     function onjoin() {
@@ -152,7 +159,9 @@ class MenuView extends Box {
 
     public function new() {
         super();
-
+        //client = new Client(endpoint);
+        appData = new AppData(endpoint);
+        client = appData.client;
         /*
         client = new Client("localhost",2567);
         
@@ -213,18 +222,16 @@ class MenuView extends Box {
     function showSignInWindow(){
         var dialog = new SignInWindow();
         dialog.onDialogClosed = function(e:DialogEvent) {
-            //trace(e.button);
-            //trace(e.data);
             signedIn = dialog.validationResult;
             trace(signedIn);
         }
         dialog.showDialog();
     }
-
+/*
     @:bind(profileButton,MouseEvent.CLICK)
     private function onProfileButtonClick(e){
         
-    }
+    }*/
     
     var getFriendsCommand:(userId:String) -> Void;
     var friendsDataSource:Array<FriendModel> = new Array<FriendModel>();
@@ -243,12 +250,7 @@ class MenuView extends Box {
 
     public function setFriends(friends:Array<FriendModel>){
         //trace("we have new friends");
-        friendList.dataSource.data = friends;
-    }
-
-    @:bind(quickMatchBtn, MouseEvent.CLICK)
-    private function onQuickMatchClick(e){
-
+        //friendList.dataSource.data = friends;
     }
 
     @:bind(actionNotificationCallbackButton, MouseEvent.CLICK)

@@ -9,5 +9,15 @@ class MainView extends VBox {
         super();
 
     }
+    function closeMenu(){
+
+    }
+
+    function selectBuilding(any){
+
+    }
+    function quickMatchButton(){
+
+    }
   
 }

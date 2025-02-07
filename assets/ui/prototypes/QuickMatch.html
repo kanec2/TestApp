@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Match</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .quick-match-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            max-width: 400px;
+            margin: auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        .game-settings, .player-info {
+            margin: 20px 0;
+        }
+        
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        
+        select, input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: #218838;
+        }
+        
+        .status-message {
+            text-align: center;
+            margin-top: 10px;
+            color: #333;
+        }
+    </style>
+    <script>
+        document.getElementById('quick-match-btn').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const map = document.getElementById('map').value;
+            const matchType = document.getElementById('match-type').value;
+            const gameMode = document.getElementById('game-mode').value;
+        
+            if (username.trim() === "") {
+                document.getElementById('status-message').textContent = "Please enter a username.";
+                return;
+            }
+        
+            // Simulation of finding a match
+            document.getElementById('status-message').textContent = `Searching for a match for ${username}...`;
+        
+            // Here you can add your matchmaking logic
+        
+            // Simulate match found after 3 seconds
+            setTimeout(() => {
+                document.getElementById('status-message').textContent = `Match found on ${map} as ${matchType} in ${gameMode} mode!`;
+            }, 3000);
+        });
+    </script>
+</head>
+<body>
+    <div class="quick-match-container">
+        <h1>Quick Match</h1>
+        <div class="game-settings">
+            <label for="map">Select Map:</label>
+            <select id="map">
+                <option value="map1">Map 1</option>
+                <option value="map2">Map 2</option>
+                <option value="map3">Map 3</option>
+            </select>
+            
+            <label for="match-type">Match Type:</label>
+            <select id="match-type">
+                <option value="1v1">1v1</option>
+                <option value="2v2">2v2</option>
+                <option value="3v3">3v3</option>
+            </select>
+    
+            <label for="game-mode">Game Mode:</label>
+            <select id="game-mode">
+                <option value="normal">Normal</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+
+        <button id="quick-match-btn">Find Match</button>
+
+        <div class="status-message" id="status-message"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascension Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif; /* Body Font */
+            background-color: #f4f4f4; /* Light gray for background */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007bff; /* Bright blue for header */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif; /* Title Font */
+            font-size: 2em; /* Larger size for heading */
+        }
+
+        nav {
+            background-color: #0056b3; /* Darker blue for navigation */
+            padding: 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #004494; /* Slightly darker on hover */
+        }
+
+        section {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+        }
+
+        .card {
+            background-color: white; /* White background for cards */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 30%; /* Width of each card */
+            text-align: center;
+        }
+
+        .card h3 {
+            color: #007bff; /* Bright blue for card titles */
+            font-family: 'Montserrat', sans-serif; /* Title font */
+            font-size: 1.5em; /* Larger size for headings */
+        }
+
+        .card p {
+            margin: 10px 0;
+        }
+
+        footer {
+            background-color: #333; /* Dark footer */
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            section {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .card {
+                width: 80%; /* Full width on smaller screens */
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        Ascension Game
+    </header>
+    <nav>
+        <a href="#features">Features</a>
+        <a href="#upgrades">Upgrades</a>
+        <a href="#community">Community</a>
+    </nav>
+    <section>
+        <div class="card">
+            <h3>Game Features</h3>
+            <p>Explore exciting gameplay mechanics and unique features.</p>
+        </div>
+        <div class="card">
+            <h3>Upgrades</h3>
+            <p>Unlock powerful upgrades to enhance your gameplay.</p>
+        </div>
+        <div class="card">
+            <h3>Community</h3>
+            <p>Join our vibrant community and connect with other players.</p>
+        </div>
+    </section>
+    <footer>
+        &copy; 2023 Ascension Game. All rights reserved.
+    </footer>
+</body>
+
+</html>

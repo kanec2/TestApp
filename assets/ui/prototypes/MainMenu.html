@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Menu</title>
+    
+    <!-- Link to Google Fonts for Montserrat and Open Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif; /* Body font */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('https://via.placeholder.com/1920x1080'); /* Replace with your background image */
+            background-size: cover;
+            color: white;
+        }
+        
+        .menu-container {
+            text-align: center;
+            background: rgba(30, 30, 30, 0.9); /* Dark background for readability */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+        }
+        
+        .button {
+            background-color: #28a745; /* Bright green for active buttons */
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%; /* Full width buttons for better accessibility */
+            font-family: 'Montserrat', sans-serif; /* Title font */
+            font-weight: 700; /* Bold for button text */
+        }
+
+        .button:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+        
+        .button:disabled {
+            background-color: #6c757d; /* Gray for disabled buttons */
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="menu-container">
+        <div class="logo">
+            <img src="https://via.placeholder.com/200x100" alt="Game Logo"> <!-- Replace with your logo image -->
+        </div>
+        <button class="button" onclick="startSingleplayer()">Play Singleplayer</button>
+        <button class="button" onclick="startMultiplayer()">Play Multiplayer</button>
+        <button class="button" onclick="showTutorial()">Tutorial</button>
+        <button class="button" onclick="showSettings()">Settings</button>
+        <button class="button" onclick="showCredits()">Credits</button>
+        <button class="button" onclick="exitGame()">Exit Game</button>
+    </div>
+
+    <script>
+        function startSingleplayer() {
+            // Logic to start singleplayer game
+            alert("Starting Singleplayer Mode...");
+        }
+
+        function startMultiplayer() {
+            // Logic to start multiplayer game
+            alert("Starting Multiplayer Mode...");
+        }
+
+        function showTutorial() {
+            // Logic to show tutorial
+            alert("Showing Tutorial...");
+        }
+
+        function showSettings() {
+            // Logic to open settings menu
+            alert("Opening Settings...");
+        }
+
+        function showCredits() {
+            // Logic to show credits
+            alert("Showing Credits...");
+        }
+
+        function exitGame() {
+            // Logic to exit game
+            alert("Exiting Game...");
+        }
+    </script>
+
+</body>
+
+</html>

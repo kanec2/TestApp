@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game News - RTS Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2e2e2e;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .news-container {
+            background-color: #444;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            width: 400px;
+            overflow-y: auto;
+            max-height: 80vh; /* Makes the container scrollable if it overflows */
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .news-item {
+            background-color: #555;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        
+        .news-item h2 {
+            margin: 0;
+        }
+        
+        .news-item p {
+            margin: 5px 0;
+        }
+        
+        .news-item ul {
+            margin: 5px 0 0 20px;
+            padding: 0;
+            list-style-type: disc;
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        button.refresh-button, button.exit-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        button.refresh-button {
+            background-color: #007bff;
+        }
+        
+        button.refresh-button:hover {
+            background-color: #0056b3;
+        }
+        
+        button.exit-button {
+            background-color: #dc3545;
+        }
+        
+        button.exit-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+    <script>
+        function refreshNews() {
+            // Logic to refresh news content
+            alert('News content refreshed!');
+            // In a real application, you would fetch updated news from a server or API.
+        }
+        
+        function closeNews() {
+            // Logic to close the news window
+            alert('Closing the news window!');
+            // Implement actual close logic, such as hiding the element or redirecting.
+        }
+    </script>
+</head>
+<body>
+    <div class="news-container">
+        <h1>Game News</h1>
+        <div class="news-item">
+            <h2>Patch Notes 1.2.0</h2>
+            <p><strong>Date:</strong> October 1, 2023</p>
+            <p>We are excited to bring you the latest update! This patch includes balance changes, bug fixes, and new content.</p>
+            <ul>
+                <li>Improved unit AI</li>
+                <li>New map: Valley of Valor</li>
+                <li>Balance adjustments to Faction 2</li>
+            </ul>
+        </div>
+
+        <div class="news-item">
+            <h2>Upcoming Event: Battle Royale Weekend</h2>
+            <p><strong>Date:</strong> October 15 - October 17, 2023</p>
+            <p>Join us for our weekly Battle Royale event! Compete for glory and exclusive rewards!</p>
+        </div>
+
+        <div class="news-item">
+            <h2>New Expansion Pack Announced</h2>
+            <p><strong>Date:</strong> September 25, 2023</p>
+            <p>We are thrilled to announce our upcoming expansion pack, "Legends of Eldoria", coming in November!</p>
+        </div>
+
+        <div class="navigation-buttons">
+            <button class="refresh-button" onclick="refreshNews()">Refresh</button>
+            <button class="exit-button" onclick="closeNews()">Exit</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

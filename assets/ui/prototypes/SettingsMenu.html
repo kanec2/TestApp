@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings Menu</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif; /* Body font */
+            background-color: #f4f4f4; /* Light background */
+            padding: 20px;
+        }
+        .settings-container {
+            background-color: white; /* White background for the settings menu */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px; /* Maximum width of the container */
+            margin: 0 auto; /* Center the settings container */
+        }
+        .tabs {
+            display: flex; /* Flexbox layout for tabs */
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px; /* Bottom margin for spacing */
+        }
+        .tab {
+            flex: 1; /* Equal width for tabs */
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #f9f9f9; /* Light background color for tabs */
+            border-radius: 5px 5px 0 0; /* Rounded corners on top */
+            margin-right: 2px; /* Right margin for spacing */
+            transition: background-color 0.3s; /* Smooth transition effect */
+        }
+        .tab.active {
+            background-color: #007bff; /* Bright blue for active tab */
+            color: white; /* White text for active tab */
+        }
+        .settings-content {
+            padding: 20px;
+            border: 1px solid #ddd; /* Light border for content area */
+            border-radius: 0 0 5px 5px; /* Rounded corners on bottom */
+        }
+        .section {
+            margin-bottom: 20px; /* Bottom margin for sections */
+        }
+        .section h3 {
+            margin: 0 0 10px 0; /* Margin for section heading */
+            color: #007bff; /* Bright blue for headings */
+            font-family: 'Montserrat', sans-serif; /* Title font */
+            font-size: 1.5em; /* Larger size for headings */
+        }
+        .slider {
+            width: 100%; /* Full width for sliders */
+        }
+        .option {
+            margin: 10px 0; /* Margin for options */
+        }
+        .option label {
+            display: flex; /* Flex layout for labels */
+            justify-content: space-between; /* Space between label and slider */
+            align-items: center; /* Center items vertically */
+        }
+        select, input[type="range"] {
+            font-family: 'Open Sans', sans-serif; /* Ensure consistent body font */
+            font-size: 1em; /* Mid-sized for body text */
+            padding: 5px; /* Padding for input fields */
+            border-radius: 5px; /* Rounded corners */
+            border: 1px solid #ccc; /* Light border around inputs */
+        }
+        select {
+            width: calc(100% - 10px); /* Adjust the width of selects to accommodate padding */
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="settings-container">
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('audio')">Audio Settings</div>
+        <div class="tab" onclick="showTab('visual')">Visual Settings</div>
+        <div class="tab" onclick="showTab('controls')">Control Settings</div>
+        <div class="tab" onclick="showTab('accessibility')">Accessibility Options</div>
+    </div>
+    
+    <div class="settings-content">
+        <div id="audio" class="section">
+            <h3>Audio Settings</h3>
+            <div class="option">
+                <label for="music-volume">Music Volume:</label>
+                <input type="range" id="music-volume" class="slider" min="0" max="100" value="70">
+            </div>
+            <div class="option">
+                <label for="sfx-volume">Sound Effects Volume:</label>
+                <input type="range" id="sfx-volume" class="slider" min="0" max="100" value="70">
+            </div>
+            <div class="option">
+                <label for="voice-chat-volume">Voice Chat Volume:</label>
+                <input type="range" id="voice-chat-volume" class="slider" min="0" max="100" value="70">
+            </div>
+        </div>
+
+        <div id="visual" class="section" style="display: none;">
+            <h3>Visual Settings</h3>
+            <div class="option">
+                <label for="resolution">Resolution:</label>
+                <select id="resolution">
+                    <option value="1920x1080">1920 x 1080</option>
+                    <option value="1280x720">1280 x 720</option>
+                    <option value="800x600">800 x 600</option>
+                </select>
+            </div>
+            <div class="option">
+                <label for="graphics-quality">Graphics Quality:</label>
+                <select id="graphics-quality">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="controls" class="section" style="display: none;">
+            <h3>Control Settings</h3>
+            <p>Key bindings customization will be available here.</p>
+        </div>
+
+        <div id="accessibility" class="section" style="display: none;">
+            <h3>Accessibility Options</h3>
+            <div class="option">
+                <label for="colorblind-mode">Colorblind Mode:</label>
+                <select id="colorblind-mode">
+                    <option value="none">None</option>
+                    <option value="protanopia">Protanopia</option>
+                    <option value="deuteranopia">Deuteranopia</option>
+                    <option value="tritanopia">Tritanopia</option>
+                </select>
+            </div>
+            <div class="option">
+                <label for="ui-scaling">UI Scaling:</label>
+                <input type="range" id="ui-scaling" class="slider" min="50" max="200" value="100">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showTab(tabId) {
+        // Hide all sections first
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Show the selected tab content
+        document.getElementById(tabId).style.display = 'block';
+        
+        // Set active tab
+        document.querySelector(`.tab:nth-child(${Array.from(tabs).indexOf([...tabs].find(tab => tab.innerText === tabId.replace('-', ' '))) + 1})`).classList.add('active');
+    }
+</script>
+
+</body>
+</html>

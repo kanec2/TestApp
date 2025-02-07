@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>End Game Screen</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #e0e0e0; /* Subdued tone for background */
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .end-game-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        .final-score {
+            font-family: 'Montserrat', sans-serif; /* Title font */
+            font-size: 2.5em; /* Larger size for main title */
+            margin: 20px 0;
+            color: #007bff; /* Bright blue for emphasis */
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .stats-container {
+            background-color: #f9f9f9; /* Subdued tone for stats container */
+            border: 1px solid #ddd; /* Light border color */
+            border-radius: 5px;
+            padding: 15px;
+            flex: 1;
+            margin: 0 10px;
+        }
+        .button {
+            background-color: #007bff; /* Bright blue for active buttons */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Open Sans', sans-serif; /* Body font */
+            font-size: 1em; /* Mid-sized for body text */
+        }
+        .button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .share-button {
+            background-color: #4CAF50; /* Bright green */
+            margin-left: 10px; /* Better spacing */
+        }
+        .share-button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="end-game-container">
+    <div class="final-score">Final Score: 12345</div>
+
+    <div class="stats">
+        <div class="stats-container">
+            <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.5em;">Player Stats</h3>
+            <p><strong>Wins:</strong> 5</p>
+            <p><strong>Losses:</strong> 2</p>
+            <p><strong>Highest Score:</strong> 1500</p>
+        </div>
+        <div class="stats-container">
+            <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.5em;">Player Contributions</h3>
+            <p><strong>Kills:</strong> 20</p>
+            <p><strong>Assists:</strong> 10</p>
+            <p><strong>Damage Done:</strong> 5000</p>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="button" onclick="playAgain()">Play Again</button>
+        <button class="button" onclick="backToLobby()">Back to Lobby</button>
+        <button class="button share-button" onclick="shareResults()">Share Results</button>
+    </div>
+</div>
+
+<script>
+    function playAgain() {
+        // Logic for playing again
+        alert("Starting a new game...");
+    }
+
+    function backToLobby() {
+        // Logic for navigating back to lobby
+        alert("Returning to lobby...");
+    }
+
+    function shareResults() {
+        // Logic for sharing results on social media
+        alert("Sharing results...");
+    }
+</script>
+
+</body>
+</html>

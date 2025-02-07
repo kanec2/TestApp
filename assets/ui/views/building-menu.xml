@@ -1,0 +1,101 @@
+
+<vbox width="800" height="600" backgroundColor="#000000">
+    <style>
+            body {
+                font-family: 'Open Sans', sans-serif;
+                background-color: #fff; /* White background for menu */
+            }
+            .close-button {
+                background: #ff5722; /* Bright red for close button */
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-family: 'Montserrat', sans-serif; /* Title font */
+                font-weight: 700; /* Bold for the button */
+            }
+            .close-button:hover {
+                background: #e64a19; /* Darker red on hover */
+            }
+            .menu-container {
+                background-color: #fff; /* White background for menu */
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+            .content {
+                display: flex;
+                flex: 1;
+            }
+            .building-list {
+                width: 30%;
+                padding: 10px;
+                border-right: 2px solid #ddd;
+                overflow-y: auto; /* Allow scrolling if there are many buildings */
+            }
+            .building-item {
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                margin: 5px 0;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
+            .building-item:hover {
+                background: rgba(0, 123, 255, 0.1); /* Light blue on hover */
+            }
+            .building-icon {
+                width: 50px;
+                height: 50px;
+                margin-right: 10px;
+            }
+            .upgrade-info {
+                flex: 1;
+                padding: 10px;
+            }
+            .upgrade-options {
+                margin-top: 20px;
+            }
+            .upgrade-option {
+                margin: 10px 0;
+                padding: 10px;
+                background: #e0e0e0; /* Light gray for upgrade options */
+                border-radius: 5px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+    </style>
+    
+    <vbox styleName="menu-container">
+        <button styleName="close-button" onClick="closeMenu()">X</button>
+
+        <hbox styleName="content">
+            <vbox styleName="building-list">
+                <label text="Available Buildings"/>
+                <button styleName="building-item" onClick="selectBuilding('Farm')">
+                    <box styleName="building-icon"></box>
+                    <label text="Farm"/>
+                </button>
+                <button styleName="building-item" onClick="selectBuilding('Barracks')">
+                    <box styleName="building-icon"></box>
+                    <label text="Barracks"/>
+                </button>
+                <button styleName="building-item" onClick="selectBuilding('Castle')">
+                    <box styleName="building-icon"></box>
+                    <label text="Castle"/>
+                </button>
+            </vbox>
+
+            <vbox styleName="upgrade-info">
+                <label text="Upgrade Options"/>
+                <box id="upgrade-options-container" styleName="upgrade-options">
+                    <label text="Please select a building to see upgrade options."/>
+                </box>
+            </vbox>
+        </hbox>
+    </vbox>
+</vbox>
