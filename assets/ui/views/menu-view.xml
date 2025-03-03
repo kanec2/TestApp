@@ -347,6 +347,8 @@
             <lobby-list />
             <single-menu />
             <news-menu />
+            <news-menu/>
+            <settings-menu/>
         </stack>
 
         <vbox visible="false" layout="vertical" verticalAlign = "center" horizontalAlign="center">

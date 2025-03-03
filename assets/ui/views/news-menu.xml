@@ -4,8 +4,8 @@
         <label width="100%" styleName="header-label" text="News"/>
     </box>
 
-    <hbox styleName="container" width="100%" height="100%">
-        <item-renderer styleName="lobby-item" height="100%" width="100%">
+    <hbox styleName="container" width="100%" height="100%" continuous="true">
+        <item-renderer styleName="lobby-item">
             <vbox width="288" height="180">
                 <label id="newsHeader" width="100%" />
                 <vbox width="288" height="100%">

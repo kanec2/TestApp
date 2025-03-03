@@ -1,3 +1,4 @@
+import ui.views.HUD;
 import ui.views.BuildingMenu;
 import ui.views.MainView;
 import extensions.Auth;
@@ -238,7 +239,9 @@ class HeapsMain extends hxd.App {
 // 		});
 
         menuView = new MenuView();
-        Screen.instance.addComponent(menuView);
+        var hud = new HUD();
+        //Screen.instance.addComponent(menuView);
+        Screen.instance.addComponent(hud);
         asyncDispatcher.fire(ev);
         //otherMenu = new BuildingMenu();
         //Screen.instance.addComponent(otherMenu);

@@ -1,0 +1,32 @@
+<box style="padding: 0px;" width="100%" height="100%">
+    <style>        
+        
+    </style>
+    <hbox width="100%">
+        <hbox>
+            <item-renderer styleName="lobby-item">
+                <hbox width="288" height="180">
+                    <image id="resource_icon" />
+                    <label id="amount"/>
+                    <vbox width="288" height="100%">
+                        <label width="100%" id="newsDate" verticalAlign="center" horizontalAlign="center" styleName="card-title-label" />
+                        <label width="100%" height="90%" id="newsDescription"  verticalAlign="center" horizontalAlign="center" styleName="card-title-label" />
+                    </vbox>    
+                </hbox>
+            </item-renderer>
+            <data>
+                <item newsHeader.text="Upcoming Event: Battle Royale Weekend" newsDate="Date: October 15 - October 17, 2023" newsDescription="Join us for our weekly Battle Royale event! Compete for glory and exclusive rewards!" />
+                <item newsHeader.text="Patch Notes 1.2.0" newsDate="Date: October 1, 2023" newsDescription="We are excited to bring you the latest update! This patch includes balance changes, bug fixes, and new content." />
+                <item newsHeader.text="New Expansion Pack Announced" newsDate="Date: September 25, 2023" newsDescription="We are thrilled to announce our upcoming expansion pack, 'Legends of Eldoria', coming in November!"  />
+                <item newsHeader.text="New Expansion Pack Announced" newsDate="Date: September 25, 2023" newsDescription="We are thrilled to announce our upcoming expansion pack, 'Legends of Eldoria', coming in November!"  />
+                <item newsHeader.text="New Expansion Pack Announced" newsDate="Date: September 25, 2023" newsDescription="We are thrilled to announce our upcoming expansion pack, 'Legends of Eldoria', coming in November!"  />
+                <item newsHeader.text="New Expansion Pack Announced" newsDate="Date: September 25, 2023" newsDescription="We are thrilled to announce our upcoming expansion pack, 'Legends of Eldoria', coming in November!"  />
+            </data>
+        </hbox>
+    </hbox>
+    <!--header-->
+    
+   
+    <!--Main content-->
+    
+</box>

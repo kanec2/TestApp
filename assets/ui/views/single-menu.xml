@@ -75,15 +75,15 @@
         <label width="100%" styleName="header-label" text="Single Play Menu"/>
     </box>
 
-    <hbox styleName="container" width="100%" height="100%">
-        <item-renderer width="100%">
-            <vbox styleName="tutorial-item" width="100%">
-                <vbox>
-                    <label id="tutorialHeader" styleName="lobby-name"/>
-                    <label id="tutorialDescription" styleName="lobby-status"/>
+    <hbox styleName="container" width="100%" height="100%" continuous="true">
+        <item-renderer  >
+            <box styleName="tutorial-item" verticalAlign="top" height="190" width="288">
+                <vbox width="100%">
+                    <label id="tutorialHeader" styleName="lobby-name" width="100%"/>
+                    <label id="tutorialDescription" styleName="lobby-status" width="100%"/>
                 </vbox>
-                <button width="100px" id="joinButton" text="Start tutorial" styleName="join-button"/>
-            </vbox>
+                <button width="100px" id="joinButton" text="Start tutorial" styleName="join-button" verticalAlign="bottom"/>
+            </box>
         </item-renderer>
         <data>
             <item tutorialHeader="Tutorial 1: Game Basics" tutorialDescription="Learn the fundamental mechanics of the game, including controls and interface." />
