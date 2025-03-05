@@ -1,3 +1,5 @@
+import h3d.mat.Texture;
+import h3d.prim.Cube;
 import ui.views.HUD;
 import ui.views.BuildingMenu;
 import ui.views.MainView;
@@ -22,6 +24,11 @@ import tweenxcore.structure.FloatChangePart;
 using tweenxcore.Tools;
 
 class HeapsMain extends hxd.App {
+
+    var movingObjects : Array<{ m : h3d.scene.Mesh, cx : Float, cy : Float, pos : Float, ray : Float, speed : Float }> = [];
+    var bitmap : h2d.Bitmap;
+    var controller : h3d.scene.CameraController;
+
     public var menuView:MenuView;
     public var otherMenu:BuildingMenu;
     var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
@@ -106,7 +113,8 @@ class HeapsMain extends hxd.App {
             }
         });
     }
-
+var renderTarget:Texture;
+var s3dTarget:h3d.scene.Scene;
     function signIn(email,pass){
         trace("try to login");
         
@@ -130,8 +138,64 @@ class HeapsMain extends hxd.App {
 
     override function init() {
 		hxd.Res.initEmbed();
-		Toolkit.init({root: s2d,manualUpdate: false});
+		renderTarget = new Texture(engine.width,engine.height, [ Target ]);
+	    //renderTarget.depthBuffer = new DepthBuffer(engine.width, engine.height);
 
+        s3dTarget = new h3d.scene.Scene();
+
+        s3d.camera.pos.set(100, 20, 80);
+        controller = new h3d.scene.CameraController(s3d);
+        controller.loadFromCamera();
+
+		var prim = new h3d.prim.Grid(100,100,1,1);
+		prim.addNormals();
+		prim.addUVs();
+
+		var floor = new h3d.scene.Mesh(prim, s3d);
+		floor.material.castShadows = false;
+		floor.x = -50;
+		floor.y = -50;
+
+		var box = new h3d.prim.Cube(1,1,1,true);
+		box.unindex();
+		box.addNormals();
+		for( i in 0...50 ) {
+			var m = new h3d.scene.Mesh(box, s3d);
+			m.material.color.set(Math.random(), Math.random(), Math.random());
+			//m.material.color.normalize();
+			m.scale(1 + Math.random() * 10);
+			m.z = m.scaleX * 0.5;
+			m.setRotation(0,0,Math.random() * Math.PI * 2);
+			do {
+				m.x = Std.random(80) - 40;
+				m.y = Std.random(80) - 40;
+			} while( m.x * m.x + m.y * m.y < 25 + m.scaleX * m.scaleX );
+			m.material.getPass("shadow").isStatic = true;
+
+			var absPos = m.getAbsPos();
+			m.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m.scaleZ, hxd.Math.max(m.scaleX, m.scaleY)));
+		}
+
+		var sp = new h3d.prim.Sphere(1,16,16);
+		sp.addNormals();
+		for( i in 0...20 ) {
+			var m = new h3d.scene.Mesh(sp, s3d);
+			m.material.color.set(Math.random(), Math.random(), Math.random());
+			//m.material.color.normalize();
+			m.scale(0.5 + Math.random() * 4);
+			m.z = 2 + Math.random() * 5;
+			var cx = (Math.random() - 0.5) * 20;
+			var cy = (Math.random() - 0.5) * 20;
+
+			var absPos = m.getAbsPos();
+			m.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m.scaleZ, hxd.Math.max(m.scaleX, m.scaleY)));
+
+			movingObjects.push({ m : m, pos : Math.random() * Math.PI * 2, cx : cx, cy : cy, ray : 8 + Math.random() * 50, speed : (0.5 + Math.random()) * 0.2 });
+		}
+
+        Toolkit.init({root: s2d,manualUpdate: false});
+        // Add the shadow map view to the UI
+		
         /*Storage.getItem("user-settings").handle(function(settings) {
             this.token = token;
         });
@@ -237,9 +301,12 @@ class HeapsMain extends hxd.App {
 // */
 // 			this.room = room;
 // 		});
-
+        bitmap = new h2d.Bitmap(null, null);
+		bitmap.scale(0.3);
+		//bitmap.filter = h2d.filter.ColorMatrix.grayed();
         menuView = new MenuView();
         var hud = new HUD();
+        hud.mapHolder.addChild(bitmap);
         //Screen.instance.addComponent(menuView);
         Screen.instance.addComponent(hud);
         asyncDispatcher.fire(ev);
@@ -294,9 +361,44 @@ class HeapsMain extends hxd.App {
 
     var elapsedTime = .0;
     var fixedTimeStep = 1/60;
+    override function render(e:h3d.Engine) {
+        // Render the target first
+        engine.pushTarget(renderTarget);
+    
+        engine.clear(0, 1);
+        //s3dTarget.render(e);
+        
+        
+    
+        // Now render our scene
+        s3d.render(e);
+        engine.popTarget();
+        s2d.render(e);
+    }
     override function update(dt:Float) {
         BackendImpl.update();
-        
+        for( m in movingObjects ) {
+			m.pos += m.speed / m.ray;
+			m.m.x = m.cx + Math.cos(m.pos) * m.ray;
+			m.m.y = m.cy + Math.sin(m.pos) * m.ray;
+
+			var cc = Std.downcast(m.m.cullingCollider, h3d.col.Sphere);
+			if( cc != null ) {
+				var absPos = m.m.getAbsPos();
+				cc.x = absPos.tx;
+				cc.y = absPos.ty;
+				cc.z = absPos.tz;
+				cc.r = hxd.Math.max(m.m.scaleZ, hxd.Math.max(m.m.scaleX, m.m.scaleY));
+			}
+		}
+		//var light = lights[curLight];
+		//var tex = light == null ? null : light.shadows.getShadowTex();
+		bitmap.tile = h2d.Tile.fromTexture(renderTarget);//null;//tex == null || tex.flags.has(Cube) ? null : 
+		//inf.text = "Shadows Draw calls: "+ s3d.lightSystem.drawPasses;
+
+		for( o in s3d ) {
+			o.culled = false;
+		}
         // if (this.room == null) { return; }
         // if (this.currentPlayer == null) { return; }
         

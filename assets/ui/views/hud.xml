@@ -1,31 +1,46 @@
 <box style="padding: 0px;" width="100%" height="100%">
     <style>        
-        
+        .resource-panel{
+            padding:2px;
+        }
+        .bottom-menu{
+            background-color:brown;
+        }
+        .mini-map{
+
+        }
     </style>
-    <hbox width="100%">
-        <hbox>
+    <hbox width="100%" height="5%">
+        <hbox height="100%" styleName="resource-panel" backgroundColor="#766776">
             <item-renderer styleName="lobby-item">
-                <hbox width="288" height="180">
-                    <image id="resource_icon" />
-                    <label id="amount"/>
-                    <vbox width="288" height="100%">
-                        <label width="100%" id="newsDate" verticalAlign="center" horizontalAlign="center" styleName="card-title-label" />
-                        <label width="100%" height="90%" id="newsDescription"  verticalAlign="center" horizontalAlign="center" styleName="card-title-label" />
-                    </vbox>    
+                <hbox width="100" height="32" backgroundColor="#ffffff">
+                    <image id="resource_icon" width="32" height="100%" verticalAlign="center"/>
+                    <label id="amount" verticalAlign="center"/> 
                 </hbox>
             </item-renderer>
             <data>
-                <item newsHeader.text="Upcoming Event: Battle Royale Weekend" newsDate="Date: October 15 - October 17, 2023" newsDescription="Join us for our weekly Battle Royale event! Compete for glory and exclusive rewards!" />
-                <item newsHeader.text="Patch Notes 1.2.0" newsDate="Date: October 1, 2023" newsDescription="We are excited to bring you the latest update! This patch includes balance changes, bug fixes, and new content." />
-                <item newsHeader.text="New Expansion Pack Announced" newsDate="Date: September 25, 2023" newsDescription="We are thrilled to announce our upcoming expansion pack, 'Legends of Eldoria', coming in November!"  />
-                <item newsHeader.text="New Expansion Pack Announced" newsDate="Date: September 25, 2023" newsDescription="We are thrilled to announce our upcoming expansion pack, 'Legends of Eldoria', coming in November!"  />
-                <item newsHeader.text="New Expansion Pack Announced" newsDate="Date: September 25, 2023" newsDescription="We are thrilled to announce our upcoming expansion pack, 'Legends of Eldoria', coming in November!"  />
-                <item newsHeader.text="New Expansion Pack Announced" newsDate="Date: September 25, 2023" newsDescription="We are thrilled to announce our upcoming expansion pack, 'Legends of Eldoria', coming in November!"  />
+                <item amount="1000" resource_icon="assets/images/wood.png" />
+                <item amount="20"   resource_icon="assets/images/meat.png" />
+                <item amount="50"   resource_icon="assets/images/gold-ingots.png" />
+                <item amount="10"   resource_icon="assets/images/coal.png" />
             </data>
         </hbox>
+        <hbox width="100%" height="100%" backgroundColor="#123123"/>
     </hbox>
+    <vbox id='mapHolder' width="100%" height="100%"/>
     <!--header-->
-    
+    <hbox styleName="bottom-menu" width="100%" height="15%" verticalAlign="bottom">
+        <vbox styleName="mini-map" width="15%" height="100%" backgroundColor="#123123">
+            <box width="100%" height="90%" >
+                <mini-map id="miniMap" width="100%" height="100%" miniMapImage="assets/images/minimap.png"/>
+            </box>
+            <hbox width="100%">
+                <button id="inc" text="+"/>
+                <button id="dec" text="-"/>
+            </hbox>
+        </vbox>
+
+    </hbox>
    
     <!--Main content-->
     
