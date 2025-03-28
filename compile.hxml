@@ -14,13 +14,15 @@
 -lib colyseus
 -lib tink_url
 -lib tink_http
+-lib tink_core
+-lib tink_lang
 -lib colyseus-websocket
 -lib tweenxcore
 -lib partials
 
 -D concurrent
 -D resourcesPath=assets
--D windowFixed
+
 -D windowSize=1280x720
 #-D windowSize=1280x1024
 -D windowTitle=GoodGames | Community and Store HTML Game Template

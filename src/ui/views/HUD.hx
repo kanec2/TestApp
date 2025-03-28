@@ -1,5 +1,6 @@
 package ui.views;
 
+import haxe.ui.events.UIEvent;
 import haxe.ui.events.MouseEvent;
 import haxe.ui.containers.VBox;
 import haxe.ui.containers.Box;
@@ -8,12 +9,28 @@ import Math;
 class HUD extends Box{
 
     var mapObjects = new Array<Dynamic>();
-
+    var minimap : h2d.Bitmap;
     public function new() {
         super();
         this.mapObjects = generateRandomObjects();
-        miniMap.setMapObjects(mapObjects);
+        //miniMap.setMapObjects(mapObjects);
         trace(this.mapObjects);
+    }
+    public function setMiniMapProjection(bitmap:h2d.Bitmap){
+        this.minimap = bitmap;
+        //this.minimap.width = this.mapHolder.width;
+        //this.minimap.height = this.mapHolder.height;
+    }
+
+    @:bind(this.mapHolder,UIEvent.RESIZE)
+    function onRes(e){
+        trace(e);
+        if(this.minimap != null && this.mapHolder != null){
+            trace(' w: ${this.mapHolder.actualComponentWidth}, h: ${this.mapHolder.actualComponentHeight}');
+            this.minimap.width = this.mapHolder.actualComponentWidth;//this.mapHolder.width;
+            this.minimap.height = this.mapHolder.actualComponentHeight;//this.mapHolder.height;
+            //trace(e.value);
+        }
     }
 
     function generateRandomObjects(){
@@ -46,6 +63,6 @@ class HUD extends Box{
     private function incf(_) {
         trace("WEWE");
         makeRandomStep();
-        miniMap.setMapObjects(mapObjects);
+        //miniMap.setMapObjects(mapObjects);
     }
 }

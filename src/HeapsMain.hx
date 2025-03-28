@@ -1,3 +1,4 @@
+import h3d.col.Bounds;
 import h3d.mat.Texture;
 import h3d.prim.Cube;
 import ui.views.HUD;
@@ -25,9 +26,15 @@ using tweenxcore.Tools;
 
 class HeapsMain extends hxd.App {
 
-    var movingObjects : Array<{ m : h3d.scene.Mesh, cx : Float, cy : Float, pos : Float, ray : Float, speed : Float }> = [];
+    var movingObjects : Array<MapObject> = [];
+    var objectMapping : Map<MapObject,MiniMapObject> = new Map<MapObject, MiniMapObject>();
+    //var miniMapObjects : Array<{ m : h3d.scene.Mesh, cx : Float, cy : Float, pos : Float, ray : Float, speed : Float }> = [];
     var bitmap : h2d.Bitmap;
     var controller : h3d.scene.CameraController;
+
+    var objectModels : Array<{id:String, cx:Float, cy: Float, objectType:String, relation:String}> = [];
+
+    var buildings : Array<{id:String, cx: Float, cy: Float, pos: Float, ray:Float}> = [];
 
     public var menuView:MenuView;
     public var otherMenu:BuildingMenu;
@@ -113,8 +120,8 @@ class HeapsMain extends hxd.App {
             }
         });
     }
-var renderTarget:Texture;
-var s3dTarget:h3d.scene.Scene;
+    var renderTarget:Texture;
+    var s3dTarget:h3d.scene.Scene;
     function signIn(email,pass){
         trace("try to login");
         
@@ -136,14 +143,58 @@ var s3dTarget:h3d.scene.Scene;
         });
     }
 
+    function initMiniMap() {
+        
+    }
+
     override function init() {
 		hxd.Res.initEmbed();
-		renderTarget = new Texture(engine.width,engine.height, [ Target ]);
+        //initMiniMap();
+		
+
+        var instance = hxd.Window.getInstance();
+        renderTarget = new Texture(engine.width,engine.height, [ Target ]);
+        s3dTarget = new h3d.scene.Scene();
+        var zoom = 10;
+        s3dTarget.camera.orthoBounds = Bounds.fromValues(
+            -instance.width / zoom / 2,
+            -instance.height / zoom / 2,
+            -99,
+            instance.width / zoom,
+            instance.height / zoom,
+            999
+        );
+        s3dTarget.camera.target.set(0, 0, 0);
+        s3dTarget.camera.pos.load(s3dTarget.camera.target.add(new h3d.Vector(0, 0, 1)));
+
+        var planeprim = new Plane3D(50);
+        planeprim.unindex();
+        planeprim.addNormals();
+        planeprim.addUVs();
+        //get our image resource and convert it into a texture
+        var tex = hxd.Res.images.minimap.toTexture();
+
+        // create a material with this texture
+        var mat = h3d.mat.Material.create(tex);
+        mat.blendMode = Alpha;
+        var miniMapObject = new h3d.scene.Mesh(planeprim,mat,s3dTarget);
+        miniMapObject.material.castShadows = false;
+        miniMapObject.setPosition(0,0,0);
+        miniMapObject.scale(0.5 + Math.random() * 40);
 	    //renderTarget.depthBuffer = new DepthBuffer(engine.width, engine.height);
 
-        s3dTarget = new h3d.scene.Scene();
+        
 
         s3d.camera.pos.set(100, 20, 80);
+
+        
+         //Math.min(instance.height, instance.width) / 2;
+        //s3dTarget.camera.pos.set(100,20,120);
+        
+
+        
+
+        //s3dTarget.camera.
         controller = new h3d.scene.CameraController(s3d);
         controller.loadFromCamera();
 
@@ -155,6 +206,11 @@ var s3dTarget:h3d.scene.Scene;
 		floor.material.castShadows = false;
 		floor.x = -50;
 		floor.y = -50;
+
+        var floor2 = new h3d.scene.Mesh(prim, s3dTarget);
+		floor2.material.castShadows = false;
+		floor2.x = -50;
+		floor2.y = -50;
 
 		var box = new h3d.prim.Cube(1,1,1,true);
 		box.unindex();
@@ -174,24 +230,51 @@ var s3dTarget:h3d.scene.Scene;
 
 			var absPos = m.getAbsPos();
 			m.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m.scaleZ, hxd.Math.max(m.scaleX, m.scaleY)));
+           // movingObjects.push(new MapObject( m, Math.random() * Math.PI * 2, cx , cy , 8 + Math.random() * 50, (0.5 + Math.random()) * 0.2 ));
 		}
 
 		var sp = new h3d.prim.Sphere(1,16,16);
 		sp.addNormals();
 		for( i in 0...20 ) {
-			var m = new h3d.scene.Mesh(sp, s3d);
-			m.material.color.set(Math.random(), Math.random(), Math.random());
+            var colorR  = Math.random();
+            var colorG  = Math.random();
+            var colorB  = Math.random();
+            var scaleM  = 0.5 + Math.random() * 4;
+            var zM      = 2 + Math.random() * 5;
+            var cx      = (Math.random() - 0.5) * 20;
+			var cy      = (Math.random() - 0.5) * 20;
+            var pos     = Math.random() * Math.PI * 2;
+            var ray     = 8 + Math.random() * 50;
+            var speed   = (0.5 + Math.random()) * 0.2;
+
+			var m1 = new h3d.scene.Mesh(sp, s3d);
+			m1.material.color.set(colorR, colorG, colorB);
 			//m.material.color.normalize();
-			m.scale(0.5 + Math.random() * 4);
-			m.z = 2 + Math.random() * 5;
-			var cx = (Math.random() - 0.5) * 20;
-			var cy = (Math.random() - 0.5) * 20;
+			m1.scale(scaleM);
+			m1.z = zM;
+			var absPos = m1.getAbsPos();
+			m1.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m1.scaleZ, hxd.Math.max(m1.scaleX, m1.scaleY)));
+            
+            //var mapObject = new MapObject( m1, pos, cx , cy , ray, speed );
 
-			var absPos = m.getAbsPos();
-			m.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m.scaleZ, hxd.Math.max(m.scaleX, m.scaleY)));
+            var m2 = new h3d.scene.Mesh(sp, s3dTarget);
+			m2.material.color.set(colorR, colorG, colorB);
+			//m.material.color.normalize();
+			m2.scale(scaleM);
+			m2.z = zM;
+			m2.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m2.scaleZ, hxd.Math.max(m2.scaleX, m2.scaleY)));
+          
+            var mapObject = new MapObject( m1, pos, cx , cy , ray, speed );
+            var miniMapObject = new MiniMapObject(m2, pos, cx, cy, ray, speed);
 
-			movingObjects.push({ m : m, pos : Math.random() * Math.PI * 2, cx : cx, cy : cy, ray : 8 + Math.random() * 50, speed : (0.5 + Math.random()) * 0.2 });
-		}
+            movingObjects.push(mapObject);
+            objectMapping.set(mapObject,miniMapObject);
+            
+            //var mm = m.clone();
+            //s3dTarget.addChild(m);
+            
+            //miniMapObjects.push({ m : mm, pos : Math.random() * Math.PI * 2, cx : cx, cy : cy, ray : 8 + Math.random() * 50, speed : (0.5 + Math.random()) * 0.2 });
+        };
 
         Toolkit.init({root: s2d,manualUpdate: false});
         // Add the shadow map view to the UI
@@ -204,7 +287,7 @@ var s3dTarget:h3d.scene.Scene;
         });
         */
         
-        try{
+        try {
             register("wtf22@mail.com", "123");
         }
         catch(e){ trace("register failed"); }
@@ -302,14 +385,21 @@ var s3dTarget:h3d.scene.Scene;
 // 			this.room = room;
 // 		});
         bitmap = new h2d.Bitmap(null, null);
-		bitmap.scale(0.3);
+		//bitmap.scale(0.3);
 		//bitmap.filter = h2d.filter.ColorMatrix.grayed();
         menuView = new MenuView();
         var hud = new HUD();
+        bitmap.width = 600;
+        bitmap.height = 600;
         hud.mapHolder.addChild(bitmap);
+        hud.setMiniMapProjection(bitmap);
         //Screen.instance.addComponent(menuView);
         Screen.instance.addComponent(hud);
         asyncDispatcher.fire(ev);
+        //var win = @:privateAccess hxd.Window.getInstance().window;
+        //win.center(); // Relocate window to center of the screen.
+        //win.setMinSize(400, 300); // Set minimum possible size of the window.
+        //win.setMaxSize(1024, 768); // Set maximum possible size of the window.
         //otherMenu = new BuildingMenu();
         //Screen.instance.addComponent(otherMenu);
         //Window.getInstance().displayMode = Windowed;
@@ -366,29 +456,43 @@ var s3dTarget:h3d.scene.Scene;
         engine.pushTarget(renderTarget);
     
         engine.clear(0, 1);
-        //s3dTarget.render(e);
+        s3dTarget.render(e);
         
-        
+        engine.popTarget();
     
         // Now render our scene
         s3d.render(e);
-        engine.popTarget();
+        
         s2d.render(e);
     }
     override function update(dt:Float) {
         BackendImpl.update();
         for( m in movingObjects ) {
-			m.pos += m.speed / m.ray;
-			m.m.x = m.cx + Math.cos(m.pos) * m.ray;
-			m.m.y = m.cy + Math.sin(m.pos) * m.ray;
 
-			var cc = Std.downcast(m.m.cullingCollider, h3d.col.Sphere);
+			m.pos += m.speed / m.ray;
+			m.x = m.cx + Math.cos(m.pos) * m.ray;
+			m.y = m.cy + Math.sin(m.pos) * m.ray;
+
+			var cc = Std.downcast(m.cullingCollider, h3d.col.Sphere);
 			if( cc != null ) {
-				var absPos = m.m.getAbsPos();
+				var absPos = m.getAbsPos();
 				cc.x = absPos.tx;
 				cc.y = absPos.ty;
 				cc.z = absPos.tz;
-				cc.r = hxd.Math.max(m.m.scaleZ, hxd.Math.max(m.m.scaleX, m.m.scaleY));
+				cc.r = hxd.Math.max(m.scaleZ, hxd.Math.max(m.scaleX, m.scaleY));
+			}
+            var m2 = objectMapping.get(m);
+
+            m2.pos = m.pos;
+            m2.x = m.x;
+            m2.y = m.y;
+            var cc2 = Std.downcast(m2.cullingCollider, h3d.col.Sphere);
+			if( cc2 != null ) {
+				var absPos = m2.getAbsPos();
+				cc2.x = absPos.tx;
+				cc2.y = absPos.ty;
+				cc2.z = absPos.tz;
+				cc2.r = hxd.Math.max(m2.scaleZ, hxd.Math.max(m2.scaleX, m2.scaleY));
 			}
 		}
 		//var light = lights[curLight];

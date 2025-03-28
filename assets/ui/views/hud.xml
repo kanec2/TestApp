@@ -27,13 +27,14 @@
         </hbox>
         <hbox width="100%" height="100%" backgroundColor="#123123"/>
     </hbox>
-    <vbox id='mapHolder' width="100%" height="100%"/>
+    
     <!--header-->
     <hbox styleName="bottom-menu" width="100%" height="15%" verticalAlign="bottom">
         <vbox styleName="mini-map" width="15%" height="100%" backgroundColor="#123123">
-            <box width="100%" height="90%" >
+            <vbox id='mapHolder' width="100%" height="100%"/>
+            <!--<box width="100%" height="90%" >
                 <mini-map id="miniMap" width="100%" height="100%" miniMapImage="assets/images/minimap.png"/>
-            </box>
+            </box>-->
             <hbox width="100%">
                 <button id="inc" text="+"/>
                 <button id="dec" text="-"/>
