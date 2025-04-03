@@ -3,7 +3,6 @@ package ui.views;
 import haxe.ui.events.MenuEvent;
 import model.AppData;
 import ui.components.LobbyList;
-import partials.Partial;
 import haxe.ui.containers.dialogs.Dialog.DialogEvent;
 import ui.components.SignInWindow;
 import network.states.LobbyState;
@@ -36,7 +35,7 @@ class MenuView extends Box {
     var signed:Bool;
     var appData:AppData;
     public var signedIn(get,set):Bool;
-
+    
     /**
      * [Menu handlers]
      */

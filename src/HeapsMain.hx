@@ -150,7 +150,7 @@ class HeapsMain extends hxd.App {
     override function init() {
 		hxd.Res.initEmbed();
         //initMiniMap();
-		
+		var tt:Object2DView = new Object2DView(null);
 
         var instance = hxd.Window.getInstance();
         renderTarget = new Texture(engine.width,engine.height, [ Target ]);
@@ -177,10 +177,11 @@ class HeapsMain extends hxd.App {
         // create a material with this texture
         var mat = h3d.mat.Material.create(tex);
         mat.blendMode = Alpha;
+        /*
         var miniMapObject = new h3d.scene.Mesh(planeprim,mat,s3dTarget);
         miniMapObject.material.castShadows = false;
         miniMapObject.setPosition(0,0,0);
-        miniMapObject.scale(0.5 + Math.random() * 40);
+        miniMapObject.scale(0.5 + Math.random() * 40);*/
 	    //renderTarget.depthBuffer = new DepthBuffer(engine.width, engine.height);
 
         
@@ -202,19 +203,26 @@ class HeapsMain extends hxd.App {
 		prim.addNormals();
 		prim.addUVs();
 
-		var floor = new h3d.scene.Mesh(prim, s3d);
+		var floor = new h3d.scene.Mesh(prim,mat, s3d);
 		floor.material.castShadows = false;
 		floor.x = -50;
 		floor.y = -50;
 
-        var floor2 = new h3d.scene.Mesh(prim, s3dTarget);
+        var prim2 = new h3d.prim.Grid(200,200,1,1);
+		prim2.addNormals();
+		prim2.addUVs();
+
+        var floor2 = new h3d.scene.Mesh(prim,mat, s3dTarget);
 		floor2.material.castShadows = false;
 		floor2.x = -50;
 		floor2.y = -50;
-
+        
+        
 		var box = new h3d.prim.Cube(1,1,1,true);
 		box.unindex();
 		box.addNormals();
+        //tt.set2DRepresentation(box);
+        
 		for( i in 0...50 ) {
 			var m = new h3d.scene.Mesh(box, s3d);
 			m.material.color.set(Math.random(), Math.random(), Math.random());
@@ -389,6 +397,11 @@ class HeapsMain extends hxd.App {
 		//bitmap.filter = h2d.filter.ColorMatrix.grayed();
         menuView = new MenuView();
         var hud = new HUD();
+        tt.set2DRepresentation(hud);
+        var oob = new h3d.scene.Object(s3d);
+        //oob.addChild(box);
+        //tt.set3DRepresentation(movingObjects[0].m);
+        trace("Is 2d: " + tt.is2d);
         bitmap.width = 600;
         bitmap.height = 600;
         hud.mapHolder.addChild(bitmap);

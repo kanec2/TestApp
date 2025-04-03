@@ -18,7 +18,8 @@
 -lib tink_lang
 -lib colyseus-websocket
 -lib tweenxcore
--lib partials
+-lib haxe-injection
+-lib uniontypes
 
 -D concurrent
 -D resourcesPath=assets
