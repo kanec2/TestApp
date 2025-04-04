@@ -1,15 +1,16 @@
 using tink.CoreApi;
 
 @:tink abstract class ObjectView implements IObjectView{
-    var representation:Representation;
+    
     @:calculated var is2d = switch representation {
-        case h2d.Object(c): true;
-        case h3d.scene.Object(e): false;
-        null;
+        case (c : h2d.Object) : true;
+        case (e : h3d.scene.Object): false;
+        default : null;
     }
     @:calculated var is3d = switch representation {
-        case h3d.scene.Object(c): true;
-        case h2d.Object(e) : false;
-        null;
+        case (c : h3d.scene.Object): true;
+        case (e : h2d.Object) : false;
+        default : null;
     }
+
 }

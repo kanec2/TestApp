@@ -25,8 +25,8 @@ import tweenxcore.structure.FloatChangePart;
 using tweenxcore.Tools;
 
 class HeapsMain extends hxd.App {
-
-    var movingObjects : Array<MapObject> = [];
+    var gameObjects   : Array<GameObject> = [];
+    var movingObjects : Array<MapObject>  = [];
     var objectMapping : Map<MapObject,MiniMapObject> = new Map<MapObject, MiniMapObject>();
     //var miniMapObjects : Array<{ m : h3d.scene.Mesh, cx : Float, cy : Float, pos : Float, ray : Float, speed : Float }> = [];
     var bitmap : h2d.Bitmap;
@@ -150,7 +150,7 @@ class HeapsMain extends hxd.App {
     override function init() {
 		hxd.Res.initEmbed();
         //initMiniMap();
-		var tt:Object2DView = new Object2DView(null);
+		var tt:Object3DView = new Object3DView(null);
 
         var instance = hxd.Window.getInstance();
         renderTarget = new Texture(engine.width,engine.height, [ Target ]);
@@ -254,6 +254,8 @@ class HeapsMain extends hxd.App {
             var pos     = Math.random() * Math.PI * 2;
             var ray     = 8 + Math.random() * 50;
             var speed   = (0.5 + Math.random()) * 0.2;
+            var gom = new BuildingGameObjectModel(cast(cx,Int));
+            
 
 			var m1 = new h3d.scene.Mesh(sp, s3d);
 			m1.material.color.set(colorR, colorG, colorB);
@@ -262,7 +264,9 @@ class HeapsMain extends hxd.App {
 			m1.z = zM;
 			var absPos = m1.getAbsPos();
 			m1.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m1.scaleZ, hxd.Math.max(m1.scaleX, m1.scaleY)));
-            
+            var gameObj = new GameObject(gom,enums.Relation.ALLY,new Object3DView(m1));
+            trace(gameObj.model.getData());
+            trace(cast(gameObj.representation3D,h3d.scene.Object));
             //var mapObject = new MapObject( m1, pos, cx , cy , ray, speed );
 
             var m2 = new h3d.scene.Mesh(sp, s3dTarget);
@@ -397,11 +401,12 @@ class HeapsMain extends hxd.App {
 		//bitmap.filter = h2d.filter.ColorMatrix.grayed();
         menuView = new MenuView();
         var hud = new HUD();
-        tt.set2DRepresentation(hud);
+        //tt.set2DRepresentation(hud);
         var oob = new h3d.scene.Object(s3d);
         //oob.addChild(box);
-        //tt.set3DRepresentation(movingObjects[0].m);
-        trace("Is 2d: " + tt.is2d);
+        tt.representation3D = movingObjects[0].m;
+        //tt.is2d();
+        trace("Is 2d: " + tt.is3d);
         bitmap.width = 600;
         bitmap.height = 600;
         hud.mapHolder.addChild(bitmap);
