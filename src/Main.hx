@@ -1,3 +1,6 @@
+import services.AppEventService;
+import hx.injection.ServiceCollection;
+import services.GameObjectManagerService;
 import hx.concurrent.collection.SynchronizedMap;
 import haxe.ui.components.Image;
 import hx.files.File;
@@ -39,7 +42,7 @@ import components.ResourceComponent;
 import components.*;
 import ecs.Entity;
 import hxd.BitmapData;
-
+using hx.injection.ServiceExtensions;
 typedef AppEventBase = {
     event:String, 
     data:Dynamic
@@ -64,20 +67,36 @@ class Main{
     var imageCachePath:Path;
     var imageMappingFile:File;
     
+    var collection:ServiceCollection;
+
+
     public function new() {
+        initServices();
+        var provider = collection.createProvider();
+        var appEventService = provider.getService(AppEventService);
+        var heapsmain = provider.getService(HeapsMain);
+        
         Toolkit.onAfterInit = startup;
         friends = new SynchronizedArray<FriendModel>();
         executor = Executor.create(5);
-        asyncDispatcher = new AsyncEventDispatcher<AppEventBase>(executor);
+        asyncDispatcher = appEventService.asyncDispatcher;//new AsyncEventDispatcher<AppEventBase>(executor);
         asyncDispatcher.subscribe(onFriendsLoaded);
         asyncDispatcher.subscribe(onAppInited);
-        menuView = new HeapsMain(asyncDispatcher);
-
+        //menuView = new HeapsMain();//asyncDispatcher);
+        //heapsmain.makeInit();
         
         /*
         initECS();
         */
         
+    }
+
+    function initServices(){
+        collection = new ServiceCollection();
+        //collection.addService(GameObjectManagerService);
+        collection.addSingleton(GameObjectManagerService);
+        collection.addSingleton(AppEventService);
+        collection.addSingleton(HeapsMain);
     }
 
     function startup(){

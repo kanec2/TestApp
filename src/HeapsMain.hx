@@ -1,3 +1,6 @@
+import hx.injection.Service;
+import hx.injection.ServiceCollection;
+import services.GameObjectManagerService;
 import h3d.col.Bounds;
 import h3d.mat.Texture;
 import h3d.prim.Cube;
@@ -21,10 +24,16 @@ import io.colyseus.Room;
 
 import tweenxcore.structure.FloatChange;
 import tweenxcore.structure.FloatChangePart;
+import services.AppEventService;
 
 using tweenxcore.Tools;
+using hx.injection.ServiceExtensions;
+class HeapsMain extends hxd.App implements Service {
+    var worldController : WorldController;
+    var uiController : UIController;
 
-class HeapsMain extends hxd.App {
+    //var gameObjectManager : GameObjectManagerService;
+
     var gameObjects   : Array<GameObject> = [];
     var movingObjects : Array<MapObject>  = [];
     var objectMapping : Map<MapObject,MiniMapObject> = new Map<MapObject, MiniMapObject>();
@@ -67,17 +76,18 @@ class HeapsMain extends hxd.App {
             arr.push(friend);
         menuView.setFriends(arr);
     }
+    /*
     public static function main(asyncDispatcher:AsyncEventDispatcher<AppEventBase>) {
 		new HeapsMain(asyncDispatcher);
-	}
+	}*/
     var ev:AppEventBase = {
         event: "AppInited",
         data: null
     }
     
-    public function new(asyncDispatcher:AsyncEventDispatcher<AppEventBase>) {
+    public function new(appEventService:AppEventService) {
         super();
-        this.asyncDispatcher = asyncDispatcher;
+        this.asyncDispatcher = appEventService.asyncDispatcher;
         asyncDispatcher.subscribe(onLogin);
         asyncDispatcher.subscribe(onRegister);
     }
@@ -147,10 +157,25 @@ class HeapsMain extends hxd.App {
         
     }
 
+    function initServices(){
+        var collection = new ServiceCollection();
+        collection.addSingleton(GameObjectManagerService);
+        var provider = collection.createProvider();
+        gameObjectManager = provider.getService(GameObjectManagerService);
+    }
+
+    public function makeInit(){
+        setup();
+        //init();
+    }
+
     override function init() {
 		hxd.Res.initEmbed();
+        //initServices();
         //initMiniMap();
-		var tt:Object3DView = new Object3DView(null);
+        gameObjectManager = new GameObjectManagerService();
+
+        var tt:Object3DView = new Object3DView(null);
 
         var instance = hxd.Window.getInstance();
         renderTarget = new Texture(engine.width,engine.height, [ Target ]);

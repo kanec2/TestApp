@@ -1,12 +1,13 @@
 package ui.views;
 
+import hx.injection.Service;
 import haxe.ui.events.UIEvent;
 import haxe.ui.events.MouseEvent;
 import haxe.ui.containers.VBox;
 import haxe.ui.containers.Box;
 import Math;
 @:build(haxe.ui.ComponentBuilder.build("assets/ui/views/hud.xml"))
-class HUD extends Box{
+class HUD extends Box implements Service{
 
     var mapObjects = new Array<Dynamic>();
     var minimap : h2d.Bitmap;
