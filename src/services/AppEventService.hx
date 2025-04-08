@@ -1,11 +1,14 @@
 package services;
 
 import hx.concurrent.executor.Executor;
-import Main.AppEventBase;
 import hx.concurrent.event.AsyncEventDispatcher;
 import haxe.Constraints.Function;
 import hx.injection.Service;
-
+import enums.AppEvent;
+typedef AppEventBase = {
+    event:AppEvent, 
+    data:Dynamic
+}
 class AppEventService implements Service{
     public var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
     public function new() {
@@ -13,7 +16,10 @@ class AppEventService implements Service{
         this.asyncDispatcher = new AsyncEventDispatcher<AppEventBase>(executor);
         //this.asyncDispatcher = asyncDispatcher;
     }   
-    public function subscribe(callback:Function){
-        
+    public function subscribe(callback:services.AppEventBase -> Void){
+        this.asyncDispatcher.subscribe(callback);
+    }
+    public function dispatch(event:AppEventBase){
+        this.asyncDispatcher.fire(event);
     }
 }

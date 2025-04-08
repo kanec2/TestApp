@@ -1,0 +1,12 @@
+package enums;
+
+enum AppEvent{
+    INITED;
+    AUTH;
+    FRIENDS_LOADED;
+    SERVICE_CREATED;
+    LOGIN_SUCCESS;
+    LOGIN_FAIL;
+    REGISTER_SUCCESS;
+    REGISTER_FAIL;
+}

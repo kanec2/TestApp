@@ -1,0 +1,8 @@
+{
+    "cachePath":"cache",
+    "friendCache":"friends.json",
+    "imageMappingPath":"image_mapping.json",
+    "imageCachePath" : "images",
+    "serverAddress" : "localhost",
+    "serverPort": 2567
+}

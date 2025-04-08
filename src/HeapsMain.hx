@@ -28,7 +28,7 @@ import services.AppEventService;
 
 using tweenxcore.Tools;
 using hx.injection.ServiceExtensions;
-class HeapsMain extends hxd.App implements Service {
+class HeapsMain extends hxd.App {
     var worldController : WorldController;
     var uiController : UIController;
 
@@ -50,6 +50,8 @@ class HeapsMain extends hxd.App implements Service {
     var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
     var userToken:String;
 
+    var serviceProvider: hx.injection.ServiceProvider;
+    
     var auth = new Auth("localhost", 2567);
     var client = new Client("localhost",2567);
 
@@ -85,8 +87,10 @@ class HeapsMain extends hxd.App implements Service {
         data: null
     }
     
-    public function new(appEventService:AppEventService) {
+    public function new(serviceProvider: hx.injection.ServiceProvider) {
         super();
+        this.serviceProvider = serviceProvider;
+        var appEventService:AppEventService = serviceProvider.getService(AppEventService);
         this.asyncDispatcher = appEventService.asyncDispatcher;
         asyncDispatcher.subscribe(onLogin);
         asyncDispatcher.subscribe(onRegister);
@@ -158,10 +162,10 @@ class HeapsMain extends hxd.App implements Service {
     }
 
     function initServices(){
-        var collection = new ServiceCollection();
-        collection.addSingleton(GameObjectManagerService);
-        var provider = collection.createProvider();
-        gameObjectManager = provider.getService(GameObjectManagerService);
+        //var collection = new ServiceCollection();
+        //collection.addSingleton(GameObjectManagerService);
+        //var provider = collection.createProvider();
+        gameObjectManager = serviceProvider.getService(GameObjectManagerService);
     }
 
     public function makeInit(){
@@ -173,7 +177,7 @@ class HeapsMain extends hxd.App implements Service {
 		hxd.Res.initEmbed();
         //initServices();
         //initMiniMap();
-        gameObjectManager = new GameObjectManagerService();
+        //gameObjectManager = new GameObjectManagerService();
 
         var tt:Object3DView = new Object3DView(null);
 
