@@ -4,5 +4,6 @@
     "imageMappingPath":"image_mapping.json",
     "imageCachePath" : "images",
     "serverAddress" : "localhost",
-    "serverPort": 2567
+    "serverPort": 2567,
+    "usersGetUrl": "http://jsonplaceholder.typicode.com/users"
 }

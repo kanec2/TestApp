@@ -1,63 +1,46 @@
-import services.AppEventService;
-import hx.injection.ServiceCollection;
-import services.GameObjectManagerService;
-import hx.concurrent.collection.SynchronizedMap;
-import haxe.ui.components.Image;
+//import libs.rx.schedulers.NewThreadScheduler;
+import libs.rx.observables.MakeScheduled;
+import libs.rx.schedulers.NewThread;
+import libs.rx.Scheduler;
+import libs.rx.schedulers.Base;
+import libs.rx.Subscription;
+import libs.rx.Observer;
+import libs.rx.observers.IObserver;
+import libs.rx.observables.Create;
+//import libs.rx.schedulers.ISchedulerBase;
+import libs.rx.schedulers.IScheduler;
+import libs.rx.schedulers.DiscardableAction;
+import libs.rx.Utils;
+import haxe.Timer;
+import libs.rx.Subscription;
+//import libs.rx.schedulers.NewThreadScheduler;
+import libs.rx.disposables.ISubscription;
+import libs.rx.subjects.Async;
+import libs.rx.subjects.Replay;
+import sys.thread.Thread;
+import http.HttpClient;
+import http.HttpError;
 import hx.files.File;
-import haxe.io.BytesData;
-import haxe.io.Bytes;
-import haxe.ui.loaders.image.HttpImageLoader;
-import haxe.ui.loaders.image.FileImageLoader;
-import haxe.ui.Toolkit;
-import haxe.ui.backend.BackendImpl;
-import ui.models.FriendsModelRoot;
+
 import hx.files.File.FileWriteMode;
 import hx.files.Dir;
 import hx.files.Path;
-import hx.concurrent.ConcurrentException;
-import haxe.Exception;
 import haxe.ds.Either;
-import haxe.Json;
+
 import haxe.Http;
-import hx.concurrent.event.AsyncEventDispatcher;
-import http.HttpResponse;
-import promises.Promise;
-import http.HttpError;
-import queues.QueueFactory;
-import http.HttpClient;
+import hx.injection.config.Configuration;
 import haxe.ui.util.Variant;
-import haxe.ui.assets.ImageInfo;
-import haxe.ui.loaders.image.ImageLoader;
-import hx.concurrent.executor.Executor;
-import sys.thread.Thread;
-import ui.models.FriendModel;
-import hx.concurrent.collection.SynchronizedArray;
-import haxe.ui.util.GUID;
-import ui.views.MainView;
-import ui.views.MenuVIew;
-import haxe.ui.HaxeUIApp;
-import systems.Render3D;
-import ecs.Workflow;
-import components.ResourceComponent;
-import components.*;
+
 import ecs.Entity;
-import hxd.BitmapData;
-
-
-import hx.injection.Service;
+import haxe.Json;
 import hx.injection.ServiceCollection;
-import services.GameObjectManagerService;
+
 import h3d.col.Bounds;
 import h3d.mat.Texture;
 import h3d.prim.Cube;
 import ui.views.HUD;
 import ui.views.BuildingMenu;
-import ui.views.MainView;
 
-import haxe.ui.backend.heaps.KeyboardHelper;
-import hxd.Key;
-import io.colyseus.error.MatchMakeError;
-import hx.concurrent.event.AsyncEventDispatcher;
 import haxe.ui.backend.BackendImpl;
 import ui.models.FriendModel;
 import hx.concurrent.collection.SynchronizedArray;
@@ -65,46 +48,20 @@ import haxe.ui.core.Screen;
 import ui.views.MenuVIew;
 import haxe.ui.Toolkit;
 import io.colyseus.Client;
-import io.colyseus.Room;
-
-import tweenxcore.structure.FloatChange;
-import tweenxcore.structure.FloatChangePart;
-import services.AppEventService;
-import services.GameObjectManagerService;
-import services.AuthenticationService;
+import hx.concurrent.collection.SynchronizedMap;
+import hx.injection.config.ConfigurationBuilder;
 
 import enums.AppEvent;
-
+using libs.rx.Observable;
 using tweenxcore.Tools;
 using hx.injection.ServiceExtensions;
-
+using Safety;
 
 //https://gigglingcorpse.com/2021/11/22/hello-world-heaps-on-android/
 class Main extends hxd.App {
-    static var friends:SynchronizedArray<FriendModel>;
-    //var menuView:MenuView;
-    //var menuView:HeapsMain;
-    //var getFriendsExecutor:Executor;
-    //var usersGetUrl = "http://localhost:5017/arnest/api/get-running-machine-checks-devices";
-    var usersGetUrl = "http://jsonplaceholder.typicode.com/users";
-    //var appInitEvent:AppEventBase;
-    var friendsLoadedEvent:AppEventBase;
-    var executor:Executor;
-    var appInited:Bool = false;
-    //var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
-    var cacheFolder:Dir;
-    var appFolder:Dir;
+   
 
-    var imageCacheMapping:SynchronizedMap<String,String>;
-    var imageCachePath:Path;
-    var imageMappingFile:File;
-    
-    var collection:ServiceCollection;
-
-    var worldController : WorldController;
-    var uiController : UIController;
-
-    var gameObjectManager : GameObjectManagerService;
+    //var gameObjectManager : GameObjectManagerService;
 
     var gameObjects   : Array<GameObject> = [];
     var movingObjects : Array<MapObject>  = [];
@@ -145,128 +102,255 @@ class Main extends hxd.App {
     };
 
     /*Service List*/
-    var appEventService             :AppEventService;
-    var gameObjectManagerService    :GameObjectManagerService;
-    var authenticationService       :AuthenticationService;
 
-    public function setFriends(friends:SynchronizedArray<FriendModel>){
-        //trace("CALLED");
-        var arr:Array<FriendModel> = new Array<FriendModel>();
-        for (friend in friends)
-            arr.push(friend);
-        menuView.setFriends(arr);
-    }
-    function onLogin(event:AppEventBase){
-        if(event.event != "LoginFailure" || event.event != "LoginSucessful") return;
 
-        if(event.event == "LoginSucessful"){
-            userToken = event.data;
-            trace(userToken);
-        }
-    }
-
-    function onRegister(event:AppEventBase){
-        if(event.event != "RegisterFailure" || event.event != "RegisterSucessful") return;
-
-        if(event.event == "RegisterSucessful"){
-            userToken = event.data;
-            trace(userToken);
-        }
-    }
-
-    
     var renderTarget:Texture;
     var s3dTarget:h3d.scene.Scene;
     
+    var usersGetUrl = "http://jsonplaceholder.typicode.com/users";
+    var serviceCollection:ServiceCollection;
+    var cacheFolder:Dir;
     public function new() {
+        super();
+        
+    }
+    static function printArray(_array:Array<Int>)
+        trace(_array);
+
+
+    function initServices(){
+
+        var builder = ConfigurationBuilder.create('configs');
+        var configApp:ApplicationConfig = builder.resolveJson('app-config.json');
+        var config:Config = new Config();
+        config.appConfig = configApp;
+        serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(services.FriendService);
+        serviceCollection.addConfig(config);
+        trace("IS IT PROBLEM HERE?");
+        /*
+        var applicationDirectory = Sys.programPath();
+        
+        var appPath = Path.of(applicationDirectory);
+        var appFolder = appPath.parent.toDir();
+
+        var configPath = appPath.parent.join("configs");
+        if(!configPath.exists()) configPath.toDir().create();
+        var configFolder = configPath.toDir();
+
+        var configFile = configFolder.path.join("app-config.json").toFile();
+        var inputStream = configFile.openInput(true);
+
+        var rawData = inputStream.readAll();
+        var rawJson = rawData.toString();
+        //trace("raw conf: "+ rawJson);
+            //trace(rawJson);
+        //var json = Json.parse(rawJson);
+		//var config:ApplicationConfig = builder.resolveJson('app-config.json');
+        //var config = 
+        //var configuration = new Configuration(rawData);
+        
+        //trace("not raw conf: "+configuration.getString());
+        //var config:ApplicationConfig = builder.build();
+        serviceCollection = new ServiceCollection();
+        //trace("AH, I SEE NOW : " + config);
+        serviceCollection.addConfig(configuration);
+        trace("ALL GOOD?");
+        //serviceCollection.addSingleton(services.ConfigurationHolderService);
+        serviceCollection.addSingleton(services.FriendService);
+        */
+
+
+    }
+
+    function startup(){
+        trace("Im here");
+        trace("U GONNA DIE WHERE?");
         initServices();
-        var provider = collection.createProvider();
-        var appEventService = provider.getService(AppEventService);
+        var provider = serviceCollection.createProvider();
+        trace("U GONNA DIE HERE?");
+        //var configService = provider.getService(services.ConfigurationHolderService);
+        trace("Whats wrong?");
+        var friendService = provider.getService(services.FriendService);
+
+        //var provider = collection.createProvider();
+        //var appEventService = provider.getService(AppEventService);
         //var heapsmain = provider.getService(HeapsMain);
         
-        Toolkit.onAfterInit = startup;
-        friends = new SynchronizedArray<FriendModel>();
-        executor = Executor.create(5);
+        //Toolkit.onAfterInit = startup;
+        //friends = new SynchronizedArray<FriendModel>();
+        
+        //var friendsObservable = Observable.
+        //executor = Executor.create(5);
         //asyncDispatcher = appEventService.asyncDispatcher;//new AsyncEventDispatcher<AppEventBase>(executor);
-        appEventService.subscribe(onFriendsLoaded);
-        appEventService.subscribe(onAppInited);
+        //appEventService.subscribe(onFriendsLoaded);
+        //appEventService.subscribe(onAppInited);
         //new HeapsMain(provider);
-        super();
+        /*
+        var apiFriendsCall = new Create(function(observer:IObserver<Dynamic>) {
+            var result = Http.requestUrl(usersGetUrl);
+            observer.on_next(result);
+            observer.on_completed();
+            return Subscription.empty();
+        });*/
+        // Threaded example.
+		//final rep             = new Replay<Array<Int>>();
+	    final threadScheduler = new NewThread(); //NewThreadScheduler();
+		//final mainSheduler    = new SpecificThreadScheduler(Thread.current());
+        
+
+		final threadID = Thread.current();
+        threadID.setName("FIRST");
+		trace('main thread is ${threadID}');
+        var observ = Observer.create(()->{},(e)->{trace("Error: "+e);},(v)->{trace(v);});
+        friendService.getFriends().subscribe(observ);
+        var scehduled = new MakeScheduled();
+        //var combinator:Array<api.models.JsonModels.RootFriendsData>->api.models.JsonModels.RootFriendsData=function(args:Array<api.models.JsonModels.RootFriendsData>){ 
+        //    return args[0]+""+args[1];
+        //};
+       /* var apiFriendsCall = Observable.create(_observer -> {
+            var client = new HttpClient();
+            client.followRedirects = false; // defaults to true
+            client.retryCount = 5; // defaults to 0
+            client.retryDelayMs = 0; // defaults to 1000
+            //client.provider = new MySuperHttpProvider(); // defaults to "DefaultHttpProvider"
+            //client.requestQueue = QueueFactory.instance.createQueue(QueueFactory.SIMPLE_QUEUE); // defaults to "NonQueue"
+            //client.defaultRequestHeaders = ["someheader" => "somevalue"];
+            //client.requestTransformers = [new MyRequestTransformerA(), new MyRequestTransformerB()];
+            //client.responseTransformers = [new MyResponseTransformerA(), new MyResponseTransformerB()];
+            client.get(usersGetUrl, [], []).then(response -> {
+                //var foo = response.bodyAsJson;
+                //trace("Loaded data: "+foo);
+                _observer.on_next(response.bodyAsJson);
+                _observer.on_completed();
+            }, (error:HttpError) -> {
+                // error
+                _observer.on_error(error.bodyAsString);
+            });*/
+            /*
+            var result = Http.requestUrl(usersGetUrl);
+            var mockFriendsJson:api.models.JsonModels.RootFriendsData = Mock.getMockJsonFriends();
+            _observer.on_next(mockFriendsJson);*/
+            //_observer.on_completed();
+            //return Subscription.empty();
+        //});//.subscribe(observ);
+        /*.map((v:api.models.JsonModels.RootFriendsData)->{
+            var arrFriend = [];
+            trace(v);
+            for (rawFriend in v.friends) {
+                arrFriend.push(new FriendModel(rawFriend.nickName,rawFriend.profileImageUrl,rawFriend.id,rawFriend.profileImageLocalUrl));
+            }
+            return arrFriend;
+        }).subscribe(observ);*/
+        
+        var storageApiCall = Observable.create(_observer->{
+            var applicationDirectory = Sys.programPath();
+        
+            var appPath = Path.of(applicationDirectory);
+            var appFolder = appPath.parent.toDir();
+
+            var cachePath = appPath.parent.join("cache");
+            if(!cachePath.exists()) cachePath.toDir().create();
+            cacheFolder = cachePath.toDir();
+
+            var friendCache = cacheFolder.path.join("friends.json").toFile();
+            var inputStream = friendCache.openInput(true);
+    
+            var rawData = inputStream.readAll();
+            var rawJson = rawData.toString();
+            //trace(rawJson);
+            var json:api.models.JsonModels.RootFriendsData = Json.parse(rawJson);
+           
+            var imageMappingPath = cachePath.join("image_mapping.json");
+            if (!imageMappingPath.exists()) imageMappingPath.toFile().touch();
+    
+            var imageMappingFile = imageMappingPath.toFile();
+            var imageCachePath = cachePath.join("images");
+            if (!imageCachePath.exists()) imageCachePath.toDir().create();
+
+            var mappingStream = imageMappingFile.openInput(true);
+            var rawMappingData = mappingStream.readAll();
+            var rawMappingJson = rawMappingData.toString();
+
+            var parser = new json2object.JsonParser<Map<String,String>>();
+            parser.fromJson(rawMappingJson,"err");
+
+            var imageCacheMapping = SynchronizedMap.from(parser.value);
+            _observer.on_next(json);
+            _observer.on_completed();
+            return Subscription.empty();
+        });
+        
+        /*.map((v:api.models.JsonModels.RootFriendsData)->{
+            var arrFriend = [];
+            for (rawFriend in v.friends) {
+                arrFriend.push(new FriendModel(rawFriend.nickName,rawFriend.profileImageUrl,rawFriend.id,rawFriend.profileImageLocalUrl));
+            }
+            return arrFriend;
+        });//.subscribe(observ);*/
+
+//        var apiAndStorage = apiFriendsCall.combineLatest([storageApiCall], combinator);
+
+        //apiAndStorage.subscribe(Observer.create(()->{},(e)->{},(v)->{trace(v);}));
+
+        /*new SubscribeOnThis(Scheduler.newThread,
+            Observable.create(_observer -> {
+                trace('performing some long running task on ${ Thread.current() }...${ threadID == Thread.current() }');
+                var anotherID = Thread.current();
+                trace("another thread: " + anotherID);
+                _observer.on_next([Std.random(10), Std.random(10), Std.random(10)]);
+                _observer.on_completed();
+
+                return Subscription.empty();
+            })
+        ).subscribe(observ);*/
+        
+        //.subscribeOn(threadScheduler)
+        //.observeOn(mainSheduler);
+            //.subscribe(observ);
+			//.subscribeOn(threadScheduler)
+			//.observeOn(mainSheduler)
+			//.subscribeFunction((_v:Array<Int>) -> printArray(_v));
+            // Create two subscriptions to prove the replay subject works.
+            //rep.subscribeFunction(printArray);
+            //rep.subscribeFunction(printArray);
+
+            // Give some time for the task to run then read a message as a function and execute it.
+            // This function will pump the observer events to the two subscribers.
+            
+           // final func : () -> Void = Thread.readMessage(false);
+           // func();
+
+            //rep.subscribeFunction(printArray);
+
+
+            /*
+        apiFriendsCall.subscribe(Observer.create(
+                function(){  
+                    trace("completed");
+                },
+                function(e){
+                    trace("err " + e);
+                },
+                function(v:Dynamic){ 
+                    trace("Val: "+ v);
+                    //observer.on_next(v); 
+                }
+        ));*/
+        
         //menuView = this;//new HeapsMain(provider);//asyncDispatcher);
         //heapsmain.makeInit();
         
         /*
         initECS();
         */
-        
     }
+ 
 
-    function initServices(){
-        collection = new ServiceCollection();
-        //collection.addService(GameObjectManagerService);
-        collection.addSingleton(GameObjectManagerService);
-        collection.addSingleton(AppEventService);
-        //collection.addSingleton(HeapsMain);
-    }
-
-    function startup(){
-        //trace("Im here");
-        checkFiles();
-        fetchData();
-    }
-    function checkFiles(){
-        var applicationDirectory = Sys.programPath();
-        
-        var appPath = Path.of(applicationDirectory);
-        appFolder = appPath.parent.toDir();
-
-        var cachePath = appPath.parent.join("cache");
-        if(!cachePath.exists()) cachePath.toDir().create();
-        cacheFolder = cachePath.toDir();
-
-        var friendCache = cachePath.join("friends.json");
-        if (!friendCache.exists()) friendCache.toFile().touch();
-
-        var imageMappingPath = cachePath.join("image_mapping.json");
-        if (!imageMappingPath.exists()) imageMappingPath.toFile().touch();
-
-        imageMappingFile = imageMappingPath.toFile();
-        imageCachePath = cachePath.join("images");
-        if (!imageCachePath.exists()) imageCachePath.toDir().create();
-        
-    }
-
-    function onFriendsLoaded(event:AppEventBase){
-        if(event.event != AppEvent.FRIENDS_LOADED) return;
-        if(!appInited) return;
-        //menuView.setFriends(friends);
-    }
-
-    function onAppInited(event:AppEventBase){
-        if(event.event != AppEvent.INITED) return;
-        //trace("App inited");
-        appInited = true;
-        //if(friends != null) menuView.setFriends(friends);
-    }
-
-    function initECS(){
-        //trace("Start ecs things");
-        Workflow.addSystem(new Render3D());
-        Workflow.addSystem(new systems.UISystem());
-        Workflow.addSystem(new systems.ResourceProduce());
-        var player:Entity = new Entity();
-        var friend:FriendModel = new FriendModel();
-        friends.addIfAbsent(friend);
-        var resources:List<ResourceComponent> = new List<ResourceComponent>();
-        resources.add(new ResourceComponent("GOLD",100));
-        resources.add(new ResourceComponent("WOOD",100));
-        resources.add(new ResourceComponent("STONE",100));
-        player.add(new PlayerComponent(player,resources));
-        //trace("End ecs things");
-    }
 
     override function init() {
 		hxd.Res.initEmbed();
+        startup();
         //initServices();
         //initMiniMap();
         //gameObjectManager = new GameObjectManagerService();
@@ -420,15 +504,7 @@ class Main extends hxd.App {
         });
         */
         
-        try {
-            authenticationService.register("wtf22@mail.com", "123");
-        }
-        catch(e){ trace("register failed"); }
-
-        try {
-            authenticationService.signIn("wtf22@mail.com", "123");
-        }
-        catch(e){ trace("login failed"); }
+      
         /*client.auth.signInWithEmailAndPassword("wtf@mail.com","123",(res,err)->{
             trace("Good");
         });*/
@@ -653,404 +729,8 @@ class Main extends hxd.App {
         //     fixedTick(hxd.Timer.lastTimeStamp, fixedTimeStep);
         // }
     }
-    function fetchData(){
-        var apiCallTask = () -> {
-            //trace("Start api call");
-            var result = Http.requestUrl(usersGetUrl);
-            //trace(result);
-            return result;
-        }
-        var storageCallTask = () ->{
-            //trace("Start local read");
-            var friendCache = cacheFolder.path.join("friends.json").toFile();
-            var inputStream = friendCache.openInput(true);
-    
-            var rawData = inputStream.readAll();
-            var rawJson = rawData.toString();
-            //trace(rawJson);
-            var json:api.models.JsonModels.RootFriendsData = Json.parse(rawJson);
 
-            var mappingStream = imageMappingFile.openInput(true);
-            var rawMappingData = mappingStream.readAll();
-            var rawMappingJson = rawMappingData.toString();
-
-            var parser = new json2object.JsonParser<Map<String,String>>();
-            parser.fromJson(rawMappingJson,"err");
-
-            imageCacheMapping = SynchronizedMap.from(parser.value);
-            
-            return json;
-        }
-        //trace("Submit storage call task");
-        var storageCallPromise = executor.submit(storageCallTask);
-        //trace("Submit api call task");
-        var apiCallPromise = executor.submit(apiCallTask);
-        //trace("Set storage completion");
-        storageCallPromise.onCompletion(result->{
-            //trace("start read local");
-            var result:api.models.JsonModels.RootFriendsData = switch (result){
-                case VALUE(value, time, _): value;
-                case FAILURE(ex, time, _): null;
-                case PENDING(_): null;
-                default: null;
-            };
-            if(result != null && result.friends != null)
-                for (rawFriend in result.friends) {
-                    friends.add(new FriendModel(rawFriend.nickName,rawFriend.profileImageUrl,rawFriend.id,rawFriend.profileImageLocalUrl));
-                }
-            var ev:AppEventBase = { event: enums.AppEvent.FRIENDS_LOADED, data: null};
-            appEventService.dispatch(ev);
-        });
-        
-        var transformJsonToFriendsTask = function ():Bool {
-            apiCallPromise.awaitCompletion(-1);
-            storageCallPromise.awaitCompletion(-1);
-            //trace("start transform");
-
-            var apiResult:Dynamic = switch (apiCallPromise.result){
-                case VALUE(value, time, _): value;
-                case FAILURE(ex, time, _): null;
-                case PENDING(_): null;
-                default: null;
-            }
-            if(apiResult == null){} //trace("No api data");//return false;
-            
-            var storageResult:Dynamic = switch (storageCallPromise.result){
-                case VALUE(value, time, _): value;
-                case FAILURE(ex, time, _): null;
-                case PENDING(_): null;
-                default: null;
-            }
-            if(storageResult == null){} //trace("No storage data");//return false;
-            
-            var mockFriendsJson:api.models.JsonModels.RootFriendsData = Mock.getMockJsonFriends();
-
-            //friendCache.openOutput(FileWriteMode.APPEND)
-            
-            for (rawFriend in mockFriendsJson.friends) {
-                var isFriendAlreadyExist = false;
-                for (friend in friends) {
-                    if(friend.id != rawFriend.id) continue;
-                    isFriendAlreadyExist = true;
-                    break;
-                }
-                if(!isFriendAlreadyExist){
-                    friends.add(new FriendModel(rawFriend.nickName,rawFriend.profileImageUrl,rawFriend.id,rawFriend.profileImageLocalUrl));
-                }
-            }
-            var i = 0;
-            for (friend in friends){
-                var key = friend.id;
-                if(imageCacheMapping.exists(key)){
-                    var fullPath = imageCachePath.join(imageCacheMapping.get(key)).getAbsolutePath();
-                    friends[i].profileImageLocalUrl = fullPath;
-                }
-                i++;
-            }
-            var ev:AppEventBase = { event: AppEvent.FRIENDS_LOADED, data: null };
-            appEventService.dispatch(ev);
-            return true;
-        };
-        //trace("Submit transform task");
-        var transformJsonPromise = executor.submit(transformJsonToFriendsTask);
-
-        var loadImagesTask = function ():Array<TaskFuture<Void>>{
-            transformJsonPromise.awaitCompletion(-1);
-            //trace("start loading images");
-            var promises:Array<TaskFuture<Void>> = new Array<TaskFuture<Void>>();
-            for(friend in friends){
-                var url = "";
-
-                //trace("r url: "+friend.profileImageLocalUrl);
-                if(friend.profileImageLocalUrl != null && friend.profileImageLocalUrl != "") url = friend.profileImageLocalUrl;
-                else if (friend.profileImageUrl != null && friend.profileImageUrl != "") url = friend.profileImageUrl;
-                else continue;
-                //trace("selected url: "+url);
-                var idx = friends.indexOf(friend);
-                var task = createLoadImageTask(idx,url);
-                var future = executor.submit(task);
-                promises.push(future);
-            }
-            return promises;
-        }
-        var loadImagesPromise = executor.submit(loadImagesTask);
-
-        var saveImagesTask = function():Void{
-            loadImagesPromise.awaitCompletion(-1);
-            var promises:Array<TaskFuture<Void>> = switch (loadImagesPromise.result){
-                case VALUE(value, time, _): value;
-                case FAILURE(ex, time, _): null;
-                case PENDING(_): null;
-                default: null;
-            }
-            for(p in promises) p.awaitCompletion(-1);
-            for(friend in friends){
-                var img = friend.image;
-                if(img == null) continue;
-                var imgData = img.toImageData();
-
-                var imgCacheName = friend.id + "_profile";
-                if(imageCacheMapping.exists(imgCacheName)) continue;
-
-                var cacheFile = imageCachePath.join(imgCacheName + ".png");
-                
-                var imageBytes = imgData.toPNG();
-                //cacheFile.toFile().touch();
-                try{
-                    cacheFile.toFile().writeBytes(imageBytes,false);
-                }
-                catch(e){}
-                imageCacheMapping.set(friend.id,imgCacheName + ".png");
-                friend.profileImageLocalUrl = imgCacheName + ".png";
-                //trace("image saved");
-                ////trace("result bytes: ");
-                ////trace(bb);
-                //stream.write();
-                //cacheFile.writeBytes(img.toImageData());
-            }
-            //trace("I waited for eternity");
-            var friendModelRoot = new FriendsModelRoot();
-            friendModelRoot.fromSyncArray(friends);
-            var friendCache = cacheFolder.path.join("friends.json").toFile();
-            var writer = new json2object.JsonWriter<FriendsModelRoot>();
-            var friendsArrayJson = writer.write(friendModelRoot);
-            friendCache.writeString(friendsArrayJson);
-
-            var imageWriter = new json2object.JsonWriter<Map<String,String>>();
-            var syncMapping:Map<String,String> = new Map<String,String>();
-            for(key in imageCacheMapping.keys()){
-                var value = imageCacheMapping.get(key);
-                syncMapping.set(key,value);
-            }
-            var imageJson = imageWriter.write(syncMapping);
-            imageMappingFile.writeString(imageJson);
-            //var output = friendCache.openOutput(FileWriteMode.REPLACE);
-            //output.writeBytes(friendsArrayJson)
-            
-        };
-        executor.submit(saveImagesTask);
-        //transformJsonPromise.awaitCompletion(-1);
-        
-    }
-
-    function gg():Void {
-        var unused:hx.concurrent.Future.FutureCompletionListener<Void> = null;
-        /*
-        for(friend in newfriends){
-           //Sys.sleep(2);
-           friends.add(friend);
-           var idx = friends.indexOf(friend);
-           //trace("done");
-           
-           menuView.setFriends(friends);
-           
-           
-        };*/
-        
-    }
-/*
-    function decodePNG(src:haxe.io.Bytes, width:Int, height:Int, requestedFmt:hxd.PixelFormat) {
-		var outFmt = requestedFmt;
-        var gg:format.hl.Reader = new format.hl.Reader();
-        var dt:format.hl.Data = gg.read();
-        
-		var ifmt:format.hl.Native. = switch (requestedFmt) {
-			case RGBA: RGBA;
-			case BGRA: BGRA;
-			case ARGB: ARGB;
-			case R16U: cast 12;
-			case RGB16U: cast 13;
-			case RGBA16U: cast 14;
-			case RG16U: cast 15;
-			default:
-				outFmt = BGRA;
-				BGRA;
-		};
-		var stride = 4; // row_stride is the step, in png_byte or png_uint_16 units	as appropriate, between adjacent rows
-		var pxsize = 4;
-		switch (outFmt) {
-			case R16U:
-				stride = 1;
-				pxsize = 2;
-			case RG16U:
-				stride = 2;
-				pxsize = 4;
-			case RGB16U:
-				stride = 3;
-				pxsize = 6;
-			case RGBA16U:
-				stride = 4;
-				pxsize = 8;
-			default:
-		}
-		var dst = haxe.io.Bytes.alloc(width * height * pxsize);
-		if (!format.hl.Native.decodePNG(src.getData(), src.length, dst.getData(), width, height, width * stride, ifmt, 0))
-			return null;
-		var pix = new hxd.Pixels(width, height, dst, outFmt);
-		return pix;
-	}*/
-
-    function createLoadImageTask(idx:Int,url:String):Void->Void{
-        return ()->{
-            //trace("Well im here");
-            if(url.indexOf("http") > -1){
-                var httpImgLoader:ImageLoader = ImageLoader.instance;
-                //trace("so what htt");
-                httpImgLoader.load(url,(inf:ImageInfo)->{
-                    if(inf != null && inf.data != null) { 
-                        //trace(inf.data); 
-                        friends[idx].image = inf.data;
-                        //trace(menuView);
-                        //menuView.setFriends(friends);
-                        //trace("and here");
-                    }
-                });
-            }
-            else{
-                //var imgFile = File.of(url);
-                //var bytes = imgFile.readAsBytes();
-                //var hlBytes = hl.Bytes.fromBytes(bytes);
-                /*var innerBitmap:{
-                    pixels:hl.Bytes,
-                    width:Int,
-                    height:Int,
-                } = ;
-                var bitmapData = BitmapData.fromNative(innerBitmap);
-                friends[idx] = bitmapData;
-                menuView.setFriends(friends);*/
-                //var bitmapData:DitmapData = new BitmapData(32,32);
-
-                //var i = sys.io.File.read(url,true);
-                var imgFile = File.of(url);
-                var input = imgFile.openInput(true);
-                var data = new format.png.Reader(input).read();
-                var bytes = format.png.Tools.extract32(data);
-                var header = format.png.Tools.getHeader(data);
-                input.close();
-                //var imgFile = File.of(url);
-                //var bytes = imgFile.readAsBytes();
-                //var pixels = decodePNG(bytes, 32, 32, null);
-				//if (pixels == null)
-				//	throw "Failed to decode PNG";
-                //hl.Bytes.fromBytes
-                var hlBytes = hl.Bytes.fromBytes(bytes);
-                var innerBitmap:BitmapInnerData = new BitmapInnerData();
-                innerBitmap.height = header.height;
-                innerBitmap.width = header.width;
-                innerBitmap.pixels = hlBytes;
-                var bitmapData:BitmapData = BitmapData.fromNative(innerBitmap);
-                //trace(bitmapData);
-                //var bitmap:ImageInfo = new ImageInfo(32,null,32,bitmapData);
-                friends[idx].image = bitmapData;
-                //menuView.setFriends(friends);
-                /*
-                var httpImgLoader:ImageLoader = ImageLoader.instance;
-                //trace("so what fil");
-                httpImgLoader.load(url,(inf:ImageInfo)->{
-                    if(inf != null && inf.data != null) { 
-                        //trace(inf.data); 
-                        friends[idx].image = inf.data;
-                        //trace(menuView);
-                        menuView.setFriends(friends);
-                        //trace("and here");
-                    }
-                });*/
-                
-            }
-        }
-    }
-    /*
-    function createLoadImageTasks(urls:Array<String>):Array<Void->Variant>{
-        var tasks:Array<Void->Variant> = new Array<Void->Variant>();
-        for(url in urls){
-            var task:Void->Variant = ()->{
-                var imgData:Variant = null;
-                var compl:Bool = false;
-                ImageLoader.instance.load(url,(inf:ImageInfo)->{
-                    if(inf != null && inf.data != null) { //trace(inf.data); imgData = inf.data;}
-                    //trace("agagaga: "+imgData);
-                    compl = true;
-                });
-                while(!compl) Sys.sleep(0.1);
-                return imgData;
-            };
-            tasks.push(task);
-        }
-        return tasks;
-    }*/
-    function loadUsers():Promise<HttpResponse>{
-        var client = new HttpClient();
-        client.followRedirects = false; // defaults to true
-        //client.retryCount = 0; // defaults to 0
-        //client.retryDelayMs = 1000; // defaults to 1000
-       // client.provider = new MySuperHttpProvider(); // defaults to "DefaultHttpProvider"
-        client.requestQueue = QueueFactory.instance.createQueue(QueueFactory.SIMPLE_QUEUE); // defaults to "NonQueue"
-        //client.defaultRequestHeaders = ["someheader" => "somevalue"];
-        //client.requestTransformers = [new MyRequestTransformerA(), new MyRequestTransformerB()];
-        //client.responseTransformers = [new MyResponseTransformerA(), new MyResponseTransformerB()];
-        var promise = client.get(usersGetUrl,null,["Content-Type"=>"Application/json"]);/*.then(response -> {
-            var foo = response.bodyAsJson;
-            //trace(foo);
-        }, (error:HttpError) -> {
-            // error
-            //trace(error);
-        });*/
-        return promise;
-        /*Sys.sleep(4);
-        var newfriends = new Array<FriendModel>();
-        newfriends.push(new FriendModel("qwe","https://placehold.co/32x32/orange/white/png","1"));
-        newfriends.push(new FriendModel("bvc","adq","2"));
-        newfriends.push(new FriendModel("zxc","https://placehold.co/32x32/orange/green/png","3"));
-        return newfriends;*/
-    }
-
-    /*
-    function getFriendList(userId:String){
-        var unused:hx.concurrent.Future.FutureCompletionListener<Void> = null;
-        
-
-        var client = new HttpClient();
-        client.followRedirects = false;
-        client.requestQueue = QueueFactory.instance.createQueue(QueueFactory.SIMPLE_QUEUE);
-        var promise = client.get(usersGetUrl,null,["Content-Type"=>"Application/json"]);
-
-        promise.then(promiseResult->{
-            var foo = promiseResult.bodyAsJson;
-            getFriendsExecutor = Executor.create(3,true);  // <- 3 means to use a thread pool of 3 threads on platforms that support threads
-            var syncResult = new Array<FriendModel>();
-            syncResult.push(new FriendModel("qwe","https://placehold.co/32x32/orange/white/png","1"));
-            syncResult.push(new FriendModel("bvc","adq","2"));
-            syncResult.push(new FriendModel("zxc","https://placehold.co/32x32/orange/green/png","3"));
-            var users:SynchronizedArray<FriendModel> = new SynchronizedArray<FriendModel>();
-            for(user in syncResult){
-                users.add(user);
-            }
-
-            for(user in users){
-                //friendMap.set(user.id,user.profileImageUrl);
-                var task = createLoadImageTask(user.profileImageUrl);
-                var future = getFriendsExecutor.submit(task);
-                var idx = users.indexOf(user);
-                future.onCompletion(result->{
-                    switch(result) {
-                        case VALUE(value, time, _): {
-                            //trace(value.toImageData());
-                            //trace('Successfully execution at ${Date.fromTime(time)} with result: $value');
-                            users[idx].image = value.toImageData();
-                            menuView.setFriends(users);
-                        }
-                        case FAILURE(ex, time, _):  //trace('Execution failed at ${Date.fromTime(time)} with exception: $ex');
-                        case PENDING(_):      //trace("Nothing is happening");
-                    }
-                });
-            }
-            menuView.setFriends(users);
-        });
-    }*/
-    function getFriendList(userId:String) {
-        
-    }
-
+   
 
     public static function main(){
         new Main();
@@ -1067,7 +747,32 @@ typedef TeamLobbyData = {
     lobbyId:String
 }
 
+/*
+class SpecificThreadScheduler extends libs.rx.schedulers.MakeScheduler {
+	public function new(thread:Thread) {
+		super(new SpecificThreadBase(thread));
+	}
+}
 
+class SpecificThreadBase implements libs.rx.schedulers.Base {
+	final thread:Thread;
+
+	public function new(_thread) {
+		thread = _thread;
+	}
+
+	public function now():Float
+		return Timer.stamp();
+
+	public function schedule_absolute (due_time:Float, action:() -> Void):ISubscription {
+		final action1 = Utils.createSleepingAction(action, due_time, now());
+		final discardable = new DiscardableAction(action1);
+
+		thread.sendMessage(action);
+
+		return discardable.unsubscribe();
+	}
+}*/
 /*
 // Cache service for caching friend data
 class CacheService {

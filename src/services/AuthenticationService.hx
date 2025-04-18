@@ -1,4 +1,5 @@
 package services;
+import haxe.ui.events.AppEvent;
 import extensions.Auth;
 
 class AuthenticationService {

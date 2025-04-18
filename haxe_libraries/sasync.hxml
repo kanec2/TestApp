@@ -1,0 +1,4 @@
+# @install: lix --silent download "haxelib:/sasync#0.0.3" into sasync/0.0.3/haxelib
+-cp ${HAXE_LIBCACHE}/sasync/0.0.3/haxelib/src
+-D sasync=0.0.3
+--macro sasync.Async.init()

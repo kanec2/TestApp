@@ -20,6 +20,10 @@
 -lib tweenxcore
 -lib haxe-injection
 -lib uniontypes
+-lib sasync
+-lib utest
+-lib signals
+-lib safety
 
 -D concurrent
 -D resourcesPath=assets
