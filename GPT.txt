@@ -1,0 +1,1131 @@
+
+and now implement colyseus client observable
+
+Certainly! I'll provide a complete Haxe implementation of a Colyseus client wrapper as an Observable, assuming a typical Colyseus client usage pattern in Haxe. This example will demonstrate how to encapsulate the full lifecycle of connecting to a Colyseus server, joining a room, and wrapping room events into Rx-style observables.
+
+Assumptions
+You have a Haxe Colyseus client library (or you want to create one) that exposes usual Colyseus client APIs:
+
+class Client {
+    public function new(serverUrl:String) {}
+    public function join<TState>(roomName:String, options:Dynamic = null):Promise<Room<TState>>;
+}
+Room<TState> has event callbacks like:
+
+class Room<TState> {
+    public var onStateChange:Void->Void<(TState)>;
+    public var onMessage:Void->Void<(Dynamic)>;
+    public var onLeave:Void->Void<()>;
+    public var onError:Void->Void<(String)>;
+    public function send(message:Dynamic):Void;
+    public function leave():Promise<Void>;
+}
+We want a class ColyseusClientObservable which:
+connects to the server,
+joins a room,
+exposes observable streams of room events (state, message, leave),
+allows sending messages,
+and cleanly manages subscriptions and disposals.
+Step 1: Minimal Observable Support
+Here is a minimal observable and subject implementation for Haxe, inspired by the previous example:
+
+
+typedef Observer<T> = {
+    function onNext(value:T):Void;
+    function onError(error:Dynamic):Void;
+    function onCompleted():Void;
+}
+
+typedef Subscription = {
+    function unsubscribe():Void;
+}
+
+class Subject<T> {
+    var observers:Array<Observer<T>> = [];
+
+    public function new() {}
+
+    public function subscribe(observer:Observer<T>):Subscription {
+        observers.push(observer);
+        return {
+            unsubscribe: () -> observers = observers.filter(o -> o != observer)
+        };
+    }
+
+    public function onNext(value:T):Void {
+        for (observer in observers) observer.onNext(value);
+    }
+
+    public function onError(error:Dynamic):Void {
+        for (observer in observers) observer.onError(error);
+        observers = [];
+    }
+
+    public function onCompleted():Void {
+        for (observer in observers) observer.onCompleted();
+        observers = [];
+    }
+}
+Step 2: Define room event types
+
+enum ColyseusRoomEventType {
+    StateChange;
+    Message;
+    Leave;
+    Error;
+}
+
+typedef ColyseusRoomEvent<TState, TMessage> = {
+    eventType: ColyseusRoomEventType;
+    state: Null<TState>;
+    message: Null<TMessage>;
+    error: Null<String>;
+}
+Step 3: The ColyseusClientObservable class
+
+import tink.core.Promise;
+
+class ColyseusClientObservable<TState, TMessage> {
+    public var serverUrl:String;
+    public var client:Client;
+    private var room:Room<TState>;
+    private var subject:Subject<ColyseusRoomEvent<TState, TMessage>>;
+
+    public function new(serverUrl:String) {
+        this.serverUrl = serverUrl;
+        this.client = new Client(serverUrl);
+        this.subject = new Subject();
+    }
+
+    /**
+     * Joins a room by name with optional options.
+     * Returns a Promise which resolves when join is successful.
+     * Once joined, room events are emitted to observers.
+     */
+    public function joinRoom(roomName:String, options:Dynamic = null):Promise<Void> {
+        return client.join<TState>(roomName, options).map(room -> {
+            this.room = room;
+
+            setupRoomEventHandlers();
+
+            return null;
+        });
+    }
+
+    private function setupRoomEventHandlers():Void {
+        room.onStateChange = (newState:TState) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.StateChange,
+                state: newState,
+                message: null,
+                error: null
+            });
+        };
+
+        room.onMessage = (msg:Dynamic) -> {
+            var typedMessage:TMessage;
+            try {
+                typedMessage = cast msg;
+                subject.onNext({
+                    eventType: ColyseusRoomEventType.Message,
+                    state: null,
+                    message: typedMessage,
+                    error: null
+                });
+            } catch(e:Dynamic) {
+                subject.onError("Received message with wrong type: " + Std.string(e));
+            }
+        };
+
+        room.onLeave = () -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Leave,
+                state: null,
+                message: null,
+                error: null
+            });
+            subject.onCompleted();
+        };
+
+        room.onError = (errMsg:String) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Error,
+                state: null,
+                message: null,
+                error: errMsg
+            });
+            subject.onError(errMsg);
+        };
+    }
+
+    /**
+     * Subscribe to room events.
+     */
+    public function subscribe(observer:Observer<ColyseusRoomEvent<TState, TMessage>>):Subscription {
+        return subject.subscribe(observer);
+    }
+
+    /**
+     * Send a message to the room.
+     */
+    public function sendMessage(message:Dynamic):Void {
+        if (room != null) {
+            room.send(message);
+        } else {
+            throw "No room joined yet.";
+        }
+    }
+
+    /**
+     * Leaves the room. Returns a Promise.
+     */
+    public function leaveRoom():Promise<Void> {
+        if (room != null) {
+            return room.leave();
+        }
+        return Promise.resolve(null);
+    }
+}
+Step 4: Example usage
+
+class Main {
+    static public function main() {
+        var colyseusObs = new ColyseusClientObservable<MyState, MyMessage>("wss://your-colyseus-server");
+
+        colyseusObs.joinRoom("my_room", null).then(_ -> {
+            trace("Joined room");
+
+            var subscription = colyseusObs.subscribe({
+                onNext: function(evt) {
+                    switch(evt.eventType) {
+                        case StateChange:
+                            trace("New state: " + Std.string(evt.state));
+                            break;
+                        case Message:
+                            trace("Received message: " + Std.string(evt.message));
+                            break;
+                        case Leave:
+                            trace("Room left");
+                            break;
+                        case Error:
+                            trace("Error: " + evt.error);
+                            break;
+                    }
+                },
+                onError: function(e) trace("Error callback: " + Std.string(e)),
+                onCompleted: function() trace("Room observable completed")
+            });
+
+            // Example sending message
+            colyseusObs.sendMessage({ _type: "hello", content: "Hi from Haxe Observable!" });
+
+            // Later …
+            // colyseusObs.leaveRoom().then(() -> subscription.unsubscribe());
+        });
+    }
+}
+Explanation
+ColyseusClientObservable manages the client and room.
+Joining a room returns a Promise<Void> to await.
+Subscribers get all room events via one observable stream.
+You can send messages once a room is joined.
+Room lifecycle and errors trigger observable events and callbacks.
+The example shows usage and how to subscribe/react to events.
+Summary
+This structured approach brings Colyseus client events into a clean Rx paradigm on Haxe:
+
+Uses a plain Subject as the core event bus.
+Wraps common room events into a discriminated union (ColyseusRoomEvent enum).
+Cleanly manages joining, sending, and leaving room actions.
+Easy to extend with reconnection logic or finer observables if needed.
+If you want me to implement reconnect logic, advanced type-safe message serializers, or integration with an existing Haxe reactive library, just ask!
+
+
+//QUERY 2
+yes i want integration with an existing Haxe reactive library. github location - https://github.com/GlassySundew/RxHaxe
+
+Great! Let's integrate the Colyseus client observable with RxHaxe from the repo you linked: https://github.com/GlassySundew/RxHaxe
+
+Plan:
+Use rxhaxe's rx.Observable to wrap Colyseus client room events.
+Replace the simple Subject with rx.Subject or build Observables using rx.Observable.create.
+Provide a clean, idiomatic RxHaxe observable interface from Colyseus client events.
+Preserve typing for TState, TMessage.
+Allow consumers to subscribe/unsubscribe easily.
+Step 1: Add RxHaxe
+Ensure your haxelib includes rxhaxe:
+
+
+haxelib install rxhaxe
+Or add it in your hxml or build config accordingly.
+
+Step 2: Import RxHaxe
+
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
+import rx.subjects.Subject;
+Step 3: ColyseusRoomEvent types (same as before)
+
+enum ColyseusRoomEventType {
+    StateChange;
+    Message;
+    Leave;
+    Error;
+}
+
+typedef ColyseusRoomEvent<TState, TMessage> = {
+    eventType: ColyseusRoomEventType;
+    state: Null<TState>;
+    message: Null<TMessage>;
+    error: Null<String>;
+}
+Step 4: Implementation of ColyseusRoomObservable wrapping room events using RxHaxe
+
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
+import rx.subjects.Subject;
+
+class ColyseusRoomObservable<TState, TMessage> {
+    private var room:Room<TState>;
+    private var subject:Subject<ColyseusRoomEvent<TState, TMessage>>;
+
+    public function new(room:Room<TState>) {
+        this.room = room;
+        this.subject = new Subject();
+
+        setupRoomEventHandlers();
+    }
+
+    private function setupRoomEventHandlers():Void {
+        room.onStateChange = (newState:TState) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.StateChange,
+                state: newState,
+                message: null,
+                error: null
+            });
+        };
+
+        room.onMessage = (msg:Dynamic) -> {
+            var typedMsg:TMessage;
+            try {
+                typedMsg = cast msg;
+                subject.onNext({
+                    eventType: ColyseusRoomEventType.Message,
+                    state: null,
+                    message: typedMsg,
+                    error: null
+                });
+            } catch(e:Dynamic) {
+                subject.onError("Received message of wrong type: " + Std.string(e));
+            }
+        };
+
+        room.onLeave = () -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Leave,
+                state: null,
+                message: null,
+                error: null
+            });
+            subject.onCompleted();
+        };
+
+        room.onError = (err:String) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Error,
+                state: null,
+                message: null,
+                error: err
+            });
+            subject.onError(err);
+        };
+    }
+
+    /**
+     * Returns an Observable to subscribe to room events.
+     */
+    public function asObservable():Observable<ColyseusRoomEvent<TState, TMessage>> {
+        return subject;
+    }
+
+    /**
+     * Send a message to the room.
+     */
+    public function sendMessage(message:Dynamic):Void {
+        if (room != null) {
+            room.send(message);
+        } else {
+            throw "No room joined yet.";
+        }
+    }
+
+    /**
+     * Leaves the room, closes observable.
+     */
+    public function leave():Promise<Void> {
+        if (room != null) {
+            return room.leave();
+        }
+        return Promise.resolve(null);
+    }
+}
+Step 5: Client wrapper that joins room and returns observable
+
+import tink.core.Promise;
+
+class ColyseusClientObservable<TState, TMessage> {
+    public var serverUrl:String;
+    public var client:Client;
+
+    public function new(serverUrl:String) {
+        this.serverUrl = serverUrl;
+        this.client = new Client(serverUrl);
+    }
+
+    /**
+     * Joins a room and returns a Promise with ColyseusRoomObservable.
+     */
+    public function joinRoom(roomName:String, options:Dynamic = null):Promise<ColyseusRoomObservable<TState, TMessage>> {
+        return client.join<TState>(roomName, options).map(room -> {
+            return new ColyseusRoomObservable<TState, TMessage>(room);
+        });
+    }
+}
+Step 6: Example usage with RxHaxe observables
+
+class Main {
+    static public function main() {
+        var clientObs = new ColyseusClientObservable<MyState, MyMessage>("wss://your-colyseus-server");
+
+        clientObs.joinRoom("my_room").then(roomObs -> {
+            var subscription = roomObs.asObservable().subscribe({
+                onNext: function(evt) {
+                    switch(evt.eventType) {
+                        case StateChange:
+                            trace("State updated: " + Std.string(evt.state));
+                            break;
+                        case Message:
+                            trace("Message received: " + Std.string(evt.message));
+                            break;
+                        case Leave:
+                            trace("Left the room");
+                            break;
+                        case Error:
+                            trace("Error: " + evt.error);
+                            break;
+                    }
+                },
+                onError: function(e) trace("Observable error: " + Std.string(e)),
+                onCompleted: function() trace("Observable completed")
+            });
+
+            // Send a message example
+            roomObs.sendMessage({ _type: "chat", content: "Hello from RxHaxe!" });
+
+            // Later unsubscribe if desired:
+            // subscription.dispose();
+        });
+    }
+}
+Summary
+Uses rxhaxe.Subject as the event emitter for Colyseus room events.
+ColyseusRoomObservable.asObservable() returns an Observable to which consumers subscribe.
+Manages events, messages, errors, and completion.
+ColyseusClientObservable.joinRoom() returns a Promise of ColyseusRoomObservable.
+Integrates naturally with RxHaxe operators if you want to map/filter etc.
+Optional improvements you can do with RxHaxe:
+Use map(), filter() on the observable stream to extract just state updates or messages, e.g.:
+
+var stateObservable = roomObs.asObservable()
+    .filter(e -> e.eventType == ColyseusRoomEventType.StateChange)
+    .map(e -> e.state);
+
+var subscription = stateObservable.subscribe({
+    onNext: state -> trace("Filtered state update: " + Std.string(state)),
+    onError: e -> trace("Error: " + e),
+    onCompleted: () -> trace("Completed")
+});
+Combine multiple Observables, etc.
+If you'd like, I can help you write examples with operators like map, filter, merge, or show reconnection strategy with RxHaxe, just ask!
+
+
+// QUERY 3
+but i need integration with existing Haxe colyseus library. github location - https://github.com/colyseus/colyseus-haxe?ysclid=m9tqvkd4x3541830072
+
+Thanks for the clarification! You want to integrate RxHaxe observables with the official Colyseus Haxe client from
+https://github.com/colyseus/colyseus-haxe.
+
+Goal:
+Wrap the Colyseus Haxe Client's Room lifecycle and events into RxHaxe Observables.
+
+Context about the Colyseus Haxe client
+The colyseus-haxe client follows this general pattern:
+
+
+class Room<T> {
+    public var onJoin:Void->Void;
+    public var onLeave:Void->Void<(Int, String)>;
+    public var onError:Void->Void<(String)>;
+    public var onStateChange:Void->Void<(T)>;
+    public var onMessage:Void->Void<(Dynamic)>;
+    public var send:Dynamic->Void;
+    public var leave():Promise<Void>;
+}
+And Client:
+
+
+class Client {
+    public function new(endpoint:String);
+    public function join<T>(roomName:String, options:Dynamic = null):Promise<Room<T>>;
+}
+Implementing RxHaxe integration for colyseus-haxe client Room
+Step 1: Dependencies
+Have colyseus-haxe installed (via haxelib or local).
+Have rxhaxe installed via haxelib install rxhaxe.
+Step 2: Imports
+
+import colyseus.Client;
+import colyseus.Room;
+import tink.core.Promise;
+
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
+import rx.subjects.Subject;
+Step 3: Define enums and event type structures
+
+enum ColyseusRoomEventType {
+    Join;
+    Leave;
+    Error;
+    StateChange;
+    Message;
+}
+
+typedef ColyseusRoomEvent<TState, TMessage> = {
+    eventType: ColyseusRoomEventType;
+    state: Null<TState>;
+    message: Null<TMessage>;
+    leaveCode: Null<Int>;
+    leaveReason: Null<String>;
+    error: Null<String>;
+}
+Step 4: Reactive wrapper class for Room<T>
+
+class ColyseusRoomObservable<TState, TMessage> {
+    private var room:Room<TState>;
+    private var subject:Subject<ColyseusRoomEvent<TState, TMessage>>;
+
+    public function new(room:Room<TState>) {
+        this.room = room;
+        this.subject = new Subject();
+
+        setupEventHandlers();
+    }
+
+    private function setupEventHandlers():Void {
+        room.onJoin = () -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Join,
+                state: null,
+                message: null,
+                leaveCode: null,
+                leaveReason: null,
+                error: null
+            });
+        };
+
+        room.onLeave = (code:Int, reason:String) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Leave,
+                state: null,
+                message: null,
+                leaveCode: code,
+                leaveReason: reason,
+                error: null
+            });
+            subject.onCompleted();
+        };
+
+        room.onError = (message:String) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Error,
+                state: null,
+                message: null,
+                leaveCode: null,
+                leaveReason: null,
+                error: message
+            });
+            subject.onError(message);
+        };
+
+        room.onStateChange = (state:TState) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.StateChange,
+                state: state,
+                message: null,
+                leaveCode: null,
+                leaveReason: null,
+                error: null
+            });
+        };
+
+        room.onMessage = (msg:Dynamic) -> {
+            var typedMsg:TMessage;
+            try {
+                typedMsg = cast msg;
+                subject.onNext({
+                    eventType: ColyseusRoomEventType.Message,
+                    state: null,
+                    message: typedMsg,
+                    leaveCode: null,
+                    leaveReason: null,
+                    error: null
+                });
+            } catch(e:Dynamic) {
+                subject.onError("Message cast error: " + Std.string(e));
+            }
+        };
+    }
+
+    public function asObservable():Observable<ColyseusRoomEvent<TState, TMessage>> {
+        return subject;
+    }
+
+    public function send(message:Dynamic):Void {
+        room.send(message);
+    }
+
+    public function leave():Promise<Void> {
+        return room.leave();
+    }
+}
+Step 5: Client wrapper that returns a Promise with the observable wrapper
+
+class ColyseusClientObservable<TState, TMessage> {
+    public var client:Client;
+
+    public function new(endpoint:String) {
+        client = new Client(endpoint);
+    }
+
+    public function joinRoom(roomName:String, options:Dynamic = null):Promise<ColyseusRoomObservable<TState, TMessage>> {
+        return client.join<TState>(roomName, options).map(room -> {
+            return new ColyseusRoomObservable<TState, TMessage>(room);
+        });
+    }
+}
+Step 6: Example usage
+
+class Main {
+    static public function main() {
+        var clientObs = new ColyseusClientObservable<MyState, MyMessage>("wss://your-colyseus-server");
+
+        clientObs.joinRoom("my_room").then(roomObservable -> {
+            var subscription = roomObservable.asObservable().subscribe({
+                onNext: function(evt) {
+                    switch(evt.eventType) {
+                        case Join:
+                            trace("Room joined!");
+                            break;
+                        case Leave:
+                            trace("Left the room with code " + evt.leaveCode + ", reason: " + evt.leaveReason);
+                            break;
+                        case Error:
+                            trace("Error occurred: " + evt.error);
+                            break;
+                        case StateChange:
+                            trace("State updated: " + Std.string(evt.state));
+                            break;
+                        case Message:
+                            trace("Message received: " + Std.string(evt.message));
+                            break;
+                    }
+                },
+                onError: function(err) {
+                    trace("Observable error: " + Std.string(err));
+                },
+                onCompleted: function() {
+                    trace("Room observable completed");
+                }
+            });
+
+            // Sending a message example
+            roomObservable.send({ _type: "chat", content: "Hello from Rx + Colyseus Haxe!" });
+
+            // You can later leave and dispose subscription:
+            // roomObservable.leave().then(() -> subscription.dispose());
+        });
+    }
+}
+Summary & Notes
+This provides a fully reactive interface on top of the official colyseus-haxe client.
+You get the power of RxHaxe operators by calling .asObservable() on the wrapper.
+Properly forwards all relevant room lifecycle events.
+Allows standard reactive composition (map, filter, merge, etc.).
+Manages subscriptions cleanly via Subscription.dispose().
+If you'd like, I can also help with:
+
+More complex Rx composition examples.
+Automating room reconnect / error recovery with Rx.
+Serialization helpers for messages & state.
+Integration with your Haxe target (JS, C#, etc.) specifics.
+Just ask!
+
+//QUERY 4
+yes, show me Automating room reconnect / error recovery with Rx.
+
+Certainly! I'll guide you on how to automate room reconnection and error recovery in the Haxe Colyseus client using RxHaxe observables.
+
+Overview
+Goal is to:
+
+Automatically reconnect to the Colyseus room if the connection drops or an error occurs.
+Use Rx operators like retryWhen, delay, or manual resubscribe loops.
+Allow configurable retry attempts and delays.
+Expose a clean observable that handles reconnection cycles transparently.
+Prerequisites
+You have your ColyseusRoomObservable and ColyseusClientObservable ready from previous code.
+Using RxHaxe (https://github.com/GlassySundew/RxHaxe).
+Your roomObservable.asObservable() emits ColyseusRoomEvent including errors and leaves.
+Sketching the approach
+Have a function that starts the join sequence and produces an Observable<ColyseusRoomEvent<...>>.
+On error/leave events, try reconnecting after a delay.
+Limit the number of retries or make it infinite.
+If reconnection succeeds, emit from the new underlying room observable.
+The "outer" observable abstracts away this reconnect logic.
+Implementation
+Step 1: Helper for joining room as observable with reconnection logic
+
+import rx.Observable;
+import tink.core.Promise;
+
+class ColyseusConnector<TState, TMessage> {
+    var clientObs:ColyseusClientObservable<TState, TMessage>;
+    var roomName:String;
+    var options:Dynamic;
+
+    public function new(clientObs:ColyseusClientObservable<TState, TMessage>, roomName:String, ?options:Dynamic) {
+        this.clientObs = clientObs;
+        this.roomName = roomName;
+        this.options = options;
+    }
+
+    /**
+     * Returns an Observable that automatically reconnects on errors / leaves.
+     * @param maxRetries Maximum retries (-1 for infinite)
+     * @param retryDelayMs Delay between retry attempts in ms
+     */
+    public function connectWithAutoReconnect(maxRetries:Int = -1, retryDelayMs:Int = 3000):Observable<ColyseusRoomEvent<TState, TMessage>> {
+        return Observable.create(observer -> {
+            var retriesLeft = maxRetries;
+            var currentSubscription:Null<Subscription> = null;
+            var disposed = false;
+
+            // Join and subscribe to room observable helper
+            function joinAndSubscribe():Void {
+                if (disposed) return;
+
+                clientObs.joinRoom(roomName, options).then(roomObs -> {
+                    if (disposed) {
+                        // If disposed while connecting leave room
+                        roomObs.leave();
+                        return;
+                    }
+
+                    currentSubscription = roomObs.asObservable().subscribe({
+                        onNext: (evt) -> {
+                            observer.onNext(evt);
+
+                            // If Left event happens unexpectedly, trigger reconnect:
+                            if (evt.eventType == ColyseusRoomEventType.Leave) {
+                                currentSubscription?.dispose();
+                                tryReconnect();
+                            }
+                        },
+                        onError: (e) -> {
+                            observer.onError(e);
+                            currentSubscription?.dispose();
+                            tryReconnect();
+                        },
+                        onCompleted: () -> {
+                            observer.onCompleted();
+                        }
+                    });
+                }).catch(err -> {
+                    observer.onError(err);
+                    tryReconnect();
+                });
+            }
+
+            // Manage retries / reconnection attempts
+            function tryReconnect():Void {
+                if (disposed) return;
+                if (retriesLeft == 0) {
+                    observer.onCompleted();
+                    return;
+                }
+
+                if (retriesLeft > 0) retriesLeft--;
+
+                // Wait retryDelayMs then reconnect
+                Sys.sleep(retryDelayMs / 1000.0); // block delay to simplify, better use timer/async in real apps
+
+                if (!disposed) {
+                    joinAndSubscribe();
+                }
+            }
+
+            joinAndSubscribe(); // start first connection
+
+            return {
+                unsubscribe: () -> {
+                    disposed = true;
+                    currentSubscription?.dispose();
+                }
+            };
+        });
+    }
+}
+Notes on the above:
+We manually implement reconnection logic by retrying join attempts after delay on errors or leave.
+maxRetries = -1 means infinite retries.
+Uses synchronous blocking delay via Sys.sleep for demo simplicity — in a real app, use timers or async delays.
+Returns an Observable that seamlessly emits events across connection lifecycles.
+Step 2: Usage example
+
+class Main {
+    static public function main() {
+        var clientObs = new ColyseusClientObservable<MyState, MyMessage>("wss://your-colyseus-server");
+        var connector = new ColyseusConnector<MyState, MyMessage>(clientObs, "my_room");
+
+        var subscription = connector.connectWithAutoReconnect(-1, 5000).subscribe({
+            onNext: function(evt) {
+                switch(evt.eventType) {
+                    case ColyseusRoomEventType.Join:
+                        trace("Room joined");
+                        break;
+                    case ColyseusRoomEventType.Leave:
+                        trace("Room left unexpectedly - will attempt reconnect");
+                        break;
+                    case ColyseusRoomEventType.StateChange:
+                        trace("State updated: " + Std.string(evt.state));
+                        break;
+                    case ColyseusRoomEventType.Message:
+                        trace("Message: " + Std.string(evt.message));
+                        break;
+                    case ColyseusRoomEventType.Error:
+                        trace("Error: " + evt.error);
+                        break;
+                }
+            },
+            onError: function(e) {
+                trace("Observable fatal error: " + Std.string(e));
+            },
+            onCompleted: function() {
+                trace("Observable completed (no more reconnect attempts)");
+            }
+        });
+
+        // Later you can unsubscribe to stop reconnection attempts
+        // subscription.dispose();
+    }
+}
+Alternative Rx-native approach: Using retryWhen
+Since rxhaxe supports retryWhen, you can do a more idiomatic Rx approach — but this requires wrapping promise-based joinRoom into an Observable that can retry on failure.
+
+Example sketch:
+
+
+function joinRoomObservable(clientObs:ColyseusClientObservable<TState, TMessage>):Observable<ColyseusRoomObservable<TState, TMessage>> {
+    return Observable.create(observer -> {
+        clientObs.joinRoom("my_room").then(roomObs -> {
+            observer.onNext(roomObs);
+            observer.onCompleted();
+        }).catch(error -> observer.onError(error));
+
+        return {
+            unsubscribe: () -> {}
+        };
+    });
+}
+
+// Then you chain with flatMap + retryWhen:
+var reconnectingObs = joinRoomObservable(clientObs)
+    .flatMap(roomObs -> roomObs.asObservable())
+    .retryWhen(errorObs -> errorObs.delay(3000))
+    .repeat(); // to reconnect again after completion
+This approach is more elegant but needs careful management of completion and leave events too.
+
+Summary
+You can do manual retry + reconnect by wrapping join+subscription as an Observable (shown in Step 1).
+Or use retryWhen and Rx operators for async retry logic.
+The manual approach gives you full control, easier to attach custom logic (backoff, limits).
+Remember to properly dispose subscriptions to stop reconnect attempts.
+If you want me to help convert the Sys.sleep blocking delay to a proper async timer-based delay or produce a full Rx operator-based reconnection example in Haxe + Colyseus client, just ask!
+
+// QUERY 5
+produce a full Rx operator-based reconnection example in Haxe + Colyseus client, just ask!
+
+Certainly! I'll provide a full Rx operator–based reconnection example that uses RxHaxe operators like retryWhen, flatMap, and delay with the official colyseus-haxe client.
+
+This approach avoids blocking calls (Sys.sleep) and leverages Rx’s declarative power to reactively resubscribe on error/disconnect events with delays.
+
+Assumptions recap
+You have colyseus-haxe client.
+You use RxHaxe (https://github.com/GlassySundew/RxHaxe).
+The Colyseus room events are wrapped as Observable<ColyseusRoomEvent<TState, TMessage>>.
+Step 0: Dependencies & imports
+
+import colyseus.Client;
+import colyseus.Room;
+import tink.core.Promise;
+
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
+import rx.subjects.Subject;
+import rx.operators.Delay;
+import rx.operators.RetryWhen;
+import rx.operators.FlatMap;
+Step 1: Define enums and ColyseusRoomEvent (ironing out previous version)
+
+enum ColyseusRoomEventType {
+    Join;
+    Leave;
+    Error;
+    StateChange;
+    Message;
+}
+
+typedef ColyseusRoomEvent<TState, TMessage> = {
+    eventType: ColyseusRoomEventType;
+    state: Null<TState>;
+    message: Null<TMessage>;
+    leaveCode: Null<Int>;
+    leaveReason: Null<String>;
+    error: Null<String>;
+}
+Step 2: Colyseus Room Wrapper Producing Observable
+
+class ColyseusRoomObservable<TState, TMessage> {
+    private var room:Room<TState>;
+    private var subject:Subject<ColyseusRoomEvent<TState, TMessage>>;
+
+    public function new(room:Room<TState>) {
+        this.room = room;
+        this.subject = new Subject();
+
+        setupEventHandlers();
+    }
+
+    private function setupEventHandlers():Void {
+        room.onJoin = () -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Join,
+                state: null,
+                message: null,
+                leaveCode: null,
+                leaveReason: null,
+                error: null
+            });
+        };
+
+        room.onLeave = (code:Int, reason:String) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Leave,
+                state: null,
+                message: null,
+                leaveCode: code,
+                leaveReason: reason,
+                error: null
+            });
+            subject.onCompleted();
+        };
+
+        room.onError = (message:String) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.Error,
+                state: null,
+                message: null,
+                leaveCode: null,
+                leaveReason: null,
+                error: message
+            });
+            subject.onError(message);
+        };
+
+        room.onStateChange = (state:TState) -> {
+            subject.onNext({
+                eventType: ColyseusRoomEventType.StateChange,
+                state: state,
+                message: null,
+                leaveCode: null,
+                leaveReason: null,
+                error: null
+            });
+        };
+
+        room.onMessage = (msg:Dynamic) -> {
+            var typedMsg:TMessage;
+            try {
+                typedMsg = cast msg;
+                subject.onNext({
+                    eventType: ColyseusRoomEventType.Message,
+                    state: null,
+                    message: typedMsg,
+                    leaveCode: null,
+                    leaveReason: null,
+                    error: null
+                });
+            } catch (e:Dynamic) {
+                subject.onError("Message cast error: " + Std.string(e));
+            }
+        };
+    }
+
+    public function asObservable():Observable<ColyseusRoomEvent<TState, TMessage>> {
+        return subject;
+    }
+
+    public function send(message:Dynamic):Void {
+        room.send(message);
+    }
+
+    public function leave():Promise<Void> {
+        return room.leave();
+    }
+}
+Step 3: Client wrapper that returns Observable of room observable join
+
+class ColyseusClientObservable<TState, TMessage> {
+    public var client:Client;
+
+    public function new(endpoint:String) {
+        client = new Client(endpoint);
+    }
+
+    /**
+     * Returns an Observable which emits the joined ColyseusRoomObservable<TState,TMessage>.
+     * Emits the room wrapper on successful join, or error on failure.
+     */
+    public function joinRoomObservable(roomName:String, options:Dynamic = null):Observable<ColyseusRoomObservable<TState, TMessage>> {
+        return Observable.create(observer -> {
+            client.join<TState>(roomName, options).then(room -> {
+                var roomObs = new ColyseusRoomObservable<TState, TMessage>(room);
+                observer.onNext(roomObs);
+                observer.onCompleted();
+            }).catch(e -> observer.onError(e));
+
+            return {
+                unsubscribe: () -> {}
+            };
+        });
+    }
+}
+Step 4: Full reconnection logic using Rx operators
+
+class ReconnectingColyseusClient<TState, TMessage> {
+    var clientObs:ColyseusClientObservable<TState, TMessage>;
+    var roomName:String;
+    var options:Dynamic;
+    var retryDelayMs:Int;
+    var maxRetries:Int;
+
+    public function new(
+        clientObs:ColyseusClientObservable<TState, TMessage>,
+        roomName:String,
+        ?options:Dynamic,
+        ?retryDelayMs:Int = 3000,
+        ?maxRetries:Int = -1  // -1 means infinite retries
+    ) {
+        this.clientObs = clientObs;
+        this.roomName = roomName;
+        this.options = options;
+        this.retryDelayMs = retryDelayMs;
+        this.maxRetries = maxRetries;
+    }
+
+    /**
+     * Returns an Observable that automatically:
+     *  - Joins a room
+     *  - Emits all room events
+     *  - Resubscribes on error or unexpected leave after delay
+     *  - Applies a retry limit or infinite retries
+     */
+    public function connectWithAutoReconnect():Observable<ColyseusRoomEvent<TState, TMessage>> {
+
+        var joinRoomObs = clientObs.joinRoomObservable(roomName, options);
+
+        // Flatten room observable events and use operators for retry and delay
+        return joinRoomObs.flatMap(roomObs -> {
+            // Observe all room events
+            return roomObs.asObservable();
+        }).retryWhen(errors -> {
+            var retryCount = 0;
+
+            return errors.flatMap(error -> {
+                // Optional: limit retries
+                if (maxRetries >= 0 && retryCount++ >= maxRetries) {
+                    return Observable.error(error);
+                }
+
+                // Retry after delay
+                trace('Retrying connection after error: $error in $retryDelayMs ms');
+                return Observable.timer(retryDelayMs);
+            });
+        }).repeat(); // After completion (like on Leave), reconnect again.
+    }
+}
+Step 5: Usage
+
+class Main {
+    static public function main() {
+        var clientObs = new ColyseusClientObservable<MyState, MyMessage>("wss://your-colyseus-server");
+        var reconnectingClient = new ReconnectingColyseusClient<MyState, MyMessage>(clientObs, "my_room");
+
+        var subscription = reconnectingClient.connectWithAutoReconnect().subscribe({
+            onNext: evt -> {
+                switch(evt.eventType) {
+                    case ColyseusRoomEventType.Join:
+                        trace("Joined the room.");
+                        break;
+                    case ColyseusRoomEventType.Leave:
+                        trace("Left the room (will reconnect).");
+                        break;
+                    case ColyseusRoomEventType.StateChange:
+                        trace("State updated: " + Std.string(evt.state));
+                        break;
+                    case ColyseusRoomEventType.Message:
+                        trace("Received message: " + Std.string(evt.message));
+                        break;
+                    case ColyseusRoomEventType.Error:
+                        trace("Room error: " + evt.error);
+                        break;
+                }
+            },
+            onError: err -> trace("Fatal error (no more retries): " + Std.string(err)),
+            onCompleted: () -> trace("Completed")
+        });
+
+        // Later, to stop reconnecting:
+        // subscription.dispose();
+    }
+}
+How it works
+joinRoomObservable creates an Observable of the room connection attempt.
+flatMap unwraps the RoomObservable event stream.
+retryWhen intercepts errors and delays before retrying.
+repeat() handles completion (such as leave event completing the observable) by reconnecting again.
+watch for Leave event inside the roomObservable triggers completion, causing upstream repeat() to resubscribe.
+maxRetries controls max reconnect attempts, or infinite if -1.
+Summary
+Fully reactive reconnection with RxHaxe operators.
+No blocking calls, fully async.
+Transparent to consumers: they just subscribe once.
+Can extend with backoff strategies, logging, UI status updates.
+Clean and idiomatic Rx usage.
+If you want me to provide an example with exponential backoff for reconnect delay or help integrating this pattern into your existing Haxe app — just ask!

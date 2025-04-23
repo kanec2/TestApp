@@ -19,8 +19,8 @@ class Mock {
                     "profileImageLocalUrl": null
                 },
                 {
-                    "id": "C1ACDCCE-5662-44AF-B279-9DC5186B772D",
-                    "nickName": "Nagib17",
+                    "id": "ZXCVDCCE-2134-44AF-B279-9DC5186B772D",
+                    "nickName": "Rony",
                     "profileImageUrl": null,
                     "profileImageLocalUrl": null
                 }

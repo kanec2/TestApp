@@ -1,5 +1,10 @@
 package services;
 
+import libs.rx.Scheduler;
+import libs.rx.observables.MakeScheduled.SubscribeOnThis;
+import libs.rx.Observer;
+import libs.rx.observables.ObserveOnThis;
+import api.models.JsonModels.FriendsData;
 import http.HttpClient;
 import http.HttpError;
 import hx.injection.config.Configuration;
@@ -16,10 +21,54 @@ class FriendService extends IFriendService
     public function new(configuration : Config){
         this._config = configuration;
     }
+    function mergeArrays(
+        array1:Array<FriendsData>,
+        array2:Array<FriendsData>
+    ):Array<FriendsData> {
+        var mapIdToProfile = new Map<String, FriendsData>();
+    
+        // Заполняем карту из первого массива
+        for (p in array1) {
+            mapIdToProfile.set(p.id, p);
+        }
+    
+        // Проходим по второму массиву
+        for (p in array2) {
+            var existing = mapIdToProfile.get(p.id);
+            if (existing != null) {
+                // Обновляем profileImageLocalUrl в существующем элементе
+                existing.profileImageLocalUrl = p.profileImageLocalUrl;
+            } else {
+                // Если элемента нет, добавляем в карту и массив
+                mapIdToProfile.set(p.id, p);
+                array1.push(p);
+            }
+        }
+    
+        // Возвращаем обновлённый первый массив или можно вернуть значения карты
+        return array1;
+    }
+
     public function getFriends():Observable<Array<api.models.JsonModels.FriendsData>>
     {
-        return getFriendsFromApi().combineLatest([getFriendsFromStorage()], (arr: Array<api.models.JsonModels.FriendsData>) ->{
-            return arr[0];
+        var apiObs = new ObserveOnThis(getFriendsFromApi(), Scheduler.newThread);
+        var storageObs = new ObserveOnThis(getFriendsFromStorage(), Scheduler.newThread);
+
+        
+        var observ = Observer.create(()->{},(e)->{trace("Error: "+e);},(v)->{trace(v);});
+
+        new SubscribeOnThis(Scheduler.newThread,apiObs).subscribe(observ);
+
+        return getFriendsFromApi().combineLatest([getFriendsFromStorage()], (arr: Array<Array<api.models.JsonModels.FriendsData>>) ->{
+            trace("Len: "+arr.length);
+
+            var arr1 = arr[0];
+            var arr2 = arr[1];
+            trace("arr1: "+arr1);
+            trace("arr2: "+arr2);
+            var resarr = mergeArrays(arr1,arr2);
+            trace(resarr);
+            return resarr;//arr1.concat(arr2);
         } );
     }
     public function getFriendsFromApi():Observable<Array<api.models.JsonModels.FriendsData>>
