@@ -1,4 +1,8 @@
 //import libs.rx.schedulers.NewThreadScheduler;
+import libs.rx.ObservableFactory;
+import libs.rx.observables.ObserveOn;
+import libs.rx.observables.SubscribeOn;
+import hx.concurrent.executor.Executor;
 import libs.rx.observables.MakeScheduled;
 import libs.rx.schedulers.NewThread;
 import libs.rx.Scheduler;
@@ -197,7 +201,20 @@ class Main extends hxd.App {
 		//final rep             = new Replay<Array<Int>>();
 	    final threadScheduler = new NewThread(); //NewThreadScheduler();
 		//final mainSheduler    = new SpecificThreadScheduler(Thread.current());
-        
+        var executor = Executor.create(10);
+
+        var source = Observable.create(function(observer) {
+            for(i in 0...5) {
+                observer.on_next(i);
+            }
+            observer.on_completed();
+            return Subscription.empty();
+        });
+
+        var observable = new SubscribeOn(source, executor);
+        var observable2 = new ObserveOn(observable, executor);
+        ObservableFactory.observer(observable2,v -> trace("Got value: " + v));
+
 
 		final threadID = Thread.current();
         threadID.setName("FIRST");

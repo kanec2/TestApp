@@ -1,5 +1,7 @@
 package libs.rx;
 
+import hx.concurrent.executor.Executor;
+import libs.rx.observables.ObserveOn;
 import libs.rx.observables.ObserveOnThis;
 import haxe.exceptions.NotImplementedException;
 import libs.rx.observables.BufferWhen;
@@ -267,5 +269,11 @@ class Observable<T> implements IObservable<T> {
 		return ObservableFactory.merge( map( f ) );
 	}
 	public function observeOn<T>(observable : IObservable<T>, scheduler : IScheduler) : Observable<T>
+		return new ObserveOnThis(observable, scheduler);
+
+	public function observeOn2<T>(observable : IObservable<T>, executor : Executor) : Observable<T>
+		return new ObserveOn(observable, executor);
+
+	public function subscribeOn<T>(observable : IObservable<T>, scheduler : IScheduler) : Observable<T>
 		return new ObserveOnThis(observable, scheduler);
 }

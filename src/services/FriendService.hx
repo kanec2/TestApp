@@ -51,13 +51,6 @@ class FriendService extends IFriendService
 
     public function getFriends():Observable<Array<api.models.JsonModels.FriendsData>>
     {
-        var apiObs = new ObserveOnThis(getFriendsFromApi(), Scheduler.newThread);
-        var storageObs = new ObserveOnThis(getFriendsFromStorage(), Scheduler.newThread);
-
-        
-        var observ = Observer.create(()->{},(e)->{trace("Error: "+e);},(v)->{trace(v);});
-
-        new SubscribeOnThis(Scheduler.newThread,apiObs).subscribe(observ);
 
         return getFriendsFromApi().combineLatest([getFriendsFromStorage()], (arr: Array<Array<api.models.JsonModels.FriendsData>>) ->{
             trace("Len: "+arr.length);
@@ -73,31 +66,30 @@ class FriendService extends IFriendService
     }
     public function getFriendsFromApi():Observable<Array<api.models.JsonModels.FriendsData>>
     {
-        
-        //var _config = configuration;//.getConfig();
-        //trace(_config);
         var apiFriendsCall = Observable.create(_observer -> {
             var client = new HttpClient();
-            client.followRedirects = false; // defaults to true
-            client.retryCount = 5; // defaults to 0
-            client.retryDelayMs = 0; // defaults to 1000
+            client.followRedirects = false; 
+            client.retryCount = 5;
+            client.retryDelayMs = 0;
             client.get(_config.usersGetUrl, [], []).then(response -> {
                 _observer.on_next(response.bodyAsJson);
                 _observer.on_completed();
             }, (error:HttpError) -> {
-                // error
                 _observer.on_error(error.bodyAsString);
             });
             return Subscription.empty();
-        }).map((rawJson)->{
-            var json:api.models.JsonModels.RootFriendsData = Mock.getMockJsonFriends();
-            //var json:api.models.JsonModels.RootFriendsData = Json.parse(rawJson)
+        })
+        .subscribeOn(backgroundExecutor) // run HTTP request subscription on background thread
+        .map((rawJson)->{
+            var json:api.models.JsonModels.RootFriendsData = Mock.getMockJsonFriends(); // replace with JSON parse of rawJson
             var arrFriend = [];
             for (rawFriend in json.friends) {
-                arrFriend.push(rawFriend);//new ui.models.FriendModel(rawFriend.nickName,rawFriend.profileImageUrl,rawFriend.id,rawFriend.profileImageLocalUrl));
+                arrFriend.push(rawFriend);
             }
             return arrFriend;
-        });
+        })
+        .observeOn(mainExecutor); // observe results on main thread executor (replace with your main/UI thread)
+    
         return apiFriendsCall;
     }
     public function getFriendsFromStorage():Observable<Array<api.models.JsonModels.FriendsData>>
