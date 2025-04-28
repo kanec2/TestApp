@@ -17,6 +17,7 @@ typedef AsyncState<T> = {
      * https://rx.codeplex.com/SourceControl/latest#Rx.NET/Source/System.Reactive.Linq/Reactive/Subjects/AsyncSubject.cs
      * https://github.com/Netflix/RxJava/blob/master/rxjava-core/src/main/java/rx/subjects/AsyncSubject.java
      */
+typedef AsyncSubject<T> = Async<T>;
 class Async<T> extends Observable<T> implements ISubject<T> {
     var state:AtomicData<AsyncState<T>>;
 

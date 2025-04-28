@@ -14,6 +14,7 @@ typedef ReplayState<T> = {
     var is_stopped:Bool;
     var observers:Array<IObserver<T>>;
 }
+typedef ReplaySubject<T> = Replay<T>;
 class Replay<T> extends Observable<T> implements ISubject<T> {
     /* Implementation based on:
      * https://rx.codeplex.com/SourceControl/latest#Rx.NET/Source/System.Reactive.Linq/Reactive/Subjects/ReplaySubject.cs

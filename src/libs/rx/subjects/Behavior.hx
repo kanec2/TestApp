@@ -12,6 +12,9 @@ typedef BehaviorState<T> = {
     var last_notification:Notification<T> ;
     var observers:Array<IObserver<T>>;
 }
+
+typedef BehaviorSubject<T> = Behavior<T>;
+
 class Behavior<T> extends Observable<T> implements ISubject<T> {
     static public function create<T>(default_value:T) {
 

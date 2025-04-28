@@ -19,7 +19,6 @@
 -lib colyseus-websocket
 -lib tweenxcore
 -lib haxe-injection
--lib uniontypes
 -lib sasync
 -lib utest
 -lib signals
@@ -37,6 +36,6 @@
 
 
 
---cmd "D:\Dev\hashlink-1.14.0-win\hl build/heaps/hl/Main.hl"
-#--cmd '/home/unidev/Загрузки/hashlink-1.14/hl build/heaps/hl/Main.hl'
+#--cmd "D:\Dev\hashlink-1.14.0-win\hl build/heaps/hl/Main.hl"
+--cmd '/home/unidev/Загрузки/hashlink-1.14/hl build/heaps/hl/Main.hl'
 

@@ -18,8 +18,10 @@ using libs.rx.Observable;
 class FriendService extends IFriendService
 {
     var _config : Config;
-    public function new(configuration : Config){
+    var _httpClient : HttpClientService;
+    public function new(configuration : Config, httpClient:HttpClientService){
         this._config = configuration;
+        this._httpClient = httpClient;
     }
     function mergeArrays(
         array1:Array<FriendsData>,
@@ -67,11 +69,7 @@ class FriendService extends IFriendService
     public function getFriendsFromApi():Observable<Array<api.models.JsonModels.FriendsData>>
     {
         var apiFriendsCall = Observable.create(_observer -> {
-            var client = new HttpClient();
-            client.followRedirects = false; 
-            client.retryCount = 5;
-            client.retryDelayMs = 0;
-            client.get(_config.usersGetUrl, [], []).then(response -> {
+            _httpClient.getClient().get(_config.usersGetUrl, [], []).then(response -> {
                 _observer.on_next(response.bodyAsJson);
                 _observer.on_completed();
             }, (error:HttpError) -> {
@@ -79,7 +77,7 @@ class FriendService extends IFriendService
             });
             return Subscription.empty();
         })
-        .subscribeOn(backgroundExecutor) // run HTTP request subscription on background thread
+        //.subscribeOn(backgroundExecutor) // run HTTP request subscription on background thread
         .map((rawJson)->{
             var json:api.models.JsonModels.RootFriendsData = Mock.getMockJsonFriends(); // replace with JSON parse of rawJson
             var arrFriend = [];
@@ -87,8 +85,8 @@ class FriendService extends IFriendService
                 arrFriend.push(rawFriend);
             }
             return arrFriend;
-        })
-        .observeOn(mainExecutor); // observe results on main thread executor (replace with your main/UI thread)
+        });
+        //.observeOn(mainExecutor); // observe results on main thread executor (replace with your main/UI thread)
     
         return apiFriendsCall;
     }
@@ -123,5 +121,21 @@ class FriendService extends IFriendService
             return arrFriend;
         });
         return storageApiCall;
+    }
+
+    function isSuccessStatusCode(statusCode:Int):Bool return statusCode >= 200 && statusCode <300;
+    
+    public function addFriend(username:String) : Observable<Bool>
+    { 
+        return Observable.create(_observer->{
+            _httpClient.getClient().post(_config.addFriendsUrl, {username: username}, [], []).then(response -> {
+                _observer.on_next(isSuccessStatusCode(response.httpStatus));
+                _observer.on_completed();
+            }, (error:HttpError) -> {
+                _observer.on_error(error.bodyAsString);
+            });
+
+            return Subscription.empty();
+        });
     }
 }

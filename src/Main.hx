@@ -210,6 +210,7 @@ class Main extends hxd.App {
             observer.on_completed();
             return Subscription.empty();
         });
+        var friendsObservable = friendService.getFriends();
 
         var observable = new SubscribeOn(source, executor);
         var observable2 = new ObserveOn(observable, executor);
@@ -625,8 +626,8 @@ class Main extends hxd.App {
         bitmap.height = 600;
         hud.mapHolder.addChild(bitmap);
         hud.setMiniMapProjection(bitmap);
-        //Screen.instance.addComponent(menuView);
-        Screen.instance.addComponent(hud);
+        Screen.instance.addComponent(menuView);
+        //Screen.instance.addComponent(hud);
         //asyncDispatcher.fire(ev);
         //var win = @:privateAccess hxd.Window.getInstance().window;
         //win.center(); // Relocate window to center of the screen.

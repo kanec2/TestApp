@@ -1,17 +1,11 @@
 package libs.rx;
 
-import hx.concurrent.lock.RLock;
-import hx.concurrent.atomic.AtomicValue;
 
+class AtomicData<T> {
+    public var data:T;
+    public var mutex:Mutex ;
 
-class AtomicData<T> extends AtomicValue<T>{
-
-    public var data(get,set):T;
-    public var mutex(get,set):RLock ;
-
-    public function new(?initial_value:Null<T>) {
-        super(initial_value);
-    }
+    public function new() {}
 
     public static function clone<T>(v:T):T {
 
@@ -39,7 +33,7 @@ class AtomicData<T> extends AtomicValue<T>{
 
         var t:AtomicData<T> = new AtomicData<T>();
         t.data = initial_value;
-        t.mutex = new RLock();
+        t.mutex = new Mutex();
         return t;
     }
 
@@ -99,22 +93,6 @@ class AtomicData<T> extends AtomicValue<T>{
     }
 
 
-
-	function get_mutex():RLock {
-		throw new haxe.exceptions.NotImplementedException();
-	}
-
-	function set_mutex(value:RLock):RLock {
-		throw new haxe.exceptions.NotImplementedException();
-	}
-
-	function get_data():T {
-		throw new haxe.exceptions.NotImplementedException();
-	}
-
-	function set_data(value:T):T {
-		throw new haxe.exceptions.NotImplementedException();
-	}
 }
 
  
