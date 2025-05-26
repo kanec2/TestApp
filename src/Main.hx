@@ -1,61 +1,89 @@
 //import libs.rx.schedulers.NewThreadScheduler;
+//RX imports 
+import libs.rx.Subscription;
+import libs.rx.Observer;
+import libs.rx.Utils;
 import libs.rx.ObservableFactory;
 import libs.rx.observables.ObserveOn;
 import libs.rx.observables.SubscribeOn;
-import hx.concurrent.executor.Executor;
 import libs.rx.observables.MakeScheduled;
-import libs.rx.schedulers.NewThread;
-import libs.rx.Scheduler;
-import libs.rx.schedulers.Base;
-import libs.rx.Subscription;
-import libs.rx.Observer;
-import libs.rx.observers.IObserver;
 import libs.rx.observables.Create;
-//import libs.rx.schedulers.ISchedulerBase;
+import libs.rx.Scheduler;
+import libs.rx.schedulers.NewThread;
+import libs.rx.schedulers.Base;
 import libs.rx.schedulers.IScheduler;
 import libs.rx.schedulers.DiscardableAction;
-import libs.rx.Utils;
-import haxe.Timer;
-import libs.rx.Subscription;
-//import libs.rx.schedulers.NewThreadScheduler;
+import libs.rx.observers.IObserver;
 import libs.rx.disposables.ISubscription;
 import libs.rx.subjects.Async;
 import libs.rx.subjects.Replay;
-import sys.thread.Thread;
-import http.HttpClient;
-import http.HttpError;
+//import libs.rx.schedulers.NewThreadScheduler;
+//import libs.rx.schedulers.ISchedulerBase;
+//hx.Files imports. https://github.com/vegardit/haxe-files
 import hx.files.File;
-
 import hx.files.File.FileWriteMode;
 import hx.files.Dir;
 import hx.files.Path;
-import haxe.ds.Either;
-
-import haxe.Http;
+//hx.Concurrent imports. https://github.com/vegardit/haxe-concurrent
+import hx.concurrent.executor.Executor;
+import hx.concurrent.collection.SynchronizedMap;
+import hx.concurrent.collection.SynchronizedArray;
+//hx.Injection imports. https://github.com/paulsgcross/haxe-injection
 import hx.injection.config.Configuration;
-import haxe.ui.util.Variant;
-
-import ecs.Entity;
-import haxe.Json;
+import hx.injection.config.ConfigurationBuilder;
 import hx.injection.ServiceCollection;
-
+import hx.injection.ServiceProvider;
+//haxe http imports. https://github.com/core-haxe/http
+import http.HttpClient;
+import http.HttpError;
+//haxe ui imports. https://github.com/haxeui/haxeui-core
+import haxe.ui.backend.BackendImpl;
+import haxe.ui.util.Variant;
+import haxe.ui.core.Screen;
+import haxe.ui.Toolkit;
+//haxe std imports
+import haxe.Timer;
+import haxe.Http;
+import haxe.Json;
+import haxe.ds.Either;
+import sys.thread.Thread;
+//heaps imports https://lib.haxe.org/p/heaps/
+import h3d.Engine;
 import h3d.col.Bounds;
+import h3d.col.Sphere;
 import h3d.mat.Texture;
+import h3d.scene.Scene;
+import h3d.scene.CameraController;
+import h3d.scene.Mesh;
+import h3d.scene.Object;
 import h3d.prim.Cube;
+import h3d.prim.Grid;
+import h3d.mat.Material;
+import h2d.Bitmap;
+import h2d.Tile;
+import hxd.Window;
+import hxd.Math;
+//Colyseus imports https://github.com/colyseus/colyseus-haxe?ysclid=mb4pagrsj0377928540
+import io.colyseus.Client;
+/*Application structure*/
+//Services
+import services.AuthenticationService;
+import services.FriendService;
+import services.HttpClientService;
+//UI
+//Views
 import ui.views.HUD;
 import ui.views.BuildingMenu;
-
-import haxe.ui.backend.BackendImpl;
-import ui.models.FriendModel;
-import hx.concurrent.collection.SynchronizedArray;
-import haxe.ui.core.Screen;
 import ui.views.MenuVIew;
-import haxe.ui.Toolkit;
-import io.colyseus.Client;
-import hx.concurrent.collection.SynchronizedMap;
-import hx.injection.config.ConfigurationBuilder;
-
+//Models
+import ui.models.FriendModel;
+import ecs.Entity;
 import enums.AppEvent;
+//MVVM
+import mvvm.AuthViewModel;
+
+import json2object.JsonParser;
+
 using libs.rx.Observable;
 using tweenxcore.Tools;
 using hx.injection.ServiceExtensions;
@@ -63,16 +91,17 @@ using Safety;
 
 //https://gigglingcorpse.com/2021/11/22/hello-world-heaps-on-android/
 class Main extends hxd.App {
-   
-
+    //MVVM
+    var authViewModel: AuthViewModel;
+    
     //var gameObjectManager : GameObjectManagerService;
 
     var gameObjects   : Array<GameObject> = [];
     var movingObjects : Array<MapObject>  = [];
     var objectMapping : Map<MapObject,MiniMapObject> = new Map<MapObject, MiniMapObject>();
     //var miniMapObjects : Array<{ m : h3d.scene.Mesh, cx : Float, cy : Float, pos : Float, ray : Float, speed : Float }> = [];
-    var bitmap : h2d.Bitmap;
-    var controller : h3d.scene.CameraController;
+    var bitmap : Bitmap;
+    var controller : CameraController;
 
     var objectModels : Array<{id:String, cx:Float, cy: Float, objectType:String, relation:String}> = [];
 
@@ -83,7 +112,7 @@ class Main extends hxd.App {
     //var asyncDispatcher:AsyncEventDispatcher<AppEventBase>;
     var userToken:String;
 
-    var serviceProvider: hx.injection.ServiceProvider;
+    var serviceProvider: ServiceProvider;
     
 //    var auth = new Auth("localhost", 2567);
     var client = new Client("localhost",2567);
@@ -116,7 +145,6 @@ class Main extends hxd.App {
     var cacheFolder:Dir;
     public function new() {
         super();
-        
     }
     static function printArray(_array:Array<Int>)
         trace(_array);
@@ -129,6 +157,8 @@ class Main extends hxd.App {
         var config:Config = new Config();
         config.appConfig = configApp;
         serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(services.HttpClientService);
+        serviceCollection.addSingleton(services.AuthenticationService);
         serviceCollection.addSingleton(services.FriendService);
         serviceCollection.addConfig(config);
         trace("IS IT PROBLEM HERE?");
@@ -168,15 +198,15 @@ class Main extends hxd.App {
     }
 
     function startup(){
-        trace("Im here");
-        trace("U GONNA DIE WHERE?");
         initServices();
         var provider = serviceCollection.createProvider();
-        trace("U GONNA DIE HERE?");
-        //var configService = provider.getService(services.ConfigurationHolderService);
-        trace("Whats wrong?");
-        var friendService = provider.getService(services.FriendService);
 
+        //var configService = provider.getService(services.ConfigurationHolderService);
+
+        var friendService = provider.getService(FriendService);
+        var authService = provider.getService(AuthenticationService);
+        authViewModel = new AuthViewModel(authService);
+        authViewModel.loginCommand.execute();
         //var provider = collection.createProvider();
         //var appEventService = provider.getService(AppEventService);
         //var heapsmain = provider.getService(HeapsMain);
@@ -375,9 +405,9 @@ class Main extends hxd.App {
 
         var tt:Object3DView = new Object3DView(null);
 
-        var instance = hxd.Window.getInstance();
+        var instance = Window.getInstance();
         renderTarget = new Texture(engine.width,engine.height, [ Target ]);
-        s3dTarget = new h3d.scene.Scene();
+        s3dTarget = new Scene();
         var zoom = 10;
         s3dTarget.camera.orthoBounds = Bounds.fromValues(
             -instance.width / zoom / 2,
@@ -398,7 +428,7 @@ class Main extends hxd.App {
         var tex = hxd.Res.images.minimap.toTexture();
 
         // create a material with this texture
-        var mat = h3d.mat.Material.create(tex);
+        var mat = Material.create(tex);
         mat.blendMode = Alpha;
         /*
         var miniMapObject = new h3d.scene.Mesh(planeprim,mat,s3dTarget);
@@ -419,35 +449,35 @@ class Main extends hxd.App {
         
 
         //s3dTarget.camera.
-        controller = new h3d.scene.CameraController(s3d);
+        controller = new CameraController(s3d);
         controller.loadFromCamera();
 
-		var prim = new h3d.prim.Grid(100,100,1,1);
+		var prim = new Grid(100,100,1,1);
 		prim.addNormals();
 		prim.addUVs();
 
-		var floor = new h3d.scene.Mesh(prim,mat, s3d);
+		var floor = new Mesh(prim,mat, s3d);
 		floor.material.castShadows = false;
 		floor.x = -50;
 		floor.y = -50;
 
-        var prim2 = new h3d.prim.Grid(200,200,1,1);
+        var prim2 = new Grid(200,200,1,1);
 		prim2.addNormals();
 		prim2.addUVs();
 
-        var floor2 = new h3d.scene.Mesh(prim,mat, s3dTarget);
+        var floor2 = new Mesh(prim,mat, s3dTarget);
 		floor2.material.castShadows = false;
 		floor2.x = -50;
 		floor2.y = -50;
         
         
-		var box = new h3d.prim.Cube(1,1,1,true);
+		var box = new Cube(1,1,1,true);
 		box.unindex();
 		box.addNormals();
         //tt.set2DRepresentation(box);
         
 		for( i in 0...50 ) {
-			var m = new h3d.scene.Mesh(box, s3d);
+			var m = new Mesh(box, s3d);
 			m.material.color.set(Math.random(), Math.random(), Math.random());
 			//m.material.color.normalize();
 			m.scale(1 + Math.random() * 10);
@@ -460,7 +490,7 @@ class Main extends hxd.App {
 			m.material.getPass("shadow").isStatic = true;
 
 			var absPos = m.getAbsPos();
-			m.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m.scaleZ, hxd.Math.max(m.scaleX, m.scaleY)));
+			m.cullingCollider = new Sphere(absPos.tx, absPos.ty, absPos.tz, Math.max(m.scaleZ, Math.max(m.scaleX, m.scaleY)));
            // movingObjects.push(new MapObject( m, Math.random() * Math.PI * 2, cx , cy , 8 + Math.random() * 50, (0.5 + Math.random()) * 0.2 ));
 		}
 
@@ -480,24 +510,24 @@ class Main extends hxd.App {
             var gom = new BuildingGameObjectModel(cast(cx,Int));
             
 
-			var m1 = new h3d.scene.Mesh(sp, s3d);
+			var m1 = new Mesh(sp, s3d);
 			m1.material.color.set(colorR, colorG, colorB);
 			//m.material.color.normalize();
 			m1.scale(scaleM);
 			m1.z = zM;
 			var absPos = m1.getAbsPos();
-			m1.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m1.scaleZ, hxd.Math.max(m1.scaleX, m1.scaleY)));
+			m1.cullingCollider = new Sphere(absPos.tx, absPos.ty, absPos.tz, Math.max(m1.scaleZ, Math.max(m1.scaleX, m1.scaleY)));
             var gameObj = new GameObject(gom,enums.Relation.ALLY,new Object3DView(m1));
             trace(gameObj.model.getData());
-            trace(cast(gameObj.representation3D,h3d.scene.Object));
+            trace(cast(gameObj.representation3D,Object));
             //var mapObject = new MapObject( m1, pos, cx , cy , ray, speed );
 
-            var m2 = new h3d.scene.Mesh(sp, s3dTarget);
+            var m2 = new Mesh(sp, s3dTarget);
 			m2.material.color.set(colorR, colorG, colorB);
 			//m.material.color.normalize();
 			m2.scale(scaleM);
 			m2.z = zM;
-			m2.cullingCollider = new h3d.col.Sphere(absPos.tx, absPos.ty, absPos.tz, hxd.Math.max(m2.scaleZ, hxd.Math.max(m2.scaleX, m2.scaleY)));
+			m2.cullingCollider = new Sphere(absPos.tx, absPos.ty, absPos.tz, Math.max(m2.scaleZ, Math.max(m2.scaleX, m2.scaleY)));
           
             var mapObject = new MapObject( m1, pos, cx , cy , ray, speed );
             var miniMapObject = new MiniMapObject(m2, pos, cx, cy, ray, speed);
@@ -611,13 +641,13 @@ class Main extends hxd.App {
 // */
 // 			this.room = room;
 // 		});
-        bitmap = new h2d.Bitmap(null, null);
+        bitmap = new Bitmap(null, null);
 		//bitmap.scale(0.3);
 		//bitmap.filter = h2d.filter.ColorMatrix.grayed();
         menuView = new MenuView();
         var hud = new HUD();
         //tt.set2DRepresentation(hud);
-        var oob = new h3d.scene.Object(s3d);
+        var oob = new Object(s3d);
         //oob.addChild(box);
         tt.representation3D = movingObjects[0].m;
         //tt.is2d();
@@ -683,7 +713,7 @@ class Main extends hxd.App {
 
     var elapsedTime = .0;
     var fixedTimeStep = 1/60;
-    override function render(e:h3d.Engine) {
+    override function render(e:Engine) {
         // Render the target first
         engine.pushTarget(renderTarget);
     
@@ -705,31 +735,31 @@ class Main extends hxd.App {
 			m.x = m.cx + Math.cos(m.pos) * m.ray;
 			m.y = m.cy + Math.sin(m.pos) * m.ray;
 
-			var cc = Std.downcast(m.cullingCollider, h3d.col.Sphere);
+			var cc = Std.downcast(m.cullingCollider, Sphere);
 			if( cc != null ) {
 				var absPos = m.getAbsPos();
 				cc.x = absPos.tx;
 				cc.y = absPos.ty;
 				cc.z = absPos.tz;
-				cc.r = hxd.Math.max(m.scaleZ, hxd.Math.max(m.scaleX, m.scaleY));
+				cc.r = Math.max(m.scaleZ, Math.max(m.scaleX, m.scaleY));
 			}
             var m2 = objectMapping.get(m);
 
             m2.pos = m.pos;
             m2.x = m.x;
             m2.y = m.y;
-            var cc2 = Std.downcast(m2.cullingCollider, h3d.col.Sphere);
+            var cc2 = Std.downcast(m2.cullingCollider, Sphere);
 			if( cc2 != null ) {
 				var absPos = m2.getAbsPos();
 				cc2.x = absPos.tx;
 				cc2.y = absPos.ty;
 				cc2.z = absPos.tz;
-				cc2.r = hxd.Math.max(m2.scaleZ, hxd.Math.max(m2.scaleX, m2.scaleY));
+				cc2.r = Math.max(m2.scaleZ, Math.max(m2.scaleX, m2.scaleY));
 			}
 		}
 		//var light = lights[curLight];
 		//var tex = light == null ? null : light.shadows.getShadowTex();
-		bitmap.tile = h2d.Tile.fromTexture(renderTarget);//null;//tex == null || tex.flags.has(Cube) ? null : 
+		bitmap.tile = Tile.fromTexture(renderTarget);//null;//tex == null || tex.flags.has(Cube) ? null : 
 		//inf.text = "Shadows Draw calls: "+ s3d.lightSystem.drawPasses;
 
 		for( o in s3d ) {

@@ -5,5 +5,6 @@
     "imageCachePath" : "images",
     "serverAddress" : "localhost",
     "serverPort": 2567,
-    "usersGetUrl": "http://jsonplaceholder.typicode.com/users"
+    "usersGetUrl": "http://jsonplaceholder.typicode.com/users",
+    "addFriendsUrl" : "http://jsonplaceholder.typicode.com/users"
 }

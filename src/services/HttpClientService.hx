@@ -1,18 +1,18 @@
 package services;
 
 import http.HttpClient;
-
-abstract class IHttpClientService {
-    abstract public function getClient():HttpClient;
+import hx.injection.Service;
+abstract class IHttpClientService implements Service{
+    abstract public function getClient(?options:{?followRedirects:Bool, ?retryCount:Int, ?retryDelayMs:Int} ):HttpClient;
 }
-class HttpCLientService extends IHttpClientService
+class HttpClientService extends IHttpClientService
 {
     var _config : Config;
     public function new(configuration : Config) {
         this._config = configuration;
     }
 
-    public function getClient(options?:{followRedirects?:Bool, retryCount?:Int, retryDelayMs?:Int}):HttpClient {
+    public function getClient(?options:{?followRedirects:Bool, ?retryCount:Int, ?retryDelayMs:Int} ):HttpClient {
         var client = new HttpClient();
         var followRedirects:Bool = false;
         var retryCount:Int = 5;

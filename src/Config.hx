@@ -1,5 +1,5 @@
 @:tink final class Config {
-    @:forward(friendCache,cachePath,imageMappingPath,imageCachePath,serverAddress,serverPort,usersGetUrl) public var  appConfig           : ApplicationConfig;
+    @:forward(friendCache,cachePath,imageMappingPath,imageCachePath,serverAddress,serverPort,usersGetUrl,addFriendsUrl) public var  appConfig           : ApplicationConfig;
     /*public var friendCache         : String;
     public var imageMappingPath    : String;
     public var imageCachePath      : String;

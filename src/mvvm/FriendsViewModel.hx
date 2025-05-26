@@ -4,7 +4,7 @@ class FriendsViewModel {
 	public var friends(get,never):Observable<Array<api.models.JsonModels.FriendsData>>;
 
 	public addFriendCommand:ICommand;
-	public function new(friendsService:IFriendsService)
+	public function new(friendsService:FriendsService)
 	{
 		_friendsSubject = new BehaviorSubject<Array<api.models.JsonModels.FriendsData>>(new Array<api.models.JsonModels.FriendsData>());
 		addFriendCommand = new RelayCommand<String>(AddFriend);

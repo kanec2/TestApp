@@ -1,12 +1,18 @@
+package services;
+class ParametrizedCommand<T> implements ICommand {
+    private var func:Array<T>->Void;
+    private var params:Array<T>;
 
-class RelayCommand<T> implements ICommand {
-    private var func:T->Void;
+    public function setParameters(params:Array<T>){
+        this.params = params;
+        return this;
+    }
 
-    public function new(func:T->Void) {
+    public function new(func:Array<T>->Void) {
         this.func = func;
     }
 
-    public function execute(v:T):Void {
-        func(v);
+    public function execute():Void {
+        func(this.params);
     }
 }

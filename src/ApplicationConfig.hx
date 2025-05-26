@@ -6,4 +6,5 @@ typedef ApplicationConfig = {
     public var serverAddress       : String;
     public var serverPort          : Int;
     public var usersGetUrl         : String;
+    public var addFriendsUrl       : String;
 }

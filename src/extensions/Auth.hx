@@ -6,7 +6,7 @@ import http.HttpError;
 using haxe.Exception;
 using haxe.ds.Either;
 using io.colyseus.events.EventHandler;
-using io.colyseus.error.MatchMakeError;
+//using io.colyseus.error.MatchMakeError;
 import tink.Url;
 import http.HttpClient;
 import queues.QueueFactory;
@@ -17,7 +17,7 @@ typedef AuthData<T> = {
     ?user: T,
 }
 
-typedef HttpCallback = (MatchMakeError,AuthData<Dynamic>)->Void;
+//typedef HttpCallback = (MatchMakeError,AuthData<Dynamic>)->Void;
 
 class EndpointSettings {
 	public var hostname:String;
@@ -104,14 +104,14 @@ class Auth {
 		};
     }
 
-    public function getUserData(callback: (MatchMakeError,AuthData<Dynamic>)->Void) {
+    /*public function getUserData(callback: (MatchMakeError,AuthData<Dynamic>)->Void) {
         if (this.token != null) {
             this.request("GET",PATH + "/userdata", null, callback);
             //this.http.get(PATH + "/userdata", null, callback);
         } else {
             callback(new MatchMakeError(-1, "missing auth.token"), null);
         }
-    }
+    }*/
 
     public function registerWithEmailAndPassword(email: String, password: String, opts_or_callback: Dynamic, ?callback: (MatchMakeError,AuthData<Dynamic>)->Void) {
         var options: Dynamic = null;
