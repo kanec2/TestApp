@@ -1,3 +1,5 @@
+https://nweb42.com/en/books/haxe/interfeys-i-ux-dlya-mobilnykh-platform/
+
 https://softwarepatternslexicon.com/patterns-haxe/15/6/
 
 and now implement colyseus client observable

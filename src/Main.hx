@@ -206,6 +206,7 @@ class Main extends hxd.App {
         var friendService = provider.getService(FriendService);
         var authService = provider.getService(AuthenticationService);
         authViewModel = new AuthViewModel(authService);
+        //authViewModel.
         authViewModel.loginCommand.execute();
         //var provider = collection.createProvider();
         //var appEventService = provider.getService(AppEventService);
@@ -249,7 +250,7 @@ class Main extends hxd.App {
 
 		final threadID = Thread.current();
         threadID.setName("FIRST");
-		trace('main thread is ${threadID}');
+		//trace('main thread is ${threadID}');
         var observ = Observer.create(()->{},(e)->{trace("Error: "+e);},(v)->{trace(v);});
         friendService.getFriends().subscribe(observ);
         var scehduled = new MakeScheduled();

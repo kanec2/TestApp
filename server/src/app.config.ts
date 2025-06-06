@@ -16,8 +16,8 @@ import { findUserByEmail, insertUser } from "./repository/UserRepository";
 import { uWebSocketsTransport } from "@colyseus/uwebsockets-transport";
 import express from "express";
 //const path = require('node:path');
-//const serveIndex = require('serve-index');
-import serveIndex from 'serve-index';
+const serveIndex = require('serve-index');
+//import serveIndex from 'serve-index';
 import path from 'path';
 import bcrypt from 'bcrypt';
 import crypto from 'node:crypto';
@@ -57,6 +57,8 @@ export default config({
         });
         
         app.post("/api/register",async (req:Request,res)=>{
+            console.log(req.body);
+            //req.
             const { email, password, name } = req.body;
             try {
                 console.log('we got: '+email, password, name);
@@ -77,11 +79,15 @@ export default config({
                 const user = await findUserByEmail(email);// User.findOne({ where: { email } });
 
                 if (!user) {
+                    console.log("user not found");
                     return res.status(401).json({ error: "Invalid email or password." });
                 }
 
                 const isPasswordValid = await bcrypt.compare(password, user.password);
+                console.log("password: "+password);
+                console.log("user password: "+user.password);
                 if (!isPasswordValid) {
+                    console.log("password is invalid");
                     return res.status(401).json({ error: "Invalid email or password." });
                 }
 
@@ -101,7 +107,7 @@ export default config({
         
         if (process.env.NODE_ENV !== "production") {
             //app.use("/", playground);
-            app.use('/', serveIndex(path.join(__dirname, ".."), { icons: true, hidden: true }))
+            //app.use('/', serveIndex(path.join(__dirname, ".."), { icons: true, hidden: true }))
             app.use('/', express.static(path.join(__dirname, "..")));
             
         }

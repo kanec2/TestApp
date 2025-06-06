@@ -55,14 +55,14 @@ class FriendService extends IFriendService
     {
 
         return getFriendsFromApi().combineLatest([getFriendsFromStorage()], (arr: Array<Array<api.models.JsonModels.FriendsData>>) ->{
-            trace("Len: "+arr.length);
+            //trace("Len: "+arr.length);
 
             var arr1 = arr[0];
             var arr2 = arr[1];
-            trace("arr1: "+arr1);
-            trace("arr2: "+arr2);
+            //trace("arr1: "+arr1);
+            //trace("arr2: "+arr2);
             var resarr = mergeArrays(arr1,arr2);
-            trace(resarr);
+            //trace(resarr);
             return resarr;//arr1.concat(arr2);
         } );
     }

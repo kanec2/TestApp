@@ -1,12 +1,14 @@
 package extensions;
 
+import services.HttpClientService;
 import http.HttpResponse;
 import thenshim.Promise;
 import http.HttpError;
 using haxe.Exception;
 using haxe.ds.Either;
-using io.colyseus.events.EventHandler;
-//using io.colyseus.error.MatchMakeError;
+using io.colyseus.events.EventHandler.EventHandlerDispatcher1;
+import io.colyseus.events.EventHandler;
+import io.colyseus.error.HttpException;
 import tink.Url;
 import http.HttpClient;
 import queues.QueueFactory;
@@ -17,7 +19,7 @@ typedef AuthData<T> = {
     ?user: T,
 }
 
-//typedef HttpCallback = (MatchMakeError,AuthData<Dynamic>)->Void;
+typedef HttpCallback = (HttpException,AuthData<Dynamic>)->Void;
 
 class EndpointSettings {
 	public var hostname:String;
@@ -37,7 +39,8 @@ class Auth {
     public var settings: EndpointSettings;
     private var authToken:String;
     private var http: haxe.Http;
-    private var client:HttpClient = new HttpClient();
+    private var client:HttpClient;// = new HttpClient();
+    //private var _httpClient:HttpClientService;
     private var _token: String;
     private var _initialized: Bool;
     var headers = [
@@ -48,7 +51,7 @@ class Auth {
     ];
     private var onChangeHandlers = new EventHandler<Dynamic->Void>();
 
-    public function new (endpointOrHostname: String, ?port: Int, ?useSSL: Bool) {
+    public function new (httpClient:HttpClientService,endpointOrHostname: String, ?port: Int, ?useSSL: Bool) {
         Storage.getItem("colyseus-auth-token").handle(function(token) {
             this.token = token;
         });
@@ -66,9 +69,11 @@ class Auth {
         } else {
             this.settings =  new EndpointSettings(endpointOrHostname, port, useSSL);
         }
-        client.followRedirects = false;
-        client.requestQueue = QueueFactory.instance.createQueue(QueueFactory.SIMPLE_QUEUE);
-        client.defaultRequestHeaders = headers;
+        //_httpClient = httpClient;
+        client = httpClient.getClient();
+        //client.followRedirects = false;
+        //client.requestQueue = QueueFactory.instance.createQueue(QueueFactory.SIMPLE_QUEUE);
+        //client.defaultRequestHeaders = headers;
     }
 
     public var token (get, set): String;
@@ -104,16 +109,16 @@ class Auth {
 		};
     }
 
-    /*public function getUserData(callback: (MatchMakeError,AuthData<Dynamic>)->Void) {
+    public function getUserData(callback: (HttpException,AuthData<Dynamic>)->Void) {
         if (this.token != null) {
             this.request("GET",PATH + "/userdata", null, callback);
             //this.http.get(PATH + "/userdata", null, callback);
         } else {
-            callback(new MatchMakeError(-1, "missing auth.token"), null);
+            callback(new HttpException(-1, "missing auth.token"), null);
         }
-    }*/
+    }
 
-    public function registerWithEmailAndPassword(email: String, password: String, opts_or_callback: Dynamic, ?callback: (MatchMakeError,AuthData<Dynamic>)->Void) {
+    public function registerWithEmailAndPassword(email: String, password: String, opts_or_callback: Dynamic, ?callback: (HttpException,AuthData<Dynamic>)->Void) {
         var options: Dynamic = null;
 
         if (callback == null) {
@@ -133,13 +138,16 @@ class Auth {
 
     }
 
-    public function signInWithEmailAndPassword(email: String, password: String, callback: (MatchMakeError,AuthData<Dynamic>)->Void) {
+    public function signInWithEmailAndPassword(email: String, password: String, callback: (HttpException,AuthData<Dynamic>)->Void) {
+        trace("ready to req sign in");
         this.request("POST", PATH + "/login", {email: email, password: password},function(err, data) {
             if (err != null) {
-                callback(err, null);
+                trace("something wrong"+err);
+                //callback(err, null);
             } else {
-                this.emitChange(data);
-                callback(null, data);
+                trace("all good"+data);
+                //this.emitChange(data);
+                //callback(null, data);
             }
         });
         /*
@@ -155,7 +163,7 @@ class Auth {
         });*/
     }
 
-    public function signInAnonymously(opts_or_callback: Dynamic, ?callback: (MatchMakeError,AuthData<Dynamic>)->Void) {
+    public function signInAnonymously(opts_or_callback: Dynamic, ?callback: (HttpException,AuthData<Dynamic>)->Void) {
         var options: Dynamic = null;
 
         if (callback == null) {
@@ -175,7 +183,7 @@ class Auth {
         });
     }
 
-    public function sendPasswordResetEmail(email: String, callback: (MatchMakeError,AuthData<Dynamic>)->Void) {
+    public function sendPasswordResetEmail(email: String, callback: (HttpException,AuthData<Dynamic>)->Void) {
 
         var rbody = haxe.Json.stringify({body: cast {email: email}});
         
@@ -201,12 +209,11 @@ class Auth {
         this.onChangeHandlers.dispatch(authData);
     }
 
-    
-    private function request(method: String, segments: String, body: Dynamic, callback: (MatchMakeError,Dynamic)->Void) {
+    private function request(method: String, segments: String, body: Dynamic, callback: (HttpException,Dynamic)->Void) {
 
         var reqEndpoint = buildHttpEndpoint(segments);
         var headers:Map<String,String> = new Map<String,String>();
-
+        trace("method : "+method);
         if (body != null) {
             headers.set("Access-Control-Allow-Origin", "*");
             headers.set("Content-Type", "application/json");
@@ -219,14 +226,19 @@ class Auth {
             case "GET" : client.get(reqEndpoint,null,headers);
             case _: throw "What was that?";
         }
+        trace(promise);
         promise.then(response -> {
+            trace("ok: "+haxe.Json.parse(response.bodyAsJson));
             var bd = haxe.Json.parse(response.bodyAsJson);
+            
             this.emitChange(bd);
             callback(null,response);//{token: "WoW-vErY-sEcReT-MuCh-sEcUrE", user: bd});
         }, (error:HttpError) -> {
+            trace("not ok");
             var code = error.httpStatus;
             var message = error.bodyAsJson.error;
-            callback(new MatchMakeError(code, message),null);
+            
+            callback(new HttpException(code, message),null);
         });
        
     }

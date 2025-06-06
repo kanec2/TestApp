@@ -39,7 +39,7 @@ class AuthViewModel {
             }
         );
 		loginCommand = new Command(()->{
-            _authService.signIn("username", "password").subscribe(observLogin);
+            _authService.signIn("test1@mail.com", "123").subscribe(observLogin);
             return true;
         });
 		registerCommand = new Command(()->{
